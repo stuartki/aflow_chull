@@ -65,6 +65,13 @@ export function pointClickHandler(auid) {
   };
 }
 
+export function pointHoverHandler(auid) {
+  return {
+    type: actionType.POINT_HOVER_HANDLER,
+    auid,
+  };
+}
+
 export function setLastSelectedHull(name) {
   return {
     type: actionType.SET_LAST_SELECTED_HULL,
