@@ -27,6 +27,7 @@ const propTypes = {
   sidebarIsVisible: PropTypes.bool.isRequired,
   showAllPoints: PropTypes.bool.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
+  pointHoverHandler: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
@@ -191,6 +192,7 @@ class LineChart extends React.Component {
           yScale={y}
           color={this.props.color}
           pointClickHandler={this.props.pointClickHandler}
+          pointHoverHandler={this.props.pointHoverHandler}
         />
       );
     }

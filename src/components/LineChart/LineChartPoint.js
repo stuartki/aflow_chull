@@ -7,16 +7,22 @@ const propTypes = {
   fill: PropTypes.string.isRequired,
   auid: PropTypes.string.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
+  pointHoverHandler: PropTypes.func.isRequired,
 };
 
 class Point extends React.Component {
   constructor(props) {
     super(props);
     this.onClick = this.onClick.bind(this);
+    this.onMouseOver = this.onMouseOver.bind(this);
   }
 
   onClick() {
     this.props.pointClickHandler(this.props.auid);
+  }
+
+  onMouseOver() {
+    this.props.pointHoverHandler(this.props.auid);
   }
 
   render() {
@@ -28,6 +34,7 @@ class Point extends React.Component {
         cy={this.props.cy}
         fill={this.props.fill}
         onClick={this.onClick}
+        onMouseOver={this.onMouseOver}
         strokeWidth="2px"
       />
     );

@@ -43,6 +43,7 @@ const propTypes = {
   yScale: PropTypes.func.isRequired,
   color: PropTypes.string.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
+  pointHoverHandler: PropTypes.func.isRequired,
 };
 
 const Points = (props) => {
@@ -61,6 +62,7 @@ const Points = (props) => {
         auid={d.auid}
         isClicked={d.isClicked}
         pointClickHandler={props.pointClickHandler}
+        pointHoverHandler={props.pointHoverHandler}
       />
     );
   });

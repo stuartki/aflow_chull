@@ -15,6 +15,7 @@ const propTypes = {
   fullscreen: PropTypes.bool,
   resizeHullAxes: PropTypes.func.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
+  pointHoverHandler: PropTypes.func.isRequired,
   sidebarIsVisible: PropTypes.bool,
 };
 
@@ -114,6 +115,7 @@ class BinaryHull extends React.Component {
           vertices={this.props.hull.vertices}
           points={this.props.hull.entries}
           pointClickHandler={this.props.pointClickHandler}
+          pointHoverHandler={this.props.pointHoverHandler}
           showAllPoints={this.props.hull.showAllPoints}
           yMin={this.props.hull.yMin}
           yMax={this.props.hull.yMax}

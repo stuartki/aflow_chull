@@ -138,12 +138,12 @@ class Visualization extends React.Component {
   }
 
 
-  downloadPDF(){
+  downloadPDF() {
     axios({
       url: `http://aflowlib.duke.edu/search/ui/API/chull/v1.1/?pdf=${this.props.selectedHull.name}`,
       method: 'get',
       responseType: 'blob',
-      headers:{'Accept':'application/pdf'},
+      headers: {'Accept':'application/pdf'},
     }).then((res) => {
       this.setState({
         downloadPDFBtnText: 'Complete! (redownload PDF)',
@@ -158,7 +158,7 @@ class Visualization extends React.Component {
     });
   }
 
-  downloadTXT(){
+  downloadTXT() {
     axios({
       url: `http://aflowlib.duke.edu/search/ui/API/chull/v1.1/?txt=${this.props.selectedHull.name}`,
       method: 'get',
@@ -174,12 +174,11 @@ class Visualization extends React.Component {
       link.setAttribute('download', `aflow_${this.props.selectedHull.name}_hull.txt`);
       document.body.appendChild(link);
       link.click();
-    });  
+    });
   }
 
 
-
-  downloadJSON(){
+  downloadJSON() {
     axios({
       url: `http://aflowlib.duke.edu/search/ui/API/chull/v1.1/?json=${this.props.selectedHull.name}`,
       method: 'get',
@@ -197,7 +196,6 @@ class Visualization extends React.Component {
       link.click();
     });
   }
-  
 
   render() {
     if (this.state.loading && this.props.params.hullName !== 'noSelection') {
@@ -410,7 +408,7 @@ class Visualization extends React.Component {
 
     return <div className="binary-hull-row" />;
   }
-  //wws16 - added if dim === 4 block...
+  // wws16 - added if dim === 4 block...
 }
 
 Visualization.propTypes = propTypes;
