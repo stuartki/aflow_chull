@@ -60,6 +60,7 @@ const Points = (props) => {
         fill={fill}
         key={d.auid}
         auid={d.auid}
+        vertices={props.vertices}
         isClicked={d.isClicked}
         line={props.line}
         pointClickHandler={props.pointClickHandler}
