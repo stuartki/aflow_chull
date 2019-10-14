@@ -38,9 +38,10 @@ class Point extends React.Component {
     if (this.props.isClicked) {
       let i;
       let t;
-      for (i = 0; i < this.props.vertices.length; i++) {
-        if (this.cx < this.props.vertices[i]) {
-          t = this.props.vertices.slice(i - 1, i);
+      console.log(this.props.vertices);
+      for (i = 0; i < this.props.vertices[0].length; i++) {
+        if (this.cx < this.props.vertices[0][i]) {
+          t = this.props.vertices[0].slice(i - 1, i);
           console.log(t);
         }
       }
