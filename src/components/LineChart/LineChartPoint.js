@@ -6,6 +6,12 @@ const propTypes = {
   cy: PropTypes.number.isRequired,
   fill: PropTypes.string.isRequired,
   auid: PropTypes.string.isRequired,
+  vertices: PropTypes.arrayOf(
+    PropTypes.shape({
+      x: React.PropTypes.number.isRequired,
+      y: React.PropTypes.number.isRequired,
+    }),
+  ).isRequired,
   isClicked: PropTypes.bool.isRequired,
   line: PropTypes.func.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
