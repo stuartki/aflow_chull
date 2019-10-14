@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 const propTypes = {
   cx: PropTypes.number.isRequired,
+  raw_cx: PropTypes.number.isRequired,
   cy: PropTypes.number.isRequired,
   fill: PropTypes.string.isRequired,
   auid: PropTypes.string.isRequired,
@@ -38,11 +39,11 @@ class Point extends React.Component {
     if (this.props.isClicked) {
       let i;
       let t;
-      console.log(this.props.vertices);
-      for (i = 0; i < this.props.vertices.length; i++) {
-        if (this.cx < this.props.vertices[i].x) {
-          t = this.props.vertices.slice(i - 1, i);
-          console.log(t);
+      const ver = this.props.vertices;
+
+      for (i = 0; i < ver.length; i++) {
+        if (this.props.raw_cx < ver[i].x) {
+          t = ver.slice(i - 1, i);
         }
       }
       tieline =

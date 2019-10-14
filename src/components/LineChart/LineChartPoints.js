@@ -56,6 +56,7 @@ const Points = (props) => {
     return (
       <Point
         cx={props.xScale(d.composition[1])}
+        raw_cx={d.composition[1]}
         cy={props.yScale(d.enthalpyFormationAtom)}
         fill={fill}
         key={d.auid}
