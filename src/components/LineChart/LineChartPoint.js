@@ -34,6 +34,23 @@ class Point extends React.Component {
   }
 
   render() {
+    // let tieline = null;
+    // if (this.props.isClicked) {
+    //   let i;
+    //   let t;
+    //   for (i = 0; i < this.props.vertices.length; i++) {
+    //     if (this.cx < this.props.vertices[i]) {
+    //       t = this.props.vertices.slice(i - 1, i);
+    //     }
+    //   }
+    //   tieline =
+    //   (<path
+    //     className="line shadow"
+    //     stroke="#ff0000"
+    //     d={this.props.line(t)}
+    //     strokeLinecap="round"
+    //   />);
+    // }
     return (
       <circle
         className="point"
