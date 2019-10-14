@@ -61,6 +61,7 @@ const Points = (props) => {
         key={d.auid}
         auid={d.auid}
         isClicked={d.isClicked}
+        line={props.line}
         pointClickHandler={props.pointClickHandler}
         pointHoverHandler={props.pointHoverHandler}
       />
