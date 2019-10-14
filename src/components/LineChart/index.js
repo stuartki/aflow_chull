@@ -191,6 +191,8 @@ class LineChart extends React.Component {
           xScale={x}
           yScale={y}
           color={this.props.color}
+          line={line}
+          vertices={vertices}
           pointClickHandler={this.props.pointClickHandler}
           pointHoverHandler={this.props.pointHoverHandler}
         />
