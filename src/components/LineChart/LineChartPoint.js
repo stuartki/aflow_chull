@@ -6,6 +6,8 @@ const propTypes = {
   cy: PropTypes.number.isRequired,
   fill: PropTypes.string.isRequired,
   auid: PropTypes.string.isRequired,
+  isClicked: PropTypes.bool.isRequired,
+  line: PropTypes.func.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
   pointHoverHandler: PropTypes.func.isRequired,
 };
