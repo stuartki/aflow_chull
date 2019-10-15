@@ -43,7 +43,8 @@ class Point extends React.Component {
 
       for (i = 0; i < ver.length; i++) {
         if (this.props.raw_cx < ver[i].x) {
-          t = ver.slice(i - 1, i);
+          t = ver.slice(i - 1, i + 1);
+          break;
         }
       }
       tieline =
@@ -55,16 +56,19 @@ class Point extends React.Component {
       />);
     }
     return (
-      <circle
-        className="point"
-        r="5"
-        cx={this.props.cx}
-        cy={this.props.cy}
-        fill={this.props.fill}
-        onClick={this.onClick}
-        onMouseOver={this.onMouseOver}
-        strokeWidth="2px"
-      />
+      <g>
+        {tieline}
+        <circle
+          className="point"
+          r="5"
+          cx={this.props.cx}
+          cy={this.props.cy}
+          fill={this.props.fill}
+          onClick={this.onClick}
+          onMouseOver={this.onMouseOver}
+          strokeWidth="2px"
+        />
+      </g>
     );
   }
 }
