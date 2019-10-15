@@ -63,6 +63,15 @@ function hoverVertexInSelectedHulls(auid, selectedHulls) {
   for (let i = 0; i < hullList.length; i++) {
     for (let j = 0; j < hullList[i].entries.length; j++) {
       if (hullList[i].entries[j].auid === auid && hullList[i].entries[j].auid !== null) {
+        const clickedEntry = hullList[i].entries[j];
+        let b;
+        const ver = hullList[i].vertices;
+        for (b = 0; b < ver.length; b++) {
+          if (clickedEntry.composition[0] < ver[b].x) {
+            hullList[i].vertices[b].tielineClicked = !hullList[i].vertices[b].tielineClicked;
+            break;
+          }
+        }
         hullList[i].entries[j].tielineClicked = !hullList[i].entries[j].tielineClicked;
       }
     }
@@ -168,6 +177,7 @@ export function hulls(state = hullDefaultState, action) {
       });
     }
     case actionType.POINT_HOVER_HANDLER: {
+      console.log("HOVER");
       const selectedHulls = hoverVertexInSelectedHulls(action.auid, state.selectedHulls);
       return Object.assign({}, state, {
         selectedHulls,
