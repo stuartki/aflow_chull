@@ -373,6 +373,7 @@ export function fetchHull(name, selectedHulls) {
           datum.y = vertex.enthalpyFormationAtom * meV;
           // datum.isClicked = hullStore.hasPointBeenClicked(vertex.auid);
           datum.isClicked = false;
+          datum.tielineClicked = false;
           vertices.push(datum);
         }
         vertices.push({ auid: null, x: 0, y: 0, isClicked: false });
