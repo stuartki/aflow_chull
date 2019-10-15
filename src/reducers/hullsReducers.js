@@ -58,6 +58,18 @@ function findEntryInSelectedHulls(auid, selectedHulls) {
   return hullList;
 }
 
+function hoverVertexInSelectedHulls(auid, selectedHulls) {
+  const hullList = selectedHulls.slice(0);
+  for (let i = 0; i < hullList.length; i++) {
+    for (let j = 0; j < hullList[i].entries.length; j++) {
+      if (hullList[i].entries[j].auid === auid && hullList[i].entries[j].auid !== null) {
+        hullList[i].entries[j].tielineClicked = !hullList[i].entries[j].tielineClicked;
+      }
+    }
+  }
+  return hullList;
+}
+
 function resetHulls(selectedHulls, name) {
   const hullList = selectedHulls.slice(0);
   for (let i = 0; i < hullList.length; i++) {
@@ -153,6 +165,12 @@ export function hulls(state = hullDefaultState, action) {
       return Object.assign({}, state, {
         selectedHulls,
         selectedEntriesAuids: auids,
+      });
+    }
+    case actionType.POINT_HOVER_HANDLER: {
+      const selectedHulls = hoverVertexInSelectedHulls(action.auid, state.selectedHulls);
+      return Object.assign({}, state, {
+        selectedHulls,
       });
     }
     case actionType.SET_POINTS_VISIBLITY:
