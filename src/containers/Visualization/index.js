@@ -15,6 +15,7 @@ import {
   setSelectedHull,
   resizeHullAxes,
   pointClickHandler,
+  pointHoverHandler,
 } from '../../actions/hullActions';
 
 const propTypes = {
@@ -25,6 +26,7 @@ const propTypes = {
   setLastSelectedHull: PropTypes.func.isRequired,
   resizeHullAxes: PropTypes.func.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
+  pointHoverHandler: PropTypes.func.isRequired,
   sidebarIsVisible: PropTypes.bool,
 };
 
@@ -259,6 +261,7 @@ class Visualization extends React.Component {
                 fullscreen
                 resizeHullAxes={this.props.resizeHullAxes}
                 pointClickHandler={this.props.pointClickHandler}
+                pointHoverHandler={this.props.pointHoverHandler}
                 sidebarIsVisible={this.props.sidebarIsVisible}
               />
             </div>
@@ -429,6 +432,7 @@ function mapDispatchToProps(dispatch) {
     },
     setLastSelectedHull: hull => dispatch(setSelectedHull(hull)),
     pointClickHandler: auid => dispatch(pointClickHandler(auid)),
+    pointHoverHandler: auid => dispatch(pointHoverHandler(auid)),
     resizeHullAxes: (name, yMin, yMax) => {
       dispatch(resizeHullAxes(name, yMin, yMax));
     },
