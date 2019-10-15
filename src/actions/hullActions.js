@@ -31,8 +31,6 @@ export function setPointsVisibility(name, isVisible) {
   };
 }
 
-
-
 export function setHullPointsVisibility() {
   return {
     type: actionType.SET_HULL_POINTS_VISIBLITY,
@@ -42,6 +40,13 @@ export function setHullPointsVisibility() {
 export function pointClickHandler(auid) {
   return {
     type: actionType.POINT_CLICK_HANDLER,
+    auid,
+  };
+}
+
+export function pointHoverHandler(auid) {
+  return {
+    type: actionType.POINT_HOVER_HANDLER,
     auid,
   };
 }
