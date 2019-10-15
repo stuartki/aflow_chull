@@ -24,6 +24,7 @@ class Point extends React.Component {
     super(props);
     this.onClick = this.onClick.bind(this);
     this.onMouseOver = this.onMouseOver.bind(this);
+    this.onMouseOut = this.onMouseOut.bind(this);
   }
 
   onClick() {
@@ -31,6 +32,10 @@ class Point extends React.Component {
   }
 
   onMouseOver() {
+    this.props.pointHoverHandler(this.props.auid);
+  }
+
+  onMouseOut() {
     this.props.pointHoverHandler(this.props.auid);
   }
 
