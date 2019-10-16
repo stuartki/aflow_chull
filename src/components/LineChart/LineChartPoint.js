@@ -22,6 +22,9 @@ const propTypes = {
 class Point extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      tielineClicked: false,
+    };
     this.onClick = this.onClick.bind(this);
     this.onMouseOver = this.onMouseOver.bind(this);
     this.onMouseOut = this.onMouseOut.bind(this);
@@ -32,11 +35,11 @@ class Point extends React.Component {
   }
 
   onMouseOver() {
-    this.props.pointHoverHandler(this.props.auid);
+    this.setState({ tielineClicked: true });
   }
 
   onMouseOut() {
-    this.props.pointHoverHandler(this.props.auid);
+    this.setState({ tielineClicked: false });
   }
 
   render() {

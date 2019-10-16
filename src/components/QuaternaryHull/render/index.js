@@ -187,7 +187,7 @@ class QuaternaryHullRender {
       canvas.width,
       canvas.height,
       segW,
-      segH
+      segH,
     );
     const tex = new THREE.Texture(canvas);
     tex.needsUpdate = true;
