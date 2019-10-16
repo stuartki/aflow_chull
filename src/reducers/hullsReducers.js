@@ -68,11 +68,11 @@ function hoverVertexInSelectedHulls(auid, selectedHulls) {
         const ver = hullList[i].vertices;
         for (b = 0; b < ver.length; b++) {
           if (clickedEntry.composition[0] < ver[b].x) {
-            hullList[i].vertices[b].tielineClicked = !hullList[i].vertices[b].tielineClicked;
+            hullList[i].vertices[b - 1].tielineClicked = !hullList[i].vertices[b - 1].tielineClicked;
             break;
           }
         }
-        hullList[i].entries[j].tielineClicked = !hullList[i].entries[j].tielineClicked;
+        // hullList[i].entries[j].tielineClicked = !hullList[i].entries[j].tielineClicked;
       }
     }
   }

@@ -7,6 +7,8 @@ const propTypes = {
   cy: PropTypes.number.isRequired,
   fill: PropTypes.string.isRequired,
   auid: PropTypes.string.isRequired,
+  xScale: PropTypes.func.isRequired,
+  yScale: PropTypes.func.isRequired,
   vertices: PropTypes.arrayOf(
     PropTypes.shape({
       x: React.PropTypes.number.isRequired,
@@ -22,6 +24,9 @@ const propTypes = {
 class Point extends React.Component {
   constructor(props) {
     super(props);
+    // this.state = {
+    //   tielineClicked: false,
+    // };
     this.onClick = this.onClick.bind(this);
     this.onMouseOver = this.onMouseOver.bind(this);
     this.onMouseOut = this.onMouseOut.bind(this);
@@ -33,10 +38,16 @@ class Point extends React.Component {
 
   onMouseOver() {
     this.props.pointHoverHandler(this.props.auid);
+    // this.setState({
+    //   tielineClicked: true,
+    // });
   }
 
   onMouseOut() {
     this.props.pointHoverHandler(this.props.auid);
+    // this.setState({
+    //   tielineClicked: false,
+    // });
   }
 
   render() {
@@ -44,21 +55,35 @@ class Point extends React.Component {
     if (this.props.isClicked) {
       let i;
       let t;
+      let tielineClicked;
       const ver = this.props.vertices;
 
       for (i = 0; i < ver.length; i++) {
         if (this.props.raw_cx < ver[i].x) {
           t = ver.slice(i - 1, i + 1);
+          tielineClicked = ver[i].tielineClicked;
           break;
         }
       }
-      tieline =
-      (<path
-        className="line shadow"
-        stroke="#ff0000"
-        d={this.props.line(t)}
-        strokeLinecap="round"
-      />);
+      if (tielineClicked) {
+        tieline =
+          (<g>
+            <path
+              className="line shadow"
+              stroke="#ff0000"
+              d={this.props.line(t)}
+              strokeLinecap="round"
+            />
+            <circle
+              className="point"
+              r="5"
+              cx={this.props.xScale(t[0].x)}
+              cy={this.props.yScale(t[0].y)}
+              fill="#ff0000"
+              strokeWidth="2px"
+            />
+          </g>);
+      }
     }
     return (
       <g>
@@ -71,6 +96,7 @@ class Point extends React.Component {
           fill={this.props.fill}
           onClick={this.onClick}
           onMouseOver={this.onMouseOver}
+          onMouseOut={this.onMouseOut}
           strokeWidth="2px"
         />
       </g>
