@@ -55,13 +55,15 @@ class Point extends React.Component {
           break;
         }
       }
-      tieline =
-      (<path
-        className="line shadow"
-        stroke="#ff0000"
-        d={this.props.line(t)}
-        strokeLinecap="round"
-      />);
+      if (this.state.tielineClicked) {
+        tieline =
+        (<path
+          className="line shadow"
+          stroke="#ff0000"
+          d={this.props.line(t)}
+          strokeLinecap="round"
+        />);
+      }
     }
     return (
       <g>
