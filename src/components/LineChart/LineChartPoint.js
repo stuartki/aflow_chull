@@ -16,7 +16,6 @@ const propTypes = {
   isClicked: PropTypes.bool.isRequired,
   line: PropTypes.func.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
-  pointHoverHandler: PropTypes.func.isRequired,
 };
 
 class Point extends React.Component {
