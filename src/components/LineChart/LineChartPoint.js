@@ -16,6 +16,7 @@ const propTypes = {
     }),
   ).isRequired,
   isClicked: PropTypes.bool.isRequired,
+  distanceToHull: PropTypes.number.isRequired,
   line: PropTypes.func.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
 };
@@ -45,6 +46,7 @@ class Point extends React.Component {
 
   render() {
     let tieline = null;
+    let point = null;
     if (this.props.isClicked) {
       let i;
       let t;
@@ -56,6 +58,8 @@ class Point extends React.Component {
           break;
         }
       }
+      const pathToHull = [this.props.cy,
+        this.props.cy + this.props.yScale(this.props.distanceToHull)];
       if (this.state.tielineClicked) {
         tieline =
         (
@@ -66,41 +70,57 @@ class Point extends React.Component {
               d={this.props.line(t)}
               strokeLinecap="round"
             />
-            <circle
-              className="point"
-              r="5"
-              cx={this.props.xScale(t[1].x)}
-              cy={this.props.yScale(t[1].y)}
-              fill="#ff0000"
-              strokeWidth="2px"
+            <path
+              className="line shadow"
+              stroke="#ff0000"
+              d={this.props.line(pathToHull)}
+              strokeLinecap="round"
             />
             <circle
               className="point"
-              r="5"
+              r="10"
+              cx={this.props.xScale(t[1].x)}
+              cy={this.props.yScale(t[1].y)}
+              fill="#ff0000"
+              strokeWidth="4px"
+            />
+            <circle
+              className="point"
+              r="10"
               cx={this.props.xScale(t[0].x)}
               cy={this.props.yScale(t[0].y)}
               fill="#ff0000"
-              strokeWidth="2px"
+              strokeWidth="4px"
             />
 
           </g>
         );
       }
     }
+    // validation if we have already mapped this point with hover
+    if (this.props.distanceToHull > 0 &&
+        !(this.props.vertices.map(v => v.auid).includes(this.props.auid))) {
+      point =
+          (
+            <g>
+              <circle
+                className="point"
+                r="5"
+                cx={this.props.cx}
+                cy={this.props.cy}
+                fill={this.props.fill}
+                onClick={this.onClick}
+                onMouseOver={this.onMouseOver}
+                onMouseOut={this.onMouseOut}
+                strokeWidth="2px"
+              />
+            </g>
+          );
+    }
     return (
       <g>
         {tieline}
-        <circle
-          className="point"
-          r="5"
-          cx={this.props.cx}
-          cy={this.props.cy}
-          fill={this.props.fill}
-          onClick={this.onClick}
-          onMouseOver={this.onMouseOver}
-          onMouseOut={this.onMouseOut}
-          strokeWidth="2px"
-        />
+        {point}
       </g>
     );
   }
