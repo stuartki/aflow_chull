@@ -60,6 +60,7 @@ const Points = (props) => {
         xScale={props.xScale}
         cy={props.yScale(d.enthalpyFormationAtom)}
         yScale={props.yScale}
+        distanceToHull={d.distanceToHull}
         fill={fill}
         key={d.auid}
         auid={d.auid}
