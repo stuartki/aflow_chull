@@ -4,7 +4,9 @@ import PropTypes from 'prop-types';
 const propTypes = {
   cx: PropTypes.number.isRequired,
   raw_cx: PropTypes.number.isRequired,
+  xScale: PropTypes.func.isRequired,
   cy: PropTypes.number.isRequired,
+  yScale: PropTypes.func.isRequired,
   fill: PropTypes.string.isRequired,
   auid: PropTypes.string.isRequired,
   vertices: PropTypes.arrayOf(
@@ -67,11 +69,20 @@ class Point extends React.Component {
             <circle
               className="point"
               r="5"
+              cx={this.props.xScale(t[1].x)}
+              cy={this.props.yScale(t[1].y)}
+              fill="#ff0000"
+              strokeWidth="2px"
+            />
+            <circle
+              className="point"
+              r="5"
               cx={this.props.xScale(t[0].x)}
               cy={this.props.yScale(t[0].y)}
               fill="#ff0000"
               strokeWidth="2px"
             />
+
           </g>
         );
       }
