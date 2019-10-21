@@ -41,7 +41,9 @@ class Point extends React.Component {
   }
 
   onMouseOut() {
-    this.setState({ tielineClicked: false });
+    setTimeout(() => {
+      this.setState({ tielineClicked: false });
+    }, 3000);
   }
 
   render() {
@@ -58,8 +60,10 @@ class Point extends React.Component {
           break;
         }
       }
-      const pathToHull = [this.props.cy,
-        this.props.cy + this.props.yScale(this.props.distanceToHull)];
+      const pathToHull = [
+        { x: this.props.cx, y: this.props.cy },
+        { x: this.props.cx, y: this.props.cy + this.props.yScale(this.props.distanceToHull) },
+      ];
       if (this.state.tielineClicked) {
         tieline =
         (
