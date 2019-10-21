@@ -98,8 +98,7 @@ class Point extends React.Component {
       }
     }
     // validation if we have already mapped this point with hover
-    if (this.props.distanceToHull > 0 &&
-        !(this.props.vertices.map(v => v.auid).includes(this.props.auid))) {
+    if (this.props.distanceToHull > -1) {
       point =
           (
             <g>
