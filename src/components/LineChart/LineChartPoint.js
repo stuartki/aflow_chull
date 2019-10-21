@@ -26,14 +26,21 @@ class Point extends React.Component {
     super(props);
     this.state = {
       tielineClicked: false,
+      doubleClicked: true,
     };
     this.onClick = this.onClick.bind(this);
     this.onMouseOver = this.onMouseOver.bind(this);
     this.onMouseOut = this.onMouseOut.bind(this);
+    this.onDoubleClick = this.onDoubleClick.bind(this);
   }
 
   onClick() {
     this.props.pointClickHandler(this.props.auid);
+    this.setState({ doubleClicked: false });
+  }
+
+  onDoubleClick() {
+    this.setState({ doubleClicked: !this.state.doubleClicked });
   }
 
   onMouseOver() {
@@ -41,7 +48,9 @@ class Point extends React.Component {
   }
 
   onMouseOut() {
-    this.setState({ tielineClicked: false });
+    if (!this.state.doubleClicked) {
+      this.setState({ tielineClicked: false });
+    }
   }
 
   render() {
@@ -78,19 +87,19 @@ class Point extends React.Component {
             />
             <circle
               className="point"
-              r="10"
+              r="6"
               cx={this.props.xScale(t[1].x)}
               cy={this.props.yScale(t[1].y)}
-              fill="#ff0000"
-              strokeWidth="4px"
+              fill="none"
+              stroke="#ff0000"
             />
             <circle
               className="point"
-              r="10"
+              r="6"
               cx={this.props.xScale(t[0].x)}
               cy={this.props.yScale(t[0].y)}
-              fill="#ff0000"
-              strokeWidth="4px"
+              fill="none"
+              stroke="#ff0000"
             />
 
           </g>
@@ -109,6 +118,7 @@ class Point extends React.Component {
                 cy={this.props.cy}
                 fill={this.props.fill}
                 onClick={this.onClick}
+                onDoubleClick={this.onDoubleClick}
                 onMouseOver={this.onMouseOver}
                 onMouseOut={this.onMouseOut}
                 strokeWidth="2px"
