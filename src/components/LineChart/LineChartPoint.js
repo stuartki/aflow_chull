@@ -87,19 +87,19 @@ class Point extends React.Component {
             />
             <circle
               className="point"
-              r="10"
+              r="6"
               cx={this.props.xScale(t[1].x)}
               cy={this.props.yScale(t[1].y)}
-              fill="#ff0000"
-              strokeWidth="4px"
+              fill="none"
+              stroke="#ff0000"
             />
             <circle
               className="point"
-              r="10"
+              r="6"
               cx={this.props.xScale(t[0].x)}
               cy={this.props.yScale(t[0].y)}
-              fill="#ff0000"
-              strokeWidth="4px"
+              fill="none"
+              stroke="#ff0000"
             />
 
           </g>
