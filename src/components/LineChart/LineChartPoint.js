@@ -60,6 +60,19 @@ class Point extends React.Component {
     return ((m * curX) + b);
   }
 
+  // fade(element) {
+  //   var op = 1;  // initial opacity
+  //   var timer = setInterval(function () {
+  //       if (op <= 0.1){
+  //           clearInterval(timer);
+  //           element.style.display = 'none';
+  //       }
+  //       element.style.opacity = op;
+  //       element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+  //       op -= op * 0.1;
+  //   }, 50);
+  // }
+
   render() {
     let tieline = null;
     let point = null;
@@ -81,17 +94,16 @@ class Point extends React.Component {
         { x, y: this.hullDistance(t, x) },
       ];
       if (this.state.tielineClicked || this.state.tielineStay) {
-        let strokeWidth = '2px';
-        let stroke = '#ff0000';
+        const stroke = '#ff0000';
+        let className = 'line shadow';
         if (this.state.tielineStay) {
-          strokeWidth = '1000px';
-          stroke = 'green';
+          className = 'tieline shadow';
         }
         tieline =
         (
           <g>
             <path
-              className="line shadow"
+              className={className}
               stroke={stroke}
               d={this.props.line(pathToHull)}
               onClick={this.onLineClick}
@@ -100,10 +112,11 @@ class Point extends React.Component {
               strokeWidth={strokeWidth}
             />
             <path
-              className="line shadow"
+              className={className}
               stroke="#ff0000"
               d={this.props.line(t)}
               strokeLinecap="round"
+              strokeWidth={strokeWidth}
             />
             <circle
               className="point"
