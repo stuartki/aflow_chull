@@ -109,14 +109,12 @@ class Point extends React.Component {
               onClick={this.onLineClick}
               strokeLinecap="round"
               strokeDasharray="3"
-              strokeWidth={strokeWidth}
             />
             <path
               className={className}
               stroke="#ff0000"
               d={this.props.line(t)}
               strokeLinecap="round"
-              strokeWidth={strokeWidth}
             />
             <circle
               className="point"
