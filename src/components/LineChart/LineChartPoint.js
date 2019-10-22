@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 const propTypes = {
   cx: PropTypes.number.isRequired,
-  raw_cx: PropTypes.number.isRequired,
   xScale: PropTypes.func.isRequired,
   cy: PropTypes.number.isRequired,
   yScale: PropTypes.func.isRequired,
@@ -46,6 +45,10 @@ class Point extends React.Component {
     }, 3000);
   }
 
+  hullDistance(endpoints, curX) {
+    const b = endpoints[0].y - ((endpoints[0].y - endpoints[1].y) * endpoints[0].x);
+    return (((endpoints[0].y - endpoints[1].y) * curX) + b);
+  }
   render() {
     let tieline = null;
     let point = null;
@@ -55,14 +58,15 @@ class Point extends React.Component {
       const ver = this.props.vertices;
 
       for (i = 0; i < ver.length; i++) {
-        if (this.props.raw_cx < ver[i].x) {
+        if (this.props.xScale.invert(this.props.cx) < ver[i].x) {
           t = ver.slice(i - 1, i + 1);
           break;
         }
       }
       const pathToHull = [
-        { x: this.props.cx, y: this.props.cy },
-        { x: this.props.cx, y: this.props.cy + this.props.yScale(this.props.distanceToHull) },
+        { x: this.props.xScale.invert(this.props.cx), y: this.props.yScale.invert(this.props.cy) },
+        // eslint-disable-next-line max-len
+        { x: this.props.xScale.invert(this.props.cx), y: this.props.yScale.invert(this.props.cy) - this.props.yScale.invert(this.props.distanceToHull) },
       ];
       if (this.state.tielineClicked) {
         tieline =
@@ -71,13 +75,13 @@ class Point extends React.Component {
             <path
               className="line shadow"
               stroke="#ff0000"
-              d={this.props.line(t)}
+              d={this.props.line(pathToHull)}
               strokeLinecap="round"
             />
             <path
               className="line shadow"
               stroke="#ff0000"
-              d={this.props.line(pathToHull)}
+              d={this.props.line(t)}
               strokeLinecap="round"
             />
             <circle
