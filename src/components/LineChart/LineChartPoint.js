@@ -25,6 +25,7 @@ class Point extends React.Component {
     super(props);
     this.state = {
       tielineClicked: false,
+      tielineStay: false,
     };
     this.timer = null;
     this.onClick = this.onClick.bind(this);
@@ -48,10 +49,8 @@ class Point extends React.Component {
   }
 
   onLineClick() {
-    console.log('hello');
-    console.log(this.timer)
     clearTimeout(this.timer);
-    this.setState({ tielineClicked: true });
+    this.setState({ tielineStay: !this.state.tielineStay });
   }
   // already inverted
   // eslint-disable-next-line class-methods-use-this
@@ -81,18 +80,24 @@ class Point extends React.Component {
         { x, y },
         { x, y: this.hullDistance(t, x) },
       ];
-      if (this.state.tielineClicked) {
+      if (this.state.tielineClicked || this.state.tielineStay) {
+        let strokeWidth = '2px';
+        let stroke = '#ff0000';
+        if (this.state.tielineStay) {
+          strokeWidth = '1000px';
+          stroke = 'green';
+        }
         tieline =
         (
           <g>
             <path
               className="line shadow"
-              stroke="#ff0000"
+              stroke={stroke}
               d={this.props.line(pathToHull)}
               onClick={this.onLineClick}
               strokeLinecap="round"
               strokeDasharray="3"
-              strokeWidth="5"
+              strokeWidth={strokeWidth}
             />
             <path
               className="line shadow"
