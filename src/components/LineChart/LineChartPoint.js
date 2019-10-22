@@ -44,10 +44,11 @@ class Point extends React.Component {
       this.setState({ tielineClicked: false });
     }, 3000);
   }
-
+  // already inverted
   hullDistance(endpoints, curX) {
-    const b = endpoints[0].y - ((endpoints[0].y - endpoints[1].y) * endpoints[0].x);
-    return (((endpoints[0].y - endpoints[1].y) * curX) + b);
+    const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
+    const b = endpoints[0].y - (m * endpoints[0].x);
+    return ((m * curX) + b);
   }
   render() {
     let tieline = null;
@@ -63,11 +64,13 @@ class Point extends React.Component {
           break;
         }
       }
+      const x = this.props.xScale.invert(this.props.cx);
+      const y = this.props.yScale.invert(this.props.cy);
       const pathToHull = [
-        { x: this.props.xScale.invert(this.props.cx), y: this.props.yScale.invert(this.props.cy) },
-        // eslint-disable-next-line max-len
-        { x: this.props.xScale.invert(this.props.cx), y: this.props.yScale.invert(this.props.cy) - this.props.yScale.invert(this.props.distanceToHull) },
+        { x, y },
+        { x, y: this.hullDistance(t, x) },
       ];
+      console.log(pathToHull);
       if (this.state.tielineClicked) {
         tieline =
         (
