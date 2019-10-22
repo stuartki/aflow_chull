@@ -48,7 +48,9 @@ class Point extends React.Component {
   }
 
   onLineClick() {
-    // clearTimeout(this.timer);
+    console.log('hello');
+    console.log(this.timer)
+    clearTimeout(this.timer);
     this.setState({ tielineClicked: true });
   }
   // already inverted
@@ -90,6 +92,7 @@ class Point extends React.Component {
               onClick={this.onLineClick}
               strokeLinecap="round"
               strokeDasharray="3"
+              strokeWidth="5"
             />
             <path
               className="line shadow"
