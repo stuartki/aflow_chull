@@ -26,9 +26,11 @@ class Point extends React.Component {
     this.state = {
       tielineClicked: false,
     };
+    this.timer = null;
     this.onClick = this.onClick.bind(this);
     this.onMouseOver = this.onMouseOver.bind(this);
     this.onMouseOut = this.onMouseOut.bind(this);
+    this.onLineClick = this.onLineClick.bind(this);
   }
 
   onClick() {
@@ -40,16 +42,23 @@ class Point extends React.Component {
   }
 
   onMouseOut() {
-    setTimeout(() => {
+    this.timer = setTimeout(() => {
       this.setState({ tielineClicked: false });
-    }, 3000);
+    }, 2000);
+  }
+
+  onLineClick() {
+    // clearTimeout(this.timer);
+    this.setState({ tielineClicked: true });
   }
   // already inverted
+  // eslint-disable-next-line class-methods-use-this
   hullDistance(endpoints, curX) {
     const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
     const b = endpoints[0].y - (m * endpoints[0].x);
     return ((m * curX) + b);
   }
+
   render() {
     let tieline = null;
     let point = null;
@@ -70,7 +79,6 @@ class Point extends React.Component {
         { x, y },
         { x, y: this.hullDistance(t, x) },
       ];
-      console.log(pathToHull);
       if (this.state.tielineClicked) {
         tieline =
         (
@@ -79,6 +87,7 @@ class Point extends React.Component {
               className="line shadow"
               stroke="#ff0000"
               d={this.props.line(pathToHull)}
+              onClick={this.onLineClick}
               strokeLinecap="round"
               strokeDasharray="3"
             />
