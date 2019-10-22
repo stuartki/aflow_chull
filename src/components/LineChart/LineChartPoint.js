@@ -80,6 +80,7 @@ class Point extends React.Component {
               stroke="#ff0000"
               d={this.props.line(pathToHull)}
               strokeLinecap="round"
+              strokeDasharray="3"
             />
             <path
               className="line shadow"
