@@ -81,11 +81,17 @@ class Point extends React.Component {
     if (this.props.isClicked && this.props.distanceToHull > 0) {
       let i;
       let t;
+      let m;
       const ver = this.props.vertices;
 
       for (i = 0; i < ver.length; i++) {
         if (this.props.xScale.invert(this.props.cx) < ver[i].x) {
-          t = ver.slice(i - 1, i + 1);
+          m = ver.slice(i - 1, i + 1);
+          // to format tieline we add radius of circle
+          t = [
+            { x: m[0].x + this.props.xScale.invert(4), y: m[0].y },
+            { x: m[1].x, y: m[1].y },
+          ];
           break;
         }
       }
@@ -122,16 +128,16 @@ class Point extends React.Component {
             <circle
               className="point"
               r="6"
-              cx={this.props.xScale(t[1].x)}
-              cy={this.props.yScale(t[1].y)}
+              cx={this.props.xScale(m[1].x)}
+              cy={this.props.yScale(m[1].y)}
               fill="none"
               stroke="#ff0000"
             />
             <circle
               className="point"
               r="6"
-              cx={this.props.xScale(t[0].x)}
-              cy={this.props.yScale(t[0].y)}
+              cx={this.props.xScale(m[0].x)}
+              cy={this.props.yScale(m[0].y)}
               fill="none"
               stroke="#ff0000"
             />
