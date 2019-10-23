@@ -57,9 +57,6 @@ class Point extends React.Component {
       }, 1000);
     }
   }
-  // already inverted
-  // eslint-disable-next-line class-methods-use-this
-
 
   // fade(element) {
   //   var op = 1;  // initial opacity
@@ -75,6 +72,7 @@ class Point extends React.Component {
   // }
 
   render() {
+    // already inverted in scale
     function hullDistance(endpoints, curX) {
       const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
       const b = endpoints[0].y - (m * endpoints[0].x);

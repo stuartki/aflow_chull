@@ -69,13 +69,16 @@ h3{
 .line {
     fill: none;
     /* stroke: #7dc7f4; */
-    stroke-width: 2px;
+    stroke-width: 3px;
+    -webkit-transition: all 1s ease-in-out;
+    -moz-transition: all 1s ease-in-out;
+    transition: all 1s ease-in-out;
 
 }
 
 .tieline {
     fill: green;
-    stroke-width: 3px;
+    stroke-width: 5px;
 }
 
 .axis{
