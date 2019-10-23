@@ -52,9 +52,7 @@ class Point extends React.Component {
     clearTimeout(this.timer);
     this.setState({ tielineStay: !this.state.tielineStay });
     if (!this.state.tielineStay) {
-      this.timer = setTimeout(() => {
-        this.setState({ tielineClicked: false });
-      }, 1000);
+      this.setState({ tielineClicked: false });
     }
   }
 
@@ -80,7 +78,7 @@ class Point extends React.Component {
     }
     let tieline = null;
     let point = null;
-    if (this.props.isClicked) {
+    if (this.props.isClicked && this.props.distanceToHull > 0) {
       let i;
       let t;
       const ver = this.props.vertices;
