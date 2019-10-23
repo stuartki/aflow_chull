@@ -89,7 +89,7 @@ class Point extends React.Component {
           m = ver.slice(i - 1, i + 1);
           // to format tieline we add radius of circle
           t = [
-            { x: m[0].x + this.props.xScale.invert(4), y: m[0].y },
+            { x: m[0].x + this.props.xScale.invert(5), y: m[0].y },
             { x: m[1].x, y: m[1].y },
           ];
           break;
