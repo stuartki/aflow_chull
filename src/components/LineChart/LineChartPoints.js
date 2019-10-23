@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Point from './LineChartPoint';
+import Vertex from './LineChartVertex';
 
 /*
 const propTypes = {
@@ -74,7 +75,7 @@ const Points = (props) => {
       );
     } else {
       point = (
-        <Point
+        <Vertex
           cx={props.xScale(d.composition[1])}
           xScale={props.xScale}
           cy={props.yScale(d.enthalpyFormationAtom)}
