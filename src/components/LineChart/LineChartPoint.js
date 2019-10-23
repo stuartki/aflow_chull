@@ -45,20 +45,21 @@ class Point extends React.Component {
   onMouseOut() {
     this.timer = setTimeout(() => {
       this.setState({ tielineClicked: false });
-    }, 2000);
+    }, 1000);
   }
 
   onLineClick() {
     clearTimeout(this.timer);
     this.setState({ tielineStay: !this.state.tielineStay });
+    if (!this.state.tielineStay) {
+      this.timer = setTimeout(() => {
+        this.setState({ tielineClicked: false });
+      }, 1000);
+    }
   }
   // already inverted
   // eslint-disable-next-line class-methods-use-this
-  hullDistance(endpoints, curX) {
-    const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
-    const b = endpoints[0].y - (m * endpoints[0].x);
-    return ((m * curX) + b);
-  }
+
 
   // fade(element) {
   //   var op = 1;  // initial opacity
@@ -74,6 +75,11 @@ class Point extends React.Component {
   // }
 
   render() {
+    function hullDistance(endpoints, curX) {
+      const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
+      const b = endpoints[0].y - (m * endpoints[0].x);
+      return ((m * curX) + b);
+    }
     let tieline = null;
     let point = null;
     if (this.props.isClicked) {
@@ -91,13 +97,14 @@ class Point extends React.Component {
       const y = this.props.yScale.invert(this.props.cy);
       const pathToHull = [
         { x, y },
-        { x, y: this.hullDistance(t, x) },
+        { x, y: hullDistance(t, x) },
       ];
       if (this.state.tielineClicked || this.state.tielineStay) {
-        const stroke = '#ff0000';
+        let stroke = '#ff0000';
         let className = 'line shadow';
         if (this.state.tielineStay) {
           className = 'tieline shadow';
+          stroke = 'green';
         }
         tieline =
         (
@@ -108,11 +115,11 @@ class Point extends React.Component {
               d={this.props.line(pathToHull)}
               onClick={this.onLineClick}
               strokeLinecap="round"
-              strokeDasharray="3"
+              strokeDasharray="3, 10"
             />
             <path
               className={className}
-              stroke="#ff0000"
+              stroke={stroke}
               d={this.props.line(t)}
               strokeLinecap="round"
             />
@@ -137,25 +144,23 @@ class Point extends React.Component {
         );
       }
     }
-    // validation if we have already mapped this point with hover
-    if (this.props.distanceToHull > -1) {
-      point =
-          (
-            <g>
-              <circle
-                className="point"
-                r="5"
-                cx={this.props.cx}
-                cy={this.props.cy}
-                fill={this.props.fill}
-                onClick={this.onClick}
-                onMouseOver={this.onMouseOver}
-                onMouseOut={this.onMouseOut}
-                strokeWidth="2px"
-              />
-            </g>
-          );
-    }
+
+    point =
+        (
+          <g>
+            <circle
+              className="point"
+              r="5"
+              cx={this.props.cx}
+              cy={this.props.cy}
+              fill={this.props.fill}
+              onClick={this.onClick}
+              onMouseOver={this.onMouseOver}
+              onMouseOut={this.onMouseOut}
+              strokeWidth="2px"
+            />
+          </g>
+        );
     return (
       <g>
         {tieline}
