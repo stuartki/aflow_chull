@@ -104,6 +104,9 @@ class Point extends React.Component {
       if (this.state.tielineClicked || this.state.tielineStay) {
         let stroke = '#ff0000';
         let className = 'line shadow';
+        if (this.state.tielineClicked) {
+          className = 'hline shadow';
+        }
         if (this.state.tielineStay) {
           className = 'tieline shadow';
           stroke = 'green';
