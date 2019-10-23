@@ -53,23 +53,45 @@ const Points = (props) => {
     if (d.isClicked) {
       fill = '#CA6F96';
     }
-    return (
-      <Point
-        cx={props.xScale(d.composition[1])}
-        xScale={props.xScale}
-        cy={props.yScale(d.enthalpyFormationAtom)}
-        yScale={props.yScale}
-        distanceToHull={d.distanceToHull}
-        fill={fill}
-        key={d.auid}
-        auid={d.auid}
-        vertices={props.vertices}
-        isClicked={d.isClicked}
-        line={props.line}
-        pointClickHandler={props.pointClickHandler}
-        pointHoverHandler={props.pointHoverHandler}
-      />
-    );
+    let point;
+    if (d.distanceToHull > 0) {
+      point = (
+        <Point
+          cx={props.xScale(d.composition[1])}
+          xScale={props.xScale}
+          cy={props.yScale(d.enthalpyFormationAtom)}
+          yScale={props.yScale}
+          distanceToHull={d.distanceToHull}
+          fill={fill}
+          key={d.auid}
+          auid={d.auid}
+          vertices={props.vertices}
+          isClicked={d.isClicked}
+          line={props.line}
+          pointClickHandler={props.pointClickHandler}
+          pointHoverHandler={props.pointHoverHandler}
+        />
+      );
+    } else {
+      point = (
+        <Point
+          cx={props.xScale(d.composition[1])}
+          xScale={props.xScale}
+          cy={props.yScale(d.enthalpyFormationAtom)}
+          yScale={props.yScale}
+          distanceToHull={d.distanceToHull}
+          fill={fill}
+          key={d.auid}
+          auid={d.auid}
+          vertices={props.vertices}
+          isClicked={d.isClicked}
+          line={props.line}
+          pointClickHandler={props.pointClickHandler}
+          pointHoverHandler={props.pointHoverHandler}
+        />
+      );
+    }
+    return (point);
   });
 
   return <g>{circles}</g>;
