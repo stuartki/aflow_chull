@@ -79,6 +79,9 @@ h3{
 .tieline {
     fill: green;
     stroke-width: 5px;
+    -webkit-transition: all 1s ease-in-out;
+    -moz-transition: all 1s ease-in-out;
+    transition: all 1s ease-in-out;
 }
 
 .axis{
