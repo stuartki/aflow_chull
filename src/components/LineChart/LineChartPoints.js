@@ -62,6 +62,10 @@ const Points = (props) => {
         xScale={props.xScale}
         cy={props.yScale(d.enthalpyFormationAtom)}
         yScale={props.yScale}
+<<<<<<< HEAD
+=======
+        distanceToHull={d.distanceToHull}
+>>>>>>> local_tieline
         fill={fill}
         key={d.auid}
         auid={d.auid}

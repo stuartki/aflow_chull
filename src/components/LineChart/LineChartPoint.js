@@ -4,7 +4,9 @@ import PropTypes from 'prop-types';
 const propTypes = {
   cx: PropTypes.number.isRequired,
   raw_cx: PropTypes.number.isRequired,
+  xScale: PropTypes.func.isRequired,
   cy: PropTypes.number.isRequired,
+  yScale: PropTypes.func.isRequired,
   fill: PropTypes.string.isRequired,
   auid: PropTypes.string.isRequired,
   xScale: PropTypes.func.isRequired,
@@ -16,27 +18,44 @@ const propTypes = {
     }),
   ).isRequired,
   isClicked: PropTypes.bool.isRequired,
+  distanceToHull: PropTypes.number.isRequired,
   line: PropTypes.func.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
-  pointHoverHandler: PropTypes.func.isRequired,
 };
 
 class Point extends React.Component {
   constructor(props) {
     super(props);
+<<<<<<< HEAD
     // this.state = {
     //   tielineClicked: false,
     // };
     this.onClick = this.onClick.bind(this);
     this.onMouseOver = this.onMouseOver.bind(this);
     this.onMouseOut = this.onMouseOut.bind(this);
+=======
+    this.state = {
+      tielineClicked: false,
+      doubleClicked: true,
+    };
+    this.onClick = this.onClick.bind(this);
+    this.onMouseOver = this.onMouseOver.bind(this);
+    this.onMouseOut = this.onMouseOut.bind(this);
+    this.onDoubleClick = this.onDoubleClick.bind(this);
+>>>>>>> local_tieline
   }
 
   onClick() {
     this.props.pointClickHandler(this.props.auid);
+    this.setState({ doubleClicked: false });
+  }
+
+  onDoubleClick() {
+    this.setState({ doubleClicked: !this.state.doubleClicked });
   }
 
   onMouseOver() {
+<<<<<<< HEAD
     this.props.pointHoverHandler(this.props.auid);
     // this.setState({
     //   tielineClicked: true,
@@ -48,10 +67,20 @@ class Point extends React.Component {
     // this.setState({
     //   tielineClicked: false,
     // });
+=======
+    this.setState({ tielineClicked: true });
+  }
+
+  onMouseOut() {
+    if (!this.state.doubleClicked) {
+      this.setState({ tielineClicked: false });
+    }
+>>>>>>> local_tieline
   }
 
   render() {
     let tieline = null;
+    let point = null;
     if (this.props.isClicked) {
       let i;
       let t;
@@ -65,15 +94,25 @@ class Point extends React.Component {
           break;
         }
       }
+<<<<<<< HEAD
       if (tielineClicked) {
         tieline =
           (<g>
+=======
+      const pathToHull = [this.props.cy,
+        this.props.cy + this.props.yScale(this.props.distanceToHull)];
+      if (this.state.tielineClicked) {
+        tieline =
+        (
+          <g>
+>>>>>>> local_tieline
             <path
               className="line shadow"
               stroke="#ff0000"
               d={this.props.line(t)}
               strokeLinecap="round"
             />
+<<<<<<< HEAD
             <circle
               className="point"
               r="5"
@@ -84,10 +123,59 @@ class Point extends React.Component {
             />
           </g>);
       }
+=======
+            <path
+              className="line shadow"
+              stroke="#ff0000"
+              d={this.props.line(pathToHull)}
+              strokeLinecap="round"
+            />
+            <circle
+              className="point"
+              r="6"
+              cx={this.props.xScale(t[1].x)}
+              cy={this.props.yScale(t[1].y)}
+              fill="none"
+              stroke="#ff0000"
+            />
+            <circle
+              className="point"
+              r="6"
+              cx={this.props.xScale(t[0].x)}
+              cy={this.props.yScale(t[0].y)}
+              fill="none"
+              stroke="#ff0000"
+            />
+
+          </g>
+        );
+      }
+    }
+    // validation if we have already mapped this point with hover
+    if (this.props.distanceToHull > -1) {
+      point =
+          (
+            <g>
+              <circle
+                className="point"
+                r="5"
+                cx={this.props.cx}
+                cy={this.props.cy}
+                fill={this.props.fill}
+                onClick={this.onClick}
+                onDoubleClick={this.onDoubleClick}
+                onMouseOver={this.onMouseOver}
+                onMouseOut={this.onMouseOut}
+                strokeWidth="2px"
+              />
+            </g>
+          );
+>>>>>>> local_tieline
     }
     return (
       <g>
         {tieline}
+<<<<<<< HEAD
         <circle
           className="point"
           r="5"
@@ -99,6 +187,9 @@ class Point extends React.Component {
           onMouseOut={this.onMouseOut}
           strokeWidth="2px"
         />
+=======
+        {point}
+>>>>>>> local_tieline
       </g>
     );
   }
