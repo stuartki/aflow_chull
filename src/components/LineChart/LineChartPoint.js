@@ -36,6 +36,7 @@ class Point extends React.Component {
 
   onClick() {
     this.props.pointClickHandler(this.props.auid);
+    this.setState({ tielineStay: false });
   }
 
   onMouseOver() {
