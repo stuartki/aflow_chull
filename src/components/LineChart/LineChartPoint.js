@@ -26,14 +26,6 @@ const propTypes = {
 class Point extends React.Component {
   constructor(props) {
     super(props);
-<<<<<<< HEAD
-    // this.state = {
-    //   tielineClicked: false,
-    // };
-    this.onClick = this.onClick.bind(this);
-    this.onMouseOver = this.onMouseOver.bind(this);
-    this.onMouseOut = this.onMouseOut.bind(this);
-=======
     this.state = {
       tielineClicked: false,
       doubleClicked: true,
@@ -42,7 +34,6 @@ class Point extends React.Component {
     this.onMouseOver = this.onMouseOver.bind(this);
     this.onMouseOut = this.onMouseOut.bind(this);
     this.onDoubleClick = this.onDoubleClick.bind(this);
->>>>>>> local_tieline
   }
 
   onClick() {
@@ -55,19 +46,6 @@ class Point extends React.Component {
   }
 
   onMouseOver() {
-<<<<<<< HEAD
-    this.props.pointHoverHandler(this.props.auid);
-    // this.setState({
-    //   tielineClicked: true,
-    // });
-  }
-
-  onMouseOut() {
-    this.props.pointHoverHandler(this.props.auid);
-    // this.setState({
-    //   tielineClicked: false,
-    // });
-=======
     this.setState({ tielineClicked: true });
   }
 
@@ -75,7 +53,6 @@ class Point extends React.Component {
     if (!this.state.doubleClicked) {
       this.setState({ tielineClicked: false });
     }
->>>>>>> local_tieline
   }
 
   render() {
@@ -94,36 +71,18 @@ class Point extends React.Component {
           break;
         }
       }
-<<<<<<< HEAD
-      if (tielineClicked) {
-        tieline =
-          (<g>
-=======
       const pathToHull = [this.props.cy,
         this.props.cy + this.props.yScale(this.props.distanceToHull)];
       if (this.state.tielineClicked) {
         tieline =
         (
           <g>
->>>>>>> local_tieline
             <path
               className="line shadow"
               stroke="#ff0000"
               d={this.props.line(t)}
               strokeLinecap="round"
             />
-<<<<<<< HEAD
-            <circle
-              className="point"
-              r="5"
-              cx={this.props.xScale(t[0].x)}
-              cy={this.props.yScale(t[0].y)}
-              fill="#ff0000"
-              strokeWidth="2px"
-            />
-          </g>);
-      }
-=======
             <path
               className="line shadow"
               stroke="#ff0000"
@@ -170,7 +129,6 @@ class Point extends React.Component {
               />
             </g>
           );
->>>>>>> local_tieline
     }
     return (
       <g>
