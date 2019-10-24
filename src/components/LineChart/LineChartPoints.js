@@ -58,7 +58,6 @@ const Points = (props) => {
       // added hover handler
       <Point
         cx={props.xScale(d.composition[1])}
-        raw_cx={d.composition[1]}
         xScale={props.xScale}
         cy={props.yScale(d.enthalpyFormationAtom)}
         yScale={props.yScale}

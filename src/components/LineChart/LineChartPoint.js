@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 const propTypes = {
   cx: PropTypes.number.isRequired,
-  raw_cx: PropTypes.number.isRequired,
   xScale: PropTypes.func.isRequired,
   cy: PropTypes.number.isRequired,
   yScale: PropTypes.func.isRequired,
@@ -28,21 +27,17 @@ class Point extends React.Component {
     super(props);
     this.state = {
       tielineClicked: false,
-      doubleClicked: true,
+      tielineStay: false,
     };
+    this.timer = null;
     this.onClick = this.onClick.bind(this);
     this.onMouseOver = this.onMouseOver.bind(this);
     this.onMouseOut = this.onMouseOut.bind(this);
-    this.onDoubleClick = this.onDoubleClick.bind(this);
+    this.onLineClick = this.onLineClick.bind(this);
   }
 
   onClick() {
     this.props.pointClickHandler(this.props.auid);
-    this.setState({ doubleClicked: false });
-  }
-
-  onDoubleClick() {
-    this.setState({ doubleClicked: !this.state.doubleClicked });
   }
 
   onMouseOver() {
@@ -50,10 +45,35 @@ class Point extends React.Component {
   }
 
   onMouseOut() {
-    if (!this.state.doubleClicked) {
+    this.timer = setTimeout(() => {
       this.setState({ tielineClicked: false });
-    }
+    }, 2000);
   }
+
+  onLineClick() {
+    clearTimeout(this.timer);
+    this.setState({ tielineStay: !this.state.tielineStay });
+  }
+  // already inverted
+  // eslint-disable-next-line class-methods-use-this
+  hullDistance(endpoints, curX) {
+    const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
+    const b = endpoints[0].y - (m * endpoints[0].x);
+    return ((m * curX) + b);
+  }
+
+  // fade(element) {
+  //   var op = 1;  // initial opacity
+  //   var timer = setInterval(function () {
+  //       if (op <= 0.1){
+  //           clearInterval(timer);
+  //           element.style.display = 'none';
+  //       }
+  //       element.style.opacity = op;
+  //       element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+  //       op -= op * 0.1;
+  //   }, 50);
+  // }
 
   render() {
     let tieline = null;
@@ -65,28 +85,39 @@ class Point extends React.Component {
       const ver = this.props.vertices;
 
       for (i = 0; i < ver.length; i++) {
-        if (this.props.raw_cx < ver[i].x) {
+        if (this.props.xScale.invert(this.props.cx) < ver[i].x) {
           t = ver.slice(i - 1, i + 1);
           tielineClicked = ver[i].tielineClicked;
           break;
         }
       }
-      const pathToHull = [this.props.cy,
-        this.props.cy + this.props.yScale(this.props.distanceToHull)];
-      if (this.state.tielineClicked) {
+      const x = this.props.xScale.invert(this.props.cx);
+      const y = this.props.yScale.invert(this.props.cy);
+      const pathToHull = [
+        { x, y },
+        { x, y: this.hullDistance(t, x) },
+      ];
+      if (this.state.tielineClicked || this.state.tielineStay) {
+        const stroke = '#ff0000';
+        let className = 'line shadow';
+        if (this.state.tielineStay) {
+          className = 'tieline shadow';
+        }
         tieline =
         (
           <g>
             <path
-              className="line shadow"
-              stroke="#ff0000"
-              d={this.props.line(t)}
+              className={className}
+              stroke={stroke}
+              d={this.props.line(pathToHull)}
+              onClick={this.onLineClick}
               strokeLinecap="round"
+              strokeDasharray="3"
             />
             <path
-              className="line shadow"
+              className={className}
               stroke="#ff0000"
-              d={this.props.line(pathToHull)}
+              d={this.props.line(t)}
               strokeLinecap="round"
             />
             <circle
@@ -122,7 +153,6 @@ class Point extends React.Component {
                 cy={this.props.cy}
                 fill={this.props.fill}
                 onClick={this.onClick}
-                onDoubleClick={this.onDoubleClick}
                 onMouseOver={this.onMouseOver}
                 onMouseOut={this.onMouseOut}
                 strokeWidth="2px"
