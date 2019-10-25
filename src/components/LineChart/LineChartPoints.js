@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unused-prop-types */
 import React from 'react';
 import PropTypes from 'prop-types';
 import Point from './LineChartPoint';
@@ -49,13 +50,16 @@ const propTypes = {
 
 const Points = (props) => {
   const data = props.data;
+  const vertexData = [];
   const circles = data.map((d) => {
-    let fill = props.color;
-    if (d.isClicked) {
-      fill = '#CA6F96';
-    }
     let point;
-    if (d.distanceToHull > 0) {
+    let fill = props.color;
+    if (d.distanceToHull === 0) {
+      vertexData.push(d);
+    } else {
+      if (d.isClicked) {
+        fill = '#CA6F96';
+      }
       point = (
         <Point
           cx={props.xScale(d.composition[1])}
@@ -73,29 +77,43 @@ const Points = (props) => {
           pointHoverHandler={props.pointHoverHandler}
         />
       );
-    } else {
-      point = (
-        <Vertex
-          cx={props.xScale(d.composition[1])}
-          xScale={props.xScale}
-          cy={props.yScale(d.enthalpyFormationAtom)}
-          yScale={props.yScale}
-          distanceToHull={d.distanceToHull}
-          fill={fill}
-          key={d.auid}
-          auid={d.auid}
-          vertices={props.vertices}
-          isClicked={d.isClicked}
-          line={props.line}
-          pointClickHandler={props.pointClickHandler}
-          pointHoverHandler={props.pointHoverHandler}
-        />
-      );
     }
+
+    return (point);
+  });
+  const vertexCircles = vertexData.map((d) => {
+    let fill = props.color;
+
+    if (d.isClicked) {
+      fill = '#CA6F96';
+    }
+    const point = (
+      <Vertex
+        cx={props.xScale(d.composition[1])}
+        xScale={props.xScale}
+        cy={props.yScale(d.enthalpyFormationAtom)}
+        yScale={props.yScale}
+        distanceToHull={d.distanceToHull}
+        fill={fill}
+        key={d.auid}
+        auid={d.auid}
+        vertices={props.vertices}
+        isClicked={d.isClicked}
+        line={props.line}
+        pointClickHandler={props.pointClickHandler}
+        pointHoverHandler={props.pointHoverHandler}
+      />
+    );
+
     return (point);
   });
 
-  return <g>{circles}</g>;
+  return (
+    <g>
+      {circles}
+      {vertexCircles}
+    </g>
+  );
 };
 
 Points.propTypes = propTypes;
