@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -33,7 +34,6 @@ class HullOptions extends React.Component {
   }
 
   onTogglelabels() {
-    console.log('here');
     this.props.toggleLabels(this.props.selectedHull.name);
   }
 
