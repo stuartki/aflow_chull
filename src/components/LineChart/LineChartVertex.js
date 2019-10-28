@@ -15,7 +15,11 @@ const propTypes = {
     }),
   ).isRequired,
   scHullVertices: PropTypes.arrayOf(
-
+    PropTypes.shape({
+      auid: React.PropTypes.string.isRequired,
+      x: React.PropTypes.number.isRequired,
+      y: React.PropTypes.number.isRequired,
+    }),
   ).isRequired,
   isClicked: PropTypes.bool.isRequired,
   distanceToHull: PropTypes.number.isRequired,
@@ -27,8 +31,7 @@ class Vertex extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      tielineClicked: false,
-      tielineStay: false,
+      sc: true,
     };
     this.onClick = this.onClick.bind(this);
   }
@@ -36,6 +39,10 @@ class Vertex extends React.Component {
   onClick() {
     this.props.pointClickHandler(this.props.auid);
   }
+
+  // onDragStart() {
+    
+  // }
 
   render() {
     let point = null;
@@ -57,6 +64,12 @@ class Vertex extends React.Component {
         );
     return (
       <g>
+        <path
+          className="line shadow"
+          stroke="blue"
+          d={this.props.line(this.props.scHullVertices)}
+          strokeLinecap="round"
+        />
         {point}
       </g>
     );

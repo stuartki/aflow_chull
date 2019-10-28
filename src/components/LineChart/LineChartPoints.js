@@ -58,7 +58,13 @@ const Points = (props) => {
   const data = props.data;
   const vertexData = [];
   const scHull = ['aflow:05636011068d8aed', 'aflow:b470c4d5c2656c07', 'aflow:7fc6963bdde3fe0f', 'aflow:17f59ed82fc797fa', 'aflow:edde65439f6a128f', 'aflow:f7a8e64312435b20', 'aflow:8d7250321f32196e'];
-  const scHullVertices = data.filter(vertex => scHull.includes(vertex.auid)).map(d => { 'auid': d.auid, 'enthalpy': props.yScale(d.enthalpyFormationAtom), 'composition': props.xScale(d.composition[0]) });
+  const scHullVertices = data.filter(vertex => scHull.includes(vertex.auid))
+    .map(d => (
+      { auid: d.auid,
+        y: d.enthalpyFormationAtom,
+        x: d.composition[1],
+      }
+    ));
   const circles = data.map((d) => {
     let point;
     let fill = props.color;
