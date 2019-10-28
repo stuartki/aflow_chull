@@ -19,6 +19,13 @@
   color: #A3A3A7;
 }
 
+#reset {
+  font-size: 12px;
+  padding-left: 10px;
+  margin-top: 15px;
+  color: #A3A3A7;
+}
+
 .axis-control-icon:hover{
   cursor: pointer;
 }

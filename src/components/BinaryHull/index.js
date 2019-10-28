@@ -146,6 +146,22 @@ class BinaryHull extends React.Component {
             }}
           />
         </div>
+        <div>
+          <button
+            id="reset"
+            // eslint-disable-next-line no-unused-vars
+            onClick={(e) => {
+              this.props.resizeHullAxes(this.props.hull.name, Number(-1000), Number(1000));
+              this.setState({
+                yMax: Number(1000),
+                yMin: Number(-1000),
+              });
+              
+            }}
+          >
+            Reset
+          </button>
+        </div>
       </div>
     );
   }
