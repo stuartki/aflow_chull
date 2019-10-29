@@ -57,6 +57,7 @@ const propTypes = {
 const Points = (props) => {
   const data = props.data;
   const vertexData = [];
+  const selectedData = [];
   const scHull = ['aflow:05636011068d8aed', 'aflow:b470c4d5c2656c07', 'aflow:7fc6963bdde3fe0f', 'aflow:17f59ed82fc797fa', 'aflow:edde65439f6a128f', 'aflow:f7a8e64312435b20', 'aflow:8d7250321f32196e'];
   const scHullVertices = data.filter(vertex => scHull.includes(vertex.auid))
     .map(d => (
@@ -67,13 +68,12 @@ const Points = (props) => {
     ));
   const circles = data.map((d) => {
     let point;
-    let fill = props.color;
+    const fill = props.color;
     if (d.distanceToHull === 0) {
       vertexData.push(d);
+    } else if (d.isClicked) {
+      selectedData.push(d);
     } else {
-      if (d.isClicked) {
-        fill = '#CA6F96';
-      }
       point = (
         <Point
           cx={props.xScale(d.composition[1])}
@@ -92,17 +92,35 @@ const Points = (props) => {
         />
       );
     }
-
     return (point);
   });
   const vertexCircles = vertexData.map((d) => {
     let fill = props.color;
-
     if (d.isClicked) {
       fill = '#CA6F96';
     }
     const point = (
       <Vertex
+        cx={props.xScale(d.composition[1])}
+        xScale={props.xScale}
+        cy={props.yScale(d.enthalpyFormationAtom)}
+        yScale={props.yScale}
+        fill={fill}
+        key={d.auid}
+        auid={d.auid}
+        scHullVertices={scHullVertices}
+        isClicked={d.isClicked}
+        line={props.line}
+        pointClickHandler={props.pointClickHandler}
+        pointHoverHandler={props.pointHoverHandler}
+      />
+    );
+    return (point);
+  });
+  const selectedCircles = selectedData.map((d) => {
+    const fill = '#CA6F96';
+    const point = (
+      <Point
         cx={props.xScale(d.composition[1])}
         xScale={props.xScale}
         cy={props.yScale(d.enthalpyFormationAtom)}
@@ -119,14 +137,13 @@ const Points = (props) => {
         pointHoverHandler={props.pointHoverHandler}
       />
     );
-
     return (point);
   });
-
   return (
     <g>
       {circles}
       {vertexCircles}
+      {selectedCircles}
     </g>
   );
 };
