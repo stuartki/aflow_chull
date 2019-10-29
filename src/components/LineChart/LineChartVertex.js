@@ -8,12 +8,6 @@ const propTypes = {
   yScale: PropTypes.func.isRequired,
   fill: PropTypes.string.isRequired,
   auid: PropTypes.string.isRequired,
-  vertices: PropTypes.arrayOf(
-    PropTypes.shape({
-      x: React.PropTypes.number.isRequired,
-      y: React.PropTypes.number.isRequired,
-    }),
-  ).isRequired,
   scHullVertices: PropTypes.arrayOf(
     PropTypes.shape({
       auid: React.PropTypes.string.isRequired,
@@ -22,7 +16,6 @@ const propTypes = {
     }),
   ).isRequired,
   isClicked: PropTypes.bool.isRequired,
-  distanceToHull: PropTypes.number.isRequired,
   line: PropTypes.func.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
 };
@@ -31,21 +24,53 @@ class Vertex extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      sc: true,
+      sc: false,
     };
     this.onClick = this.onClick.bind(this);
+    this.onMouseOver = this.onMouseOver.bind(this);
+    this.onMouseOut = this.onMouseOut.bind(this);
   }
 
   onClick() {
     this.props.pointClickHandler(this.props.auid);
   }
 
-  // onDragStart() {
-    
-  // }
+  onMouseOver() {
+    this.setState({ sc: true });
+  }
+
+  onMouseOut() {
+    this.setState({ sc: false });
+  }
 
   render() {
+    let newHull = null;
     let point = null;
+    if (this.state.sc && this.props.isClicked) {
+      const circles = this.props.scHullVertices.map(d => (
+        <circle
+          className="point"
+          r="5"
+          cx={this.props.xScale(d.x)}
+          cy={this.props.yScale(d.y)}
+          fill="none"
+          strokeWidth="2px"
+          stroke="#ff0000"
+        />
+      ));
+      newHull =
+        (
+          <g>
+            <path
+              className="line shadow"
+              stroke="blue"
+              d={this.props.line(this.props.scHullVertices)}
+              strokeLinecap="round"
+            />
+            {circles}
+          </g>
+        );
+    }
     point =
         (
           <g>
@@ -64,12 +89,7 @@ class Vertex extends React.Component {
         );
     return (
       <g>
-        <path
-          className="line shadow"
-          stroke="blue"
-          d={this.props.line(this.props.scHullVertices)}
-          strokeLinecap="round"
-        />
+        {newHull}
         {point}
       </g>
     );
