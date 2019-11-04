@@ -40,11 +40,7 @@ class TernaryHullRender {
     this.scene = new THREE.Scene();
     this.group = new THREE.Group();
     this.group.applyMatrix(
-      new THREE.Matrix4().makeTranslation(
-        - this.triCenter[0],
-        - this.triCenter[1],
-        0
-      )
+      new THREE.Matrix4().makeTranslation(-this.triCenter[0], -this.triCenter[1], 0),
     );
     // this.controls;
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -59,7 +55,7 @@ class TernaryHullRender {
       45,
       this.width / this.height,
       1,
-      10000
+      10000,
     );
     this.camera.position.set(0, 0, 1500);
 
@@ -86,10 +82,11 @@ class TernaryHullRender {
     this.renderer.setClearColor(0xFFFFFF, 1);
     this.renderer.setSize(
       this.width,
-      this.height
+      this.height,
     );
     this.container.appendChild(this.renderer.domElement);
 
+    // eslint-disable-next-line max-len
     // window.addEventListener('keydown', this.onKeyDown.bind(this), false); // part of work in progress
 
     this.controls.addEventListener('change', () => this.render());
@@ -104,7 +101,7 @@ class TernaryHullRender {
     this.container.addEventListener(
       'mousedown',
       this.onClick.bind(this),
-      false
+      false,
     );
     this.animate();
   }
@@ -123,12 +120,13 @@ class TernaryHullRender {
       const x = a / sum;
       const y = b / sum;
       const z = c / sum;
-      pos[0] = corners[0][0] * x + corners[1][0] * y + corners[2][0] * z;
-      pos[1] = corners[0][1] * x + corners[1][1] * y + corners[2][1] * z;
+      pos[0] = (corners[0][0] * x) + (corners[1][0] * y) + (corners[2][0] * z);
+      pos[1] = (corners[0][1] * x) + (corners[1][1] * y) + (corners[2][1] * z);
     }
     return pos;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   createTextCanvas(text, color, font, size) {
     const textSize = size || 64;
     const canvas = document.createElement('canvas');
@@ -151,7 +149,7 @@ class TernaryHullRender {
       canvas.width,
       canvas.height,
       segW,
-      segH
+      segH,
     );
     const tex = new THREE.Texture(canvas);
     tex.needsUpdate = true;
@@ -175,99 +173,108 @@ class TernaryHullRender {
       color: 0x000000,
     });
 
+    // lower geometry
     const gridLowerGeometry = new THREE.Geometry();
     gridLowerGeometry.vertices.push(
-      new THREE.Vector3(0, 0, - this.gridHeight)
+      new THREE.Vector3(0, 0, -this.gridHeight),
     );
     gridLowerGeometry.vertices.push(
       new THREE.Vector3(
         (this.triSide / 2) + this.triMargin,
         this.triHeight + this.triMargin,
-        - this.gridHeight
-      )
+        -this.gridHeight,
+      ),
     );
     gridLowerGeometry.vertices.push(
       new THREE.Vector3(
         this.triSide + this.triMargin,
         0,
-        - this.gridHeight
-      )
+        -this.gridHeight,
+      ),
     );
     gridLowerGeometry.vertices.push(
-      new THREE.Vector3(0, 0, - this.gridHeight)
+      new THREE.Vector3(0, 0, -this.gridHeight),
     );
 
+    // mid geometry
     const gridMidGeometry = new THREE.Geometry();
     gridMidGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
     gridMidGeometry.vertices.push(
       new THREE.Vector3(
         (this.triSide / 2) + this.triMargin,
         this.triHeight + this.triMargin,
-        0
-      )
+        0,
+      ),
     );
     gridMidGeometry.vertices.push(
-      new THREE.Vector3(this.triSide + this.triMargin, 0, 0)
+      new THREE.Vector3(this.triSide + this.triMargin, 0, 0),
     );
     gridMidGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
 
+    // upper geometry
     const gridUpperGeometry = new THREE.Geometry();
     gridUpperGeometry.vertices.push(new THREE.Vector3(0, 0, this.gridHeight));
     gridUpperGeometry.vertices.push(
       new THREE.Vector3(
         (this.triSide / 2) + this.triMargin,
         this.triHeight + this.triMargin,
-        this.gridHeight
-      )
+        this.gridHeight,
+      ),
     );
     gridUpperGeometry.vertices.push(
       new THREE.Vector3(
         this.triSide + this.triMargin,
         0,
-        this.gridHeight
-      )
+        this.gridHeight,
+      ),
     );
     gridUpperGeometry.vertices.push(new THREE.Vector3(0, 0, this.gridHeight));
 
+    // SIDE GEOMETRY (lines?)
+    // side one
     const gridSideOneGeometry = new THREE.Geometry();
     gridSideOneGeometry.vertices.push(
-      new THREE.Vector3(0, 0, - this.gridHeight)
+      new THREE.Vector3(0, 0, -this.gridHeight),
     );
     gridSideOneGeometry.vertices.push(
-      new THREE.Vector3(0, 0, this.gridHeight)
+      new THREE.Vector3(0, 0, this.gridHeight),
     );
 
+    // side two
     const gridSideTwoGeometry = new THREE.Geometry();
     gridSideTwoGeometry.vertices.push(
       new THREE.Vector3(
         (this.triSide / 2) + this.triMargin,
         this.triHeight + this.triMargin,
-        -this.gridHeight
-      )
+        -this.gridHeight,
+      ),
     );
     gridSideTwoGeometry.vertices.push(
       new THREE.Vector3(
         (this.triSide / 2) + this.triMargin,
         this.triHeight + this.triMargin,
-        this.gridHeight
-      )
+        this.gridHeight,
+      ),
     );
+
+    // side three
     const gridSideThreeGeometry = new THREE.Geometry();
     gridSideThreeGeometry.vertices.push(
       new THREE.Vector3(
         this.triSide + this.triMargin,
         0,
-        - this.gridHeight
-      )
+        -this.gridHeight,
+      ),
     );
     gridSideThreeGeometry.vertices.push(
       new THREE.Vector3(
         this.triSide + this.triMargin,
         0,
-        this.gridHeight
-      )
+        this.gridHeight,
+      ),
     );
 
+    // constructing lines
     const gridLineLower = new THREE.Line(gridLowerGeometry, material);
     const gridLineMid = new THREE.Line(gridMidGeometry, material);
     const gridLineUpper = new THREE.Line(gridUpperGeometry, material);
@@ -284,7 +291,7 @@ class TernaryHullRender {
     this.group.add(gridLineSideThree);
   }
 
-
+  // drawing axis
   drawAxis(axisMin, axisMax) {
     this.group.remove(this.axisTicks);
     this.group.remove(this.axisLabels);
@@ -293,10 +300,10 @@ class TernaryHullRender {
     this.axisLabels = new THREE.Group();
 
     const normalizationMin = Math.abs(
-      this.gridHeight / (axisMin * this.gridHeight)
+      this.gridHeight / (axisMin * this.gridHeight),
     );
     const normalizationMax = Math.abs(
-      this.gridHeight / (axisMax * this.gridHeight)
+      this.gridHeight / (axisMax * this.gridHeight),
     );
 
     const tickSize = 10;
@@ -304,28 +311,33 @@ class TernaryHullRender {
       color: 0xE75112,
       linewidth: 1,
     });
+
+    // text position within the canvas
     const textPosX = 150;
     const textPosY = 75;
+    // sprite position in relative to the axis
     const spritePosX = -25;
     const spritePosY = 5;
 
-
-    for (let i = axisMin; i <= -0.1; i = i + 0.1) {
+    for (let i = axisMin; i <= -0.1; i += 0.1) {
       const tickGeometry = new THREE.Geometry();
+
+      // add a tick on both sides of axes
       tickGeometry.vertices.push(
         new THREE.Vector3(
           tickSize / 2,
           0,
-          i * this.gridHeight * normalizationMin
-        )
+          i * this.gridHeight * normalizationMin,
+        ),
       );
       tickGeometry.vertices.push(
         new THREE.Vector3(
           -tickSize / 2,
           0,
-          i * this.gridHeight * normalizationMin
-        )
+          i * this.gridHeight * normalizationMin,
+        ),
       );
+
       const tick = new THREE.Line(tickGeometry, axisMaterial);
       this.axisTicks.add(tick);
 
@@ -341,6 +353,7 @@ class TernaryHullRender {
       if (i > 0) label = ` ${label}`;
       labelContext.fillText(label, textPosX, textPosY);
 
+      // 3D creation of sprite and canvas created above
       const labelTexture = new THREE.Texture(labelCanvas);
       labelTexture.needsUpdate = true;
       const labelMaterial = new THREE.SpriteMaterial({ map: labelTexture });
@@ -349,26 +362,27 @@ class TernaryHullRender {
       labelSprite.position.set(
         spritePosX,
         spritePosY,
-        i * this.gridHeight * normalizationMin
+        i * this.gridHeight * normalizationMin,
       );
       this.axisLabels.add(labelSprite);
     }
 
+    // hm, they switched the for loop definiiton
     for (let i = 0; i <= this.gridMax * 10; i++) {
       const tickGeometry = new THREE.Geometry();
       tickGeometry.vertices.push(
         new THREE.Vector3(
           tickSize / 2,
           0,
-          i / 10 * this.gridHeight * normalizationMax
-        )
+          (i / 10) * this.gridHeight * normalizationMax,
+        ),
       );
       tickGeometry.vertices.push(
         new THREE.Vector3(
           -tickSize / 2,
           0,
-          i / 10 * this.gridHeight * normalizationMax
-        )
+          (i / 10) * this.gridHeight * normalizationMax,
+        ),
       );
       const tick = new THREE.Line(tickGeometry, axisMaterial);
       this.axisTicks.add(tick);
@@ -395,7 +409,7 @@ class TernaryHullRender {
       labelSprite.position.set(
         spritePosX,
         spritePosY,
-        i / 10 * this.gridHeight * normalizationMax
+        (i / 10) * this.gridHeight * normalizationMax,
       );
       this.axisLabels.add(labelSprite);
     }
@@ -410,7 +424,7 @@ class TernaryHullRender {
     labelContext.fillText(
       'formation enthalpy (meV)',
       textPosX - 50,
-      textPosY
+      textPosY,
     );
 
     const labelTexture = new THREE.Texture(labelCanvas);
@@ -437,13 +451,15 @@ class TernaryHullRender {
   drawHull(data) {
     // console.log('passed data', hullData);
     const hullData = data;
+
+    // clean previous elements
     this.group.remove(this.hullMesh);
     this.group.remove(this.elementA);
     this.group.remove(this.elementB);
     this.group.remove(this.elementC);
     this.scene.remove(this.edges);
 
-    // titles on graph
+    // ELEMENT TITLES
     let elemColor = this.color;
     if (this.defaultColor) {
       elemColor = '#FF0000';
@@ -458,8 +474,8 @@ class TernaryHullRender {
     this.elementB = this.createText2D(hullData.species[1], elemColor);
     this.elementB.position.set(
       this.triCenter[0],
-      this.triCenter[1] + this.triSide / 2 + 70,
-      0
+      this.triCenter[1] + (this.triSide / 2) + 70,
+      0,
     );
     // this.elementB.position.x = this.triCenter[0];
     // this.elementB.position.y = this.triCenter[1] + this.triSide / 2 + 70;
@@ -472,14 +488,14 @@ class TernaryHullRender {
     this.elementC = this.createText2D(hullData.species[2], elemColor);
     this.elementC.position.set(
       this.triSide + 30,
-      this.triCenter[1] - this.triSide / 3 - 10,
-      0
+      // bottom is because midpoint is localized below midpoint
+      this.triCenter[1] - (this.triSide / 3) - 10,
+      0,
     );
     // this.elementC.position.x = this.triSide + 30;
     // this.elementC.position.y = this.triCenter[1] - this.triSide / 3 - 10;
     // this.elementC.position.z = 0;
     this.group.add(this.elementC);
-    
 
 
     // ============ DRAWING CONVEX HULL USING FACES ===================
@@ -493,8 +509,9 @@ class TernaryHullRender {
       depthTest: false,   // FIXES TOOLTIP VISIBILITY WHEN WITHIN HULL
     });
 
-
+    // ONLY VERTICES
     for (let i = 0; i < hullData.vertices.length; i++) {
+      // resetting vertices for the sake of visualization?
       if (hullData.vertices[i].composition[0] === 1 ||
           hullData.vertices[i].composition[1] === 1 ||
           hullData.vertices[i].composition[2] === 1) {
@@ -503,14 +520,15 @@ class TernaryHullRender {
       const triPos = this.triCoord(
         hullData.vertices[i].composition[0],
         hullData.vertices[i].composition[2],
-        hullData.vertices[i].composition[1]
+        hullData.vertices[i].composition[1],
       );
       geometry.vertices.push(
         new THREE.Vector3(
           triPos[0],
           triPos[1],
-          hullData.vertices[i].enthalpyFormationAtom * this.gridHeight
-        )
+          // why is this scaled this way?
+          hullData.vertices[i].enthalpyFormationAtom * this.gridHeight,
+        ),
       );
     }
 
@@ -519,8 +537,8 @@ class TernaryHullRender {
         new THREE.Face3(
           hullData.faces[i][0],
           hullData.faces[i][1],
-          hullData.faces[i][2]
-        )
+          hullData.faces[i][2],
+        ),
       );
     }
 
@@ -551,8 +569,12 @@ class TernaryHullRender {
 
 
   plotEntries(data) {
+    // clear points
     this.group.remove(this.pointCloud);
+
     const entries = this.filterByEnthalpy(data);
+
+    // create new geometry
     const pointsGeometry = new THREE.BufferGeometry();
 
     const positions = new Float32Array(entries.length * 3);
@@ -571,7 +593,7 @@ class TernaryHullRender {
       const datapoint = new THREE.Vector3(
         pCoord[0],
         pCoord[1],
-        (entries[i].enthalpyFormationAtom * this.gridHeight)
+        (entries[i].enthalpyFormationAtom * this.gridHeight),
       );
       let pointColor;
       if (this.defaultColor) {
@@ -592,15 +614,15 @@ class TernaryHullRender {
 
     pointsGeometry.addAttribute(
       'position',
-      new THREE.BufferAttribute(positions, 3)
+      new THREE.BufferAttribute(positions, 3),
     );
     pointsGeometry.addAttribute(
       'customColor',
-      new THREE.BufferAttribute(colors, 3)
+      new THREE.BufferAttribute(colors, 3),
     );
     pointsGeometry.addAttribute(
       'size',
-      new THREE.BufferAttribute(sizes, 1)
+      new THREE.BufferAttribute(sizes, 1),
     );
 
     const fragmentShader = [
@@ -626,11 +648,11 @@ class TernaryHullRender {
       '}',
     ].join('\n');
 
-    const texture = new THREE.TextureLoader().load('textures/disc.png');
+    // const texture = new THREE.TextureLoader().load('textures/disc.png');
     const pointsMaterial = new THREE.ShaderMaterial({
       uniforms: {
         color: { type: 'c', value: new THREE.Color(0xFFFFFF) },
-        texture: { type: 't', value: texture },
+        // texture: { type: 't', value: texture },
       },
       vertexShader,
       fragmentShader,
@@ -661,7 +683,7 @@ class TernaryHullRender {
       const datapoint = new THREE.Vector3(
         pCoord[0],
         pCoord[1],
-        (entries[i].enthalpyFormationAtom * this.gridHeight)
+        (entries[i].enthalpyFormationAtom * this.gridHeight),
       );
       let pointColor;
       if (this.defaultColor) {
@@ -749,7 +771,7 @@ class TernaryHullRender {
     z = 1 - Math.abs(vertex.z / this.gridHeight);
     const hsl = c.getHSL();
 
-    c.setHSL(hsl.h, hsl.s, 1 - hsl.l * z);
+    c.setHSL(hsl.h, hsl.s, 1 - (hsl.l * z));
     return c;
   }
 
@@ -760,11 +782,14 @@ class TernaryHullRender {
     const top = window.pageYOffset || document.documentElement.scrollTop;
     const left = window.pageXOffset || document.documentElement.scrollLeft;
     this.mouse.x = (
+      // eslint-disable-next-line no-mixed-operators
       (event.clientX - this.renderer.domElement.offsetLeft - viewport.offsetLeft + left + 5) /
       this.renderer.domElement.width
+    // eslint-disable-next-line no-mixed-operators
     ) * 2 - 1; // NOTE: the +5 is a hack to get raycaster centered on point in nwjs
     this.mouse.y = -(
       (event.clientY - this.renderer.domElement.offsetTop - viewport.offsetTop) /
+    // eslint-disable-next-line no-mixed-operators
     this.renderer.domElement.height) * 2 + 1;
   }
 
@@ -912,8 +937,8 @@ class TernaryHullRender {
       this.container.removeChild(this.container.firstChild);
     }
     */
-    while(this.scene.children.length > 0){ 
-      this.scene.remove(this.scene.children[0]); 
+    while (this.scene.children.length > 0) {
+      this.scene.remove(this.scene.children[0]);
     }
   }
 
@@ -930,7 +955,7 @@ class TernaryHullRender {
     this.container.removeEventListener(
       'mousedown',
       this.onClick.bind(this),
-      false
+      false,
     );
   }
 }
