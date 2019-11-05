@@ -45,10 +45,11 @@ class TernaryHullRender {
     // this.controls;
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
 
-    this.spheres = [];
-    this.spheresIndex = 0;
-    this.clock = new THREE.Clock();
-    this.toggle = 0;
+    // pointer
+    const sphereGeometry = new THREE.SphereBufferGeometry(1, 32, 32);
+    const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    this.sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    this.scene.add(this.sphere);
   }
 
   init(containerID) {
@@ -90,15 +91,6 @@ class TernaryHullRender {
       this.height,
     );
     this.container.appendChild(this.renderer.domElement);
-
-    // raycaster
-    const sphereGeometry = new THREE.SphereBufferGeometry(1, 32, 32);
-    const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    for (let i = 0; i < 40; i++) {
-      const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-      this.scene.add(sphere);
-      this.spheres.push(sphere);
-    }
 
     // eslint-disable-next-line max-len
     // window.addEventListener('keydown', this.onKeyDown.bind(this), false); // part of work in progress
@@ -815,18 +807,9 @@ class TernaryHullRender {
     const intersections = this.raycaster.intersectObjects(this.intersectArray);
     const intersection = (intersections.length) > 0 ? intersections[0] : null;
 
-    if (this.toggle > 0.02 && intersection !== null) {
-      this.spheres[this.spheresIndex].position.copy(intersection.point);
-      this.spheres[this.spheresIndex].scale.set(1, 1, 1);
-      this.spheresIndex = (this.spheresIndex + 1) % this.spheres.length;
-      this.toggle = 0;
+    if (intersection !== null) {
+      this.sphere.position.copy(intersection.point);
     }
-    // for (let i = 0; i < this.spheres.length; i++) {
-    //   const sphere = this.spheres[i];
-    //   sphere.scale.multiplyScalar(0.98);
-    //   sphere.scale.clampScalar(0.01, 1);
-    // }
-    this.toggle += this.clock.getDelta();
     this.render();
   }
 
