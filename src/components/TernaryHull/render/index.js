@@ -44,6 +44,11 @@ class TernaryHullRender {
     );
     // this.controls;
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
+
+    this.spheres = [];
+    this.spheresIndex = 0;
+    this.clock = new THREE.Clock();
+    this.toggle = 0;
   }
 
   init(containerID) {
@@ -86,18 +91,27 @@ class TernaryHullRender {
     );
     this.container.appendChild(this.renderer.domElement);
 
+    // raycaster
+    const sphereGeometry = new THREE.SphereBufferGeometry(1, 32, 32);
+    const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    for (let i = 0; i < 40; i++) {
+      const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+      this.scene.add(sphere);
+      this.spheres.push(sphere);
+    }
+
     // eslint-disable-next-line max-len
     // window.addEventListener('keydown', this.onKeyDown.bind(this), false); // part of work in progress
 
     this.controls.addEventListener('change', () => this.render());
     window.addEventListener('resize', this.onWindowResize.bind(this), false);
-    /*
+
     this.container.addEventListener(
       'mousemove',
       this.onMouseMove.bind(this),
-      false
+      false,
     );
-    */
+
     this.container.addEventListener(
       'mousedown',
       this.onClick.bind(this),
@@ -511,7 +525,7 @@ class TernaryHullRender {
 
     // ONLY VERTICES
     for (let i = 0; i < hullData.vertices.length; i++) {
-      // resetting vertices for the sake of visualization?
+      // resetting vertices height to 0 for the sake of visualization?
       if (hullData.vertices[i].composition[0] === 1 ||
           hullData.vertices[i].composition[1] === 1 ||
           hullData.vertices[i].composition[2] === 1) {
@@ -775,10 +789,15 @@ class TernaryHullRender {
     return c;
   }
 
+  // findFacet(point) {
+  //   const hullMesh = this.hullMesh;
+  // }
+
   onMouseMove(event) {
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
     const viewport = document.getElementById('viewport'); // boostrap fix
+    // eslint-disable-next-line no-unused-vars
     const top = window.pageYOffset || document.documentElement.scrollTop;
     const left = window.pageXOffset || document.documentElement.scrollLeft;
     this.mouse.x = (
@@ -791,6 +810,24 @@ class TernaryHullRender {
       (event.clientY - this.renderer.domElement.offsetTop - viewport.offsetTop) /
     // eslint-disable-next-line no-mixed-operators
     this.renderer.domElement.height) * 2 + 1;
+
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const intersections = this.raycaster.intersectObjects(this.intersectArray);
+    const intersection = (intersections.length) > 0 ? intersections[0] : null;
+
+    if (this.toggle > 0.02 && intersection !== null) {
+      this.spheres[this.spheresIndex].position.copy(intersection.point);
+      this.spheres[this.spheresIndex].scale.set(1, 1, 1);
+      this.spheresIndex = (this.spheresIndex + 1) % this.spheres.length;
+      this.toggle = 0;
+    }
+    // for (let i = 0; i < this.spheres.length; i++) {
+    //   const sphere = this.spheres[i];
+    //   sphere.scale.multiplyScalar(0.98);
+    //   sphere.scale.clampScalar(0.01, 1);
+    // }
+    this.toggle += this.clock.getDelta();
+    this.render();
   }
 
 
@@ -812,14 +849,21 @@ class TernaryHullRender {
   onClick(event) {
     event.preventDefault();
     const viewport = document.getElementById('viewport'); // boostrap fix
+    // eslint-disable-next-line no-unused-vars
     const top = window.pageYOffset || document.documentElement.scrollTop;
     const left = window.pageXOffset || document.documentElement.scrollLeft;
+    // viewport for scrolls + domElement in respect to sidebar, etc. + already scrolled
     this.mouse.x = (
+      // eslint-disable-next-line no-mixed-operators
       (event.clientX - this.renderer.domElement.offsetLeft - viewport.offsetLeft + left + 5) /
       this.renderer.domElement.width
+    // eslint-disable-next-line no-mixed-operators
     ) * 2 - 1; // NOTE: the +5 is a hack to get raycaster centered on point in nwjs
     this.mouse.y = -(
+      // eslint-disable-next-line no-mixed-operators
+      // eslint-disable-next-line max-len
       (event.clientY - this.renderer.domElement.offsetTop - viewport.offsetTop + viewport.scrollTop) /
+    // eslint-disable-next-line no-mixed-operators
     this.renderer.domElement.height) * 2 + 1;
     // update the picking ray with the camera and mouse position
     this.raycaster.setFromCamera(this.mouse, this.camera);
