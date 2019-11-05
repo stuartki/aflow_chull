@@ -46,7 +46,7 @@ class TernaryHullRender {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
 
     // pointer
-    const sphereGeometry = new THREE.SphereBufferGeometry(1, 32, 32);
+    const sphereGeometry = new THREE.SphereBufferGeometry(2, 32, 32);
     const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     this.sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     this.scene.add(this.sphere);
