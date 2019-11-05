@@ -802,7 +802,7 @@ class TernaryHullRender {
     const left = window.pageXOffset || document.documentElement.scrollLeft;
     this.mouse.x = (
       // eslint-disable-next-line no-mixed-operators
-      (event.clientX - this.renderer.domElement.offsetLeft - viewport.offsetLeft + left + 5) /
+      (event.clientX - this.renderer.domElement.offsetLeft - viewport.offsetLeft + left) /
       this.renderer.domElement.width
     // eslint-disable-next-line no-mixed-operators
     ) * 2 - 1; // NOTE: the +5 is a hack to get raycaster centered on point in nwjs
