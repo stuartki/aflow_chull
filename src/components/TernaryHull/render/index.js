@@ -532,7 +532,6 @@ class TernaryHullRender {
         new THREE.Vector3(
           triPos[0],
           triPos[1],
-          // why is this scaled this way?
           hullData.vertices[i].enthalpyFormationAtom * this.gridHeight,
         ),
       );
@@ -781,9 +780,60 @@ class TernaryHullRender {
     return c;
   }
 
-  // findFacet(point) {
-  //   const hullMesh = this.hullMesh;
-  // }
+  findFacet(point) {
+    // cite https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
+    function inTriangle(pt, vertices) {
+      function sgn(p1, p2, p3) {
+        // eslint-disable-next-line no-mixed-operators
+        return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+      }
+
+      const d1 = sgn(pt, vertices[0], vertices[1]);
+      const d2 = sgn(pt, vertices[1], vertices[2]);
+      const d3 = sgn(pt, vertices[0], vertices[2]);
+
+      const hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+      const hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+
+      return !(hasNeg && hasPos);
+    }
+
+    // this.group.remove(this.hullMesh);
+    const faces = this.hullMesh.geometry.faces;
+    const vertices = this.hullMesh.geometry.vertices;
+    let v1;
+    let v2;
+    let v3;
+    for (let i = 0; i < faces.length; i++) {
+      v1 = vertices[faces[i].a];
+      v2 = vertices[faces[i].b];
+      v3 = vertices[faces[i].c];
+      // eslint-disable-next-line max-len
+      if (inTriangle(point, [{ x: v1.x, y: v1.y }, { x: v2.x, y: v2.y }, { x: v3.x, y: v3.y }])) {
+      //   geometry = new THREE.Geometry();
+      //   geometry.vertices.push(
+      //     new THREE.Vector3(
+      //       v1,
+      //       v2,
+      //       hullData.vertices[i].enthalpyFormationAtom * this.gridHeight,
+      //     ),
+      //   );
+      // }
+  
+      // for (let i = 0; i < hullData.faces.length; i++) {
+      //   geometry.faces.push(
+      //     new THREE.Face3(
+      //       hullData.faces[i][0],
+      //       hullData.faces[i][1],
+      //       hullData.faces[i][2],
+      //     ),
+      //   );
+      // }
+        return v1;
+      }
+    }
+    return null;
+  }
 
   onMouseMove(event) {
     // calculate mouse position in normalized device coordinates
@@ -809,6 +859,7 @@ class TernaryHullRender {
 
     if (intersection !== null) {
       this.sphere.position.copy(intersection.point);
+      this.findFacet(intersection.point);
     }
     this.render();
   }
