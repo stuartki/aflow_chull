@@ -790,7 +790,10 @@ class TernaryHullRender {
 
       const d1 = sgn(pt, vertices[0], vertices[1]);
       const d2 = sgn(pt, vertices[1], vertices[2]);
-      const d3 = sgn(pt, vertices[0], vertices[2]);
+      const d3 = sgn(pt, vertices[2], vertices[0]);
+      // if (d1 === 0 || d2 === 0 || d3 === 0) {
+      //   return true;
+      // }
 
       const hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
       const hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
@@ -808,27 +811,20 @@ class TernaryHullRender {
       v1 = vertices[faces[i].a];
       v2 = vertices[faces[i].b];
       v3 = vertices[faces[i].c];
-      // eslint-disable-next-line max-len
-      if (inTriangle(point, [{ x: v1.x, y: v1.y }, { x: v2.x, y: v2.y }, { x: v3.x, y: v3.y }])) {
-      //   geometry = new THREE.Geometry();
-      //   geometry.vertices.push(
-      //     new THREE.Vector3(
-      //       v1,
-      //       v2,
-      //       hullData.vertices[i].enthalpyFormationAtom * this.gridHeight,
-      //     ),
-      //   );
-      // }
-  
-      // for (let i = 0; i < hullData.faces.length; i++) {
-      //   geometry.faces.push(
-      //     new THREE.Face3(
-      //       hullData.faces[i][0],
-      //       hullData.faces[i][1],
-      //       hullData.faces[i][2],
-      //     ),
-      //   );
-      // }
+
+      // eslint-disable-next-line no-mixed-operators
+      if (inTriangle({ x: point[0], y: point[1] }, [{ x: v1.x, y: v1.y }, { x: v2.x, y: v2.y }, { x: v3.x, y: v3.y }])) {
+        const geometry = new THREE.Geometry();
+        geometry.vertices.push(
+          v1, v2, v3,
+        );
+
+        geometry.faces.push(
+          new THREE.Face3(
+            0, 1, 2,
+          ),
+        );
+        this.group.add(new THREE.Mesh(geometry));
         return v1;
       }
     }
@@ -859,7 +855,7 @@ class TernaryHullRender {
 
     if (intersection !== null) {
       this.sphere.position.copy(intersection.point);
-      this.findFacet(intersection.point);
+      this.findFacet(this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3));
     }
     this.render();
   }
