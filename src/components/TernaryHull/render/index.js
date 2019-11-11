@@ -781,54 +781,48 @@ class TernaryHullRender {
   }
 
   findFacet(point) {
-    // cite https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
-    function inTriangle(pt, vertices) {
-      function sgn(p1, p2, p3) {
+    function inEdge(pt, v1, v2) {
+      const thisPoint = { x: pt[0], y: pt[1] };
+      function distance(one, two) {
+        const a = one.x - two.x;
+        const b = one.y - two.y;
         // eslint-disable-next-line no-mixed-operators
-        return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+        return Math.sqrt(a * a + b * b);
       }
-
-      const d1 = sgn(pt, vertices[0], vertices[1]);
-      const d2 = sgn(pt, vertices[1], vertices[2]);
-      const d3 = sgn(pt, vertices[2], vertices[0]);
-      // if (d1 === 0 || d2 === 0 || d3 === 0) {
-      //   return true;
-      // }
-
-      const hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
-      const hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
-
-      return !(hasNeg && hasPos);
+      // eslint-disable-next-line no-mixed-operators
+      if (distance(thisPoint, v1) + distance(thisPoint, v2) - distance(v2, v1) < 0.01) {
+        return true;
+      }
+      return false;
     }
 
-    // this.group.remove(this.hullMesh);
+    function makeLine(v1, v2) {
+      const geometry = new THREE.Geometry();
+      geometry.vertices.push(
+        v1, v2,
+      );
+      const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
+      return new THREE.Line(geometry, material);
+    }
     const faces = this.hullMesh.geometry.faces;
     const vertices = this.hullMesh.geometry.vertices;
-    let v1;
-    let v2;
-    let v3;
+    let vertex1;
+    let vertex2;
+    let vertex3;
     for (let i = 0; i < faces.length; i++) {
-      v1 = vertices[faces[i].a];
-      v2 = vertices[faces[i].b];
-      v3 = vertices[faces[i].c];
-
-      // eslint-disable-next-line no-mixed-operators
-      if (inTriangle({ x: point[0], y: point[1] }, [{ x: v1.x, y: v1.y }, { x: v2.x, y: v2.y }, { x: v3.x, y: v3.y }])) {
-        const geometry = new THREE.Geometry();
-        geometry.vertices.push(
-          v1, v2, v3,
-        );
-
-        geometry.faces.push(
-          new THREE.Face3(
-            0, 1, 2,
-          ),
-        );
-        this.group.add(new THREE.Mesh(geometry));
-        return v1;
+      vertex1 = vertices[faces[i].a];
+      vertex2 = vertices[faces[i].b];
+      vertex3 = vertices[faces[i].c];
+      if (inEdge(point, vertex1, vertex2)) {
+        this.group.add(makeLine(vertex1, vertex2));
+      }
+      if (inEdge(point, vertex2, vertex3)) {
+        this.group.add(makeLine(vertex2, vertex3));
+      }
+      if (inEdge(point, vertex3, vertex1)) {
+        this.group.add(makeLine(vertex3, vertex1));
       }
     }
-    return null;
   }
 
   onMouseMove(event) {
