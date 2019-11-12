@@ -653,7 +653,7 @@ class TernaryHullRender {
       '}',
     ].join('\n');
 
-    const texture = new THREE.TextureLoader().load('textures/disc.png');
+    const texture = new THREE.TextureLoader().load('textures/ball.png');
     const pointsMaterial = new THREE.ShaderMaterial({
       uniforms: {
         color: { type: 'c', value: new THREE.Color(0xFFFFFF) },
