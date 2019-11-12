@@ -1,5 +1,8 @@
 import * as THREE from 'three';
 import TrackballControls from './TrackballControls';
+import Canvas2D from './Canvas2D';
+import TernaryGrid from './TernaryGrid';
+// import OrbitControls from './OrbitControls';
 
 
 class TernaryHullRender {
@@ -13,6 +16,8 @@ class TernaryHullRender {
     } else {
       this.color = this.hull.color;
     }
+
+    // grid attributes
     this.gridHeight = 300;
     this.gridMin = -1.0;
     this.gridMax = 1.0;
@@ -20,6 +25,7 @@ class TernaryHullRender {
     this.triMargin = 0;
     this.triHeight = (Math.sqrt(3) / (2)) * this.triSide;
     this.triCenter = this.triCoord(33, 33, 34);
+
     // this.axisTicks;
     // this.axisLabels;
     // this.axisName;
@@ -77,7 +83,7 @@ class TernaryHullRender {
 
 
     // Draw Triangular grid
-    this.drawGrid();
+    this.group.add(TernaryGrid(this.gridHeight, this.triSide, this.triMargin, this.triHeight));
     // Draw Axis Ticks
     this.drawAxis(-1.0, 1.0);
     // Draw hull mesh
@@ -112,7 +118,6 @@ class TernaryHullRender {
     this.animate();
   }
 
-
   triCoord(a, b, c) {
     let sum = [0, 0];
     const pos = [0, 0];
@@ -130,171 +135,6 @@ class TernaryHullRender {
       pos[1] = (corners[0][1] * x) + (corners[1][1] * y) + (corners[2][1] * z);
     }
     return pos;
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  createTextCanvas(text, color, font, size) {
-    const textSize = size || 64;
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const fontStr = `${textSize}px ${font || 'Arial'}`;
-    ctx.font = fontStr;
-    const w = ctx.measureText(text).width;
-    const h = Math.ceil(textSize);
-    canvas.width = w;
-    canvas.height = h;
-    ctx.font = fontStr;
-    ctx.fillStyle = color || 'black';
-    ctx.fillText(text, 0, Math.ceil(textSize * 0.8));
-    return canvas;
-  }
-
-  createText2D(text, color, font, size, segW, segH) {
-    const canvas = this.createTextCanvas(text, color, font, size);
-    const plane = new THREE.PlaneGeometry(
-      canvas.width,
-      canvas.height,
-      segW,
-      segH,
-    );
-    const tex = new THREE.Texture(canvas);
-    tex.needsUpdate = true;
-    const planeMat = new THREE.MeshBasicMaterial({
-      map: tex,
-      color: 0xffffff,
-      transparent: true,
-      side: THREE.DoubleSide,
-    });
-    const mesh = new THREE.Mesh(plane, planeMat);
-    mesh.scale.set(0.5, 0.5, 0.5);
-    mesh.doubleSided = true;
-    return mesh;
-  }
-
-  drawGrid() {
-    // ++++++++++++++++++ DRAWING TRIANGULAR GRID ++++++++++++++++++++++++++++++
-    //        this can be cleaner but for now it will do...
-
-    const material = new THREE.LineBasicMaterial({
-      color: 0x000000,
-    });
-
-    // lower geometry
-    const gridLowerGeometry = new THREE.Geometry();
-    gridLowerGeometry.vertices.push(
-      new THREE.Vector3(0, 0, -this.gridHeight),
-    );
-    gridLowerGeometry.vertices.push(
-      new THREE.Vector3(
-        (this.triSide / 2) + this.triMargin,
-        this.triHeight + this.triMargin,
-        -this.gridHeight,
-      ),
-    );
-    gridLowerGeometry.vertices.push(
-      new THREE.Vector3(
-        this.triSide + this.triMargin,
-        0,
-        -this.gridHeight,
-      ),
-    );
-    gridLowerGeometry.vertices.push(
-      new THREE.Vector3(0, 0, -this.gridHeight),
-    );
-
-    // mid geometry
-    const gridMidGeometry = new THREE.Geometry();
-    gridMidGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
-    gridMidGeometry.vertices.push(
-      new THREE.Vector3(
-        (this.triSide / 2) + this.triMargin,
-        this.triHeight + this.triMargin,
-        0,
-      ),
-    );
-    gridMidGeometry.vertices.push(
-      new THREE.Vector3(this.triSide + this.triMargin, 0, 0),
-    );
-    gridMidGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
-
-    // upper geometry
-    const gridUpperGeometry = new THREE.Geometry();
-    gridUpperGeometry.vertices.push(new THREE.Vector3(0, 0, this.gridHeight));
-    gridUpperGeometry.vertices.push(
-      new THREE.Vector3(
-        (this.triSide / 2) + this.triMargin,
-        this.triHeight + this.triMargin,
-        this.gridHeight,
-      ),
-    );
-    gridUpperGeometry.vertices.push(
-      new THREE.Vector3(
-        this.triSide + this.triMargin,
-        0,
-        this.gridHeight,
-      ),
-    );
-    gridUpperGeometry.vertices.push(new THREE.Vector3(0, 0, this.gridHeight));
-
-    // SIDE GEOMETRY (lines?)
-    // side one
-    const gridSideOneGeometry = new THREE.Geometry();
-    gridSideOneGeometry.vertices.push(
-      new THREE.Vector3(0, 0, -this.gridHeight),
-    );
-    gridSideOneGeometry.vertices.push(
-      new THREE.Vector3(0, 0, this.gridHeight),
-    );
-
-    // side two
-    const gridSideTwoGeometry = new THREE.Geometry();
-    gridSideTwoGeometry.vertices.push(
-      new THREE.Vector3(
-        (this.triSide / 2) + this.triMargin,
-        this.triHeight + this.triMargin,
-        -this.gridHeight,
-      ),
-    );
-    gridSideTwoGeometry.vertices.push(
-      new THREE.Vector3(
-        (this.triSide / 2) + this.triMargin,
-        this.triHeight + this.triMargin,
-        this.gridHeight,
-      ),
-    );
-
-    // side three
-    const gridSideThreeGeometry = new THREE.Geometry();
-    gridSideThreeGeometry.vertices.push(
-      new THREE.Vector3(
-        this.triSide + this.triMargin,
-        0,
-        -this.gridHeight,
-      ),
-    );
-    gridSideThreeGeometry.vertices.push(
-      new THREE.Vector3(
-        this.triSide + this.triMargin,
-        0,
-        this.gridHeight,
-      ),
-    );
-
-    // constructing lines
-    const gridLineLower = new THREE.Line(gridLowerGeometry, material);
-    const gridLineMid = new THREE.Line(gridMidGeometry, material);
-    const gridLineUpper = new THREE.Line(gridUpperGeometry, material);
-
-    const gridLineSideOne = new THREE.Line(gridSideOneGeometry, material);
-    const gridLineSideTwo = new THREE.Line(gridSideTwoGeometry, material);
-    const gridLineSideThree = new THREE.Line(gridSideThreeGeometry, material);
-
-    this.group.add(gridLineLower);
-    this.group.add(gridLineMid);
-    this.group.add(gridLineUpper);
-    this.group.add(gridLineSideOne);
-    this.group.add(gridLineSideTwo);
-    this.group.add(gridLineSideThree);
   }
 
   // drawing axis
@@ -446,7 +286,7 @@ class TernaryHullRender {
     this.group.add(this.axisTicks);
     this.group.add(this.axisLabels);
 
-    this.axisName = this.createText2D('formation enthalpy (meV)', '#000000');
+    this.axisName = Canvas2D('formation enthalpy (meV)', '#000000');
     this.axisName.position.set(-50, 0, 0);
     this.axisName.rotation.x = -(Math.PI) / 2;
     this.axisName.rotation.z = (Math.PI) / 2;
@@ -470,14 +310,14 @@ class TernaryHullRender {
     if (this.defaultColor) {
       elemColor = '#FF0000';
     }
-    this.elementA = this.createText2D(hullData.species[0], elemColor);
+    this.elementA = Canvas2D(hullData.species[0], elemColor);
     this.elementA.position.set(-30, -30, 0);
     this.group.add(this.elementA);
 
     if (this.defaultColor) {
       elemColor = '#0000FF';
     }
-    this.elementB = this.createText2D(hullData.species[1], elemColor);
+    this.elementB = Canvas2D(hullData.species[1], elemColor);
     this.elementB.position.set(
       this.triCenter[0],
       this.triCenter[1] + (this.triSide / 2) + 70,
@@ -491,7 +331,7 @@ class TernaryHullRender {
     if (this.defaultColor) {
       elemColor = '#00FF00';
     }
-    this.elementC = this.createText2D(hullData.species[2], elemColor);
+    this.elementC = Canvas2D(hullData.species[2], elemColor);
     this.elementC.position.set(
       this.triSide + 30,
       // bottom is because midpoint is localized below midpoint
@@ -849,6 +689,7 @@ class TernaryHullRender {
 
     if (intersection !== null) {
       this.sphere.position.copy(intersection.point);
+      
       this.findFacet(this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3));
     }
     this.render();
