@@ -9,9 +9,9 @@ const propTypes = {
 };
 
 class Axis extends React.Component {
-  constructor(props) {
-    super(props);
-    this.renderAxis = this.renderAxis.bind(this);
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
   }
 
   componentDidMount() {

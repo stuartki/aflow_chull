@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import TrackballControls from './TrackballControls';
 import Canvas2D from './Canvas2D';
 import TernaryGrid from './TernaryGrid';
+import TernaryAxis from './TernaryAxis';
 // import OrbitControls from './OrbitControls';
 
 
@@ -85,7 +86,7 @@ class TernaryHullRender {
     // Draw Triangular grid
     this.group.add(TernaryGrid(this.gridHeight, this.triSide, this.triMargin, this.triHeight));
     // Draw Axis Ticks
-    this.drawAxis(-1.0, 1.0);
+    this.group.add(TernaryAxis(-1.0, 1.0));
     // Draw hull mesh
     this.drawHull(this.hull);
 
@@ -135,163 +136,6 @@ class TernaryHullRender {
       pos[1] = (corners[0][1] * x) + (corners[1][1] * y) + (corners[2][1] * z);
     }
     return pos;
-  }
-
-  // drawing axis
-  drawAxis(axisMin, axisMax) {
-    this.group.remove(this.axisTicks);
-    this.group.remove(this.axisLabels);
-    this.group.remove(this.axisName);
-    this.axisTicks = new THREE.Group();
-    this.axisLabels = new THREE.Group();
-
-    const normalizationMin = Math.abs(
-      this.gridHeight / (axisMin * this.gridHeight),
-    );
-    const normalizationMax = Math.abs(
-      this.gridHeight / (axisMax * this.gridHeight),
-    );
-
-    const tickSize = 10;
-    const axisMaterial = new THREE.LineBasicMaterial({
-      color: 0xE75112,
-      linewidth: 1,
-    });
-
-    // text position within the canvas
-    const textPosX = 150;
-    const textPosY = 75;
-    // sprite position in relative to the axis
-    const spritePosX = -25;
-    const spritePosY = 5;
-
-    for (let i = axisMin; i <= -0.1; i += 0.1) {
-      const tickGeometry = new THREE.Geometry();
-
-      // add a tick on both sides of axes
-      tickGeometry.vertices.push(
-        new THREE.Vector3(
-          tickSize / 2,
-          0,
-          i * this.gridHeight * normalizationMin,
-        ),
-      );
-      tickGeometry.vertices.push(
-        new THREE.Vector3(
-          -tickSize / 2,
-          0,
-          i * this.gridHeight * normalizationMin,
-        ),
-      );
-
-      const tick = new THREE.Line(tickGeometry, axisMaterial);
-      this.axisTicks.add(tick);
-
-      const labelCanvas = document.createElement('canvas');
-      const labelContext = labelCanvas.getContext('2d');
-
-      labelContext.font = '16px Arial';
-      labelContext.clearRect(0, 0, labelCanvas.width, labelCanvas.height);
-      labelContext.fillStyle = '#E75112';
-      let label;
-      if (i < 0) label = i.toFixed(1) * 1000;
-      if (i === 0) label = ' 0.0';
-      if (i > 0) label = ` ${label}`;
-      labelContext.fillText(label, textPosX, textPosY);
-
-      // 3D creation of sprite and canvas created above
-      const labelTexture = new THREE.Texture(labelCanvas);
-      labelTexture.needsUpdate = true;
-      const labelMaterial = new THREE.SpriteMaterial({ map: labelTexture });
-      const labelSprite = new THREE.Sprite(labelMaterial);
-      labelSprite.scale.set(200, 100, 1.0);
-      labelSprite.position.set(
-        spritePosX,
-        spritePosY,
-        i * this.gridHeight * normalizationMin,
-      );
-      this.axisLabels.add(labelSprite);
-    }
-
-    // hm, they switched the for loop definiiton
-    for (let i = 0; i <= this.gridMax * 10; i++) {
-      const tickGeometry = new THREE.Geometry();
-      tickGeometry.vertices.push(
-        new THREE.Vector3(
-          tickSize / 2,
-          0,
-          (i / 10) * this.gridHeight * normalizationMax,
-        ),
-      );
-      tickGeometry.vertices.push(
-        new THREE.Vector3(
-          -tickSize / 2,
-          0,
-          (i / 10) * this.gridHeight * normalizationMax,
-        ),
-      );
-      const tick = new THREE.Line(tickGeometry, axisMaterial);
-      this.axisTicks.add(tick);
-
-      const labelCanvas = document.createElement('canvas');
-      const labelContext = labelCanvas.getContext('2d');
-
-      labelContext.font = '16px Arial';
-      labelContext.clearRect(0, 0, labelCanvas.width, labelCanvas.height);
-      labelContext.fillStyle = '#E75112';
-      let label;
-      if (i === 0) label = ' 0.0';
-      if (i > 0) label = ` ${(i.toFixed(1) / 10) * 1000}`;
-      if (i === 10) label = ' 1000';
-      labelContext.fillText(label, textPosX, textPosY);
-
-      const labelTexture = new THREE.Texture(labelCanvas);
-      labelTexture.needsUpdate = true;
-      const labelMaterial = new THREE.SpriteMaterial({
-        map: labelTexture,
-      });
-      const labelSprite = new THREE.Sprite(labelMaterial);
-      labelSprite.scale.set(200, 100, 1.0);
-      labelSprite.position.set(
-        spritePosX,
-        spritePosY,
-        (i / 10) * this.gridHeight * normalizationMax,
-      );
-      this.axisLabels.add(labelSprite);
-    }
-
-    // Axis Name Label
-    const labelCanvas = document.createElement('canvas');
-    const labelContext = labelCanvas.getContext('2d');
-
-    labelContext.font = '16px Arial';
-    labelContext.clearRect(0, 0, labelCanvas.width, labelCanvas.height);
-    labelContext.fillStyle = '#000000';
-    labelContext.fillText(
-      'formation enthalpy (meV)',
-      textPosX - 50,
-      textPosY,
-    );
-
-    const labelTexture = new THREE.Texture(labelCanvas);
-    labelTexture.needsUpdate = true;
-    const labelMaterial = new THREE.SpriteMaterial({
-      map: labelTexture,
-    });
-    const labelSprite = new THREE.Sprite(labelMaterial);
-    labelSprite.scale.set(200, 100, 1.0);
-    labelSprite.position.set(spritePosX - 10, spritePosY, 0);
-
-
-    this.group.add(this.axisTicks);
-    this.group.add(this.axisLabels);
-
-    this.axisName = Canvas2D('formation enthalpy (meV)', '#000000');
-    this.axisName.position.set(-50, 0, 0);
-    this.axisName.rotation.x = -(Math.PI) / 2;
-    this.axisName.rotation.z = (Math.PI) / 2;
-
-    this.group.add(this.axisName);
   }
 
   drawHull(data) {
