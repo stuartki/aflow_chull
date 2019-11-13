@@ -2,23 +2,44 @@ import * as THREE from 'three';
 import Canvas2D from './Canvas2D';
 // drawing axis
 
-export class TernaryAxis {
-  constructor(axisMin, axisMax, gridHeight) {
+export default class TernaryAxis {
+  constructor(axisMin, axisMax, gridHeight, species) {
     this.axisMin = axisMin;
     this.axisMax = axisMax;
     this.gridHeight = gridHeight;
+    this.species = species;
+    this.axisGroup = new THREE.Group();
+    this.axisTicks = new THREE.Group();
+    this.axisLabels = new THREE.Group();
+    this.elements = new THREE.Group();
+    this.axisName = Canvas2D('formation enthalpy (meV)', '#000000');
   }
-}
-  function drawAxis(axisMin, axisMax, gridHeight) {
-    const axisGroup = new THREE.Group();
-    const axisTicks = new THREE.Group();
-    const axisLabels = new THREE.Group();
+  // offset is displacement of element to side
+  // offset = 0 would be overlapping
+  drawThreeElements(offset = 30, colors = ['#FF0000', '#0000FF', '#00FF00']) {
+    const triSide = this.gridHeight * 2;
+    const triPositions = [
+      [-offset, offset, 0],
+      [triSide / 2, (offset * Math.sqrt(2)) + (triSide * (Math.sqrt(3) / 2)), 0],
+      [triSide + offset, -offset, 0],
+    ];
+    for (let i = 0; i < 3; i++) {
+      const element = Canvas2D(this.species[i], colors[i]);
+      element.position.set(...triPositions[i]);
+      this.elements.add(element);
+    }
+  }
+
+  drawAxis() {
+    // draw elements
+    this.drawThreeElements();
+    this.axisGroup.add(this.elements);
 
     const normalizationMin = Math.abs(
-        gridHeight / (axisMin * gridHeight),
+        this.gridHeight / (this.axisMin * this.gridHeight),
       );
     const normalizationMax = Math.abs(
-        gridHeight / (axisMax * gridHeight),
+        this.gridHeight / (this.axisMax * this.gridHeight),
       );
 
     const tickSize = 10;
@@ -34,7 +55,7 @@ export class TernaryAxis {
     const spritePosX = -25;
     const spritePosY = 5;
 
-    for (let i = axisMin; i <= -0.1; i += 0.1) {
+    for (let i = this.axisMin; i <= -0.1; i += 0.1) {
       const tickGeometry = new THREE.Geometry();
 
         // add a tick on both sides of axes
@@ -42,19 +63,19 @@ export class TernaryAxis {
           new THREE.Vector3(
             tickSize / 2,
             0,
-            i * gridHeight * normalizationMin,
+            i * this.gridHeight * normalizationMin,
           ),
         );
       tickGeometry.vertices.push(
           new THREE.Vector3(
             -tickSize / 2,
             0,
-            i * gridHeight * normalizationMin,
+            i * this.gridHeight * normalizationMin,
           ),
         );
 
       const tick = new THREE.Line(tickGeometry, axisMaterial);
-      axisTicks.add(tick);
+      this.axisTicks.add(tick);
 
       const labelCanvas = document.createElement('canvas');
       const labelContext = labelCanvas.getContext('2d');
@@ -77,30 +98,30 @@ export class TernaryAxis {
       labelSprite.position.set(
           spritePosX,
           spritePosY,
-          i * gridHeight * normalizationMin,
+          i * this.gridHeight * normalizationMin,
         );
-      axisLabels.add(labelSprite);
+      this.axisLabels.add(labelSprite);
     }
 
       // hm, they switched the for loop definiiton
-    for (let i = 0; i <= axisMax * 10; i++) {
+    for (let i = 0; i <= this.axisMax * 10; i++) {
       const tickGeometry = new THREE.Geometry();
       tickGeometry.vertices.push(
           new THREE.Vector3(
             tickSize / 2,
             0,
-            (i / 10) * gridHeight * normalizationMax,
+            (i / 10) * this.gridHeight * normalizationMax,
           ),
         );
       tickGeometry.vertices.push(
           new THREE.Vector3(
             -tickSize / 2,
             0,
-            (i / 10) * gridHeight * normalizationMax,
+            (i / 10) * this.gridHeight * normalizationMax,
           ),
         );
       const tick = new THREE.Line(tickGeometry, axisMaterial);
-      axisTicks.add(tick);
+      this.axisTicks.add(tick);
 
       const labelCanvas = document.createElement('canvas');
       const labelContext = labelCanvas.getContext('2d');
@@ -117,16 +138,16 @@ export class TernaryAxis {
       const labelTexture = new THREE.Texture(labelCanvas);
       labelTexture.needsUpdate = true;
       const labelMaterial = new THREE.SpriteMaterial({
-          map: labelTexture,
-        });
+        map: labelTexture,
+      });
       const labelSprite = new THREE.Sprite(labelMaterial);
       labelSprite.scale.set(200, 100, 1.0);
       labelSprite.position.set(
           spritePosX,
           spritePosY,
-          (i / 10) * gridHeight * normalizationMax,
+          (i / 10) * this.gridHeight * normalizationMax,
         );
-      axisLabels.add(labelSprite);
+      this.axisLabels.add(labelSprite);
     }
 
       // Axis Name Label
@@ -152,21 +173,23 @@ export class TernaryAxis {
     labelSprite.position.set(spritePosX - 10, spritePosY, 0);
 
 
-    axisGroup.add(axisTicks);
-    axisGroup.add(axisLabels);
+    this.axisGroup.add(this.axisTicks);
+    this.axisGroup.add(this.axisLabels);
 
-    const axisName = Canvas2D('formation enthalpy (meV)', '#000000');
-    axisName.position.set(-50, 0, 0);
-    axisName.rotation.x = -(Math.PI) / 2;
-    axisName.rotation.z = (Math.PI) / 2;
+    this.axisName.position.set(-50, 0, 0);
+    this.axisName.rotation.x = -(Math.PI) / 2;
+    this.axisName.rotation.z = (Math.PI) / 2;
 
-    axisGroup.add(axisName);
+    this.axisGroup.add(this.axisName);
 
-    return axisGroup;
+    return this.axisGroup;
   }
 
-  export function setVisibility(bool) {
+  setVisibility(bool) {
+    // eslint-disable-next-line no-param-reassign
+    this.elements.forEach((element) => { element.visible = bool; });
     this.axisTicks.visible = bool;
     this.axisLabels.visible = bool;
     this.axisName.visible = bool;
   }
+}
