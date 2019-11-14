@@ -1,22 +1,58 @@
 import * as THREE from 'three';
-import Canvas2D from './Canvas2D';
 // drawing axis
 
 export default class TernaryAxis {
-  constructor(axisMin, axisMax, gridHeight, species) {
+  constructor(axisMin, axisMax, gridHeight) {
     this.axisMin = axisMin;
     this.axisMax = axisMax;
     this.gridHeight = gridHeight;
-    this.species = species;
     this.axisGroup = new THREE.Group();
     this.axisTicks = new THREE.Group();
     this.axisLabels = new THREE.Group();
     this.elements = new THREE.Group();
-    this.axisName = Canvas2D('formation enthalpy (meV)', '#000000');
+    this.axisName = this.createText2D('formation enthalpy (meV)', '#000000');
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  createText2D(text, color, font, size, segW, segH) {
+    function createTextCanvas() {
+      const textSize = size || 64;
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const fontStr = `${textSize}px ${font || 'Arial'}`;
+      ctx.font = fontStr;
+      const w = ctx.measureText(text).width;
+      const h = Math.ceil(textSize);
+      canvas.width = w;
+      canvas.height = h;
+      ctx.font = fontStr;
+      ctx.fillStyle = color || 'black';
+      ctx.fillText(text, 0, Math.ceil(textSize * 0.8));
+      return canvas;
+    }
+    const canvas = createTextCanvas(text, color, font, size);
+    const plane = new THREE.PlaneGeometry(
+        canvas.width,
+        canvas.height,
+        segW,
+        segH,
+      );
+    const tex = new THREE.Texture(canvas);
+    tex.needsUpdate = true;
+    const planeMat = new THREE.MeshBasicMaterial({
+      map: tex,
+      color: 0xffffff,
+      transparent: true,
+      side: THREE.DoubleSide,
+    });
+    const mesh = new THREE.Mesh(plane, planeMat);
+    mesh.scale.set(0.5, 0.5, 0.5);
+    mesh.doubleSided = true;
+    return mesh;
   }
   // offset is displacement of element to side
   // offset = 0 would be overlapping
-  drawThreeElements(offset = 30, colors = ['#FF0000', '#0000FF', '#00FF00']) {
+  drawThreeElements(species, offset = 30, colors = ['#FF0000', '#0000FF', '#00FF00']) {
     const triSide = this.gridHeight * 2;
     const triPositions = [
       [-offset, offset, 0],
@@ -24,17 +60,16 @@ export default class TernaryAxis {
       [triSide + offset, -offset, 0],
     ];
     for (let i = 0; i < 3; i++) {
-      const element = Canvas2D(this.species[i], colors[i]);
+      const element = this.createText2D(species[i], colors[i]);
       element.position.set(...triPositions[i]);
       this.elements.add(element);
     }
+    this.axisGroup.add(this.elements);
+    return this.elements;
   }
 
   drawAxis() {
-    // draw elements
-    this.drawThreeElements();
-    this.axisGroup.add(this.elements);
-
+    // huh? is this not just 1 / this.axisMin
     const normalizationMin = Math.abs(
         this.gridHeight / (this.axisMin * this.gridHeight),
       );
@@ -187,7 +222,7 @@ export default class TernaryAxis {
 
   setVisibility(bool) {
     // eslint-disable-next-line no-param-reassign
-    this.elements.forEach((element) => { element.visible = bool; });
+    this.elements.children.forEach((element) => { element.visible = bool; });
     this.axisTicks.visible = bool;
     this.axisLabels.visible = bool;
     this.axisName.visible = bool;
