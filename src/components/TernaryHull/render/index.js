@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import TrackballControls from './TrackballControls';
-import Canvas2D from './Canvas2D';
 import TernaryGrid from './TernaryGrid';
 import TernaryAxis from './TernaryAxis';
+import TernaryHull from './TernaryHull';
 // import OrbitControls from './OrbitControls';
 
 
@@ -18,25 +18,21 @@ class TernaryHullRender {
       this.color = this.hull.color;
     }
 
+    // initialize grid, axis, hull classes
+    // all scaling, gridHeights are connected in TGrid
+    this.TGrid = new TernaryGrid();
+
+    // all drawing of axis labels are in TAxis
+    this.TAxis = new TernaryAxis(-1.0, 1.0, this.TGrid.gridHeight);
+    this.THull = new TernaryHull(this.hull, this.TGrid);
+
     // grid attributes
-    this.gridHeight = 300;
     this.gridMin = -1.0;
     this.gridMax = 1.0;
-    this.triSide = 600;
-    this.triMargin = 0;
-    this.triHeight = (Math.sqrt(3) / (2)) * this.triSide;
-    this.triCenter = this.triCoord(33, 33, 34);
 
-    // this.axisTicks;
-    // this.axisLabels;
-    // this.axisName;
     this.pointCloud = null;
     this.intersectArray = [];
-    // this.hullMesh;
-    // this.elementA;
-    // this.elementB;
-    // this.elementC;
-    // this.edges;
+
     this.mouse = new THREE.Vector2();
     this.raycaster = new THREE.Raycaster();
     this.raycaster.params.Points.threshold = 15;
@@ -47,7 +43,7 @@ class TernaryHullRender {
     this.scene = new THREE.Scene();
     this.group = new THREE.Group();
     this.group.applyMatrix(
-      new THREE.Matrix4().makeTranslation(-this.triCenter[0], -this.triCenter[1], 0),
+      new THREE.Matrix4().makeTranslation(-this.TGrid.triCenter[0], -this.TGrid.triCenter[1], 0),
     );
     // this.controls;
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -60,6 +56,8 @@ class TernaryHullRender {
   }
 
   init(containerID) {
+    this.group.remove(this.group.children);
+
     this.container = document.getElementById(containerID);
     this.width = this.container.getBoundingClientRect().width;
     this.height = this.container.getBoundingClientRect().height;
@@ -83,12 +81,16 @@ class TernaryHullRender {
     // TODO: add tooltip stuff
 
 
+    // ternary Axis needs hull data for elements
+    // ternary grid is just a component, visual
     // Draw Triangular grid
-    this.group.add(TernaryGrid(this.gridHeight, this.triSide, this.triMargin, this.triHeight));
+    this.group.add(this.TGrid.drawGrid());
     // Draw Axis Ticks
-    this.group.add(TernaryAxis(-1.0, 1.0));
+    this.group.add(this.TAxis.drawAxis());
+    // Draw Element names
+    this.group.add(this.TAxis.drawThreeElements(this.hull.species));
     // Draw hull mesh
-    this.drawHull(this.hull);
+    this.group.add(this.THull.drawHull());
 
     // if(this.showEntries) this.plotEntries(this.hull.entries);
 
@@ -119,144 +121,6 @@ class TernaryHullRender {
     this.animate();
   }
 
-  triCoord(a, b, c) {
-    let sum = [0, 0];
-    const pos = [0, 0];
-    const corners = [
-      [this.triMargin, 0],
-      [this.triSide + this.triMargin, 0],
-      [(this.triSide / 2) + this.triMargin, this.triHeight + this.triMargin],
-    ];
-    sum = a + b + c;
-    if (sum !== 0) {
-      const x = a / sum;
-      const y = b / sum;
-      const z = c / sum;
-      pos[0] = (corners[0][0] * x) + (corners[1][0] * y) + (corners[2][0] * z);
-      pos[1] = (corners[0][1] * x) + (corners[1][1] * y) + (corners[2][1] * z);
-    }
-    return pos;
-  }
-
-  drawHull(data) {
-    // console.log('passed data', hullData);
-    const hullData = data;
-
-    // clean previous elements
-    this.group.remove(this.hullMesh);
-    this.group.remove(this.elementA);
-    this.group.remove(this.elementB);
-    this.group.remove(this.elementC);
-    this.scene.remove(this.edges);
-
-    // ELEMENT TITLES
-    let elemColor = this.color;
-    if (this.defaultColor) {
-      elemColor = '#FF0000';
-    }
-    this.elementA = Canvas2D(hullData.species[0], elemColor);
-    this.elementA.position.set(-30, -30, 0);
-    this.group.add(this.elementA);
-
-    if (this.defaultColor) {
-      elemColor = '#0000FF';
-    }
-    this.elementB = Canvas2D(hullData.species[1], elemColor);
-    this.elementB.position.set(
-      this.triCenter[0],
-      this.triCenter[1] + (this.triSide / 2) + 70,
-      0,
-    );
-    // this.elementB.position.x = this.triCenter[0];
-    // this.elementB.position.y = this.triCenter[1] + this.triSide / 2 + 70;
-    // this.elementB.position.z = 0;
-    this.group.add(this.elementB);
-
-    if (this.defaultColor) {
-      elemColor = '#00FF00';
-    }
-    this.elementC = Canvas2D(hullData.species[2], elemColor);
-    this.elementC.position.set(
-      this.triSide + 30,
-      // bottom is because midpoint is localized below midpoint
-      this.triCenter[1] - (this.triSide / 3) - 10,
-      0,
-    );
-    // this.elementC.position.x = this.triSide + 30;
-    // this.elementC.position.y = this.triCenter[1] - this.triSide / 3 - 10;
-    // this.elementC.position.z = 0;
-    this.group.add(this.elementC);
-
-
-    // ============ DRAWING CONVEX HULL USING FACES ===================
-    const geometry = new THREE.Geometry();
-    const material = new THREE.MeshBasicMaterial({
-      side: THREE.DoubleSide,
-      vertexColors: THREE.VertexColors,
-      opacity: 0.40, // orig 0.25
-      transparent: true,
-      depthWrite: false, // FIXES TOOLTIP VISIBILITY WHEN WITHIN HULL
-      depthTest: false,   // FIXES TOOLTIP VISIBILITY WHEN WITHIN HULL
-    });
-
-    // ONLY VERTICES
-    for (let i = 0; i < hullData.vertices.length; i++) {
-      // resetting vertices height to 0 for the sake of visualization?
-      if (hullData.vertices[i].composition[0] === 1 ||
-          hullData.vertices[i].composition[1] === 1 ||
-          hullData.vertices[i].composition[2] === 1) {
-        hullData.vertices[i].enthalpyFormationAtom = 0.0;
-      }
-      const triPos = this.triCoord(
-        hullData.vertices[i].composition[0],
-        hullData.vertices[i].composition[2],
-        hullData.vertices[i].composition[1],
-      );
-      geometry.vertices.push(
-        new THREE.Vector3(
-          triPos[0],
-          triPos[1],
-          hullData.vertices[i].enthalpyFormationAtom * this.gridHeight,
-        ),
-      );
-    }
-
-    for (let i = 0; i < hullData.faces.length; i++) {
-      geometry.faces.push(
-        new THREE.Face3(
-          hullData.faces[i][0],
-          hullData.faces[i][1],
-          hullData.faces[i][2],
-        ),
-      );
-    }
-
-    for (let i = 0; i < geometry.faces.length; ++i) {
-      const face = geometry.faces[i];
-      face.vertexColors[0] = this.colorVertex(geometry.vertices[face.a]);
-      face.vertexColors[1] = this.colorVertex(geometry.vertices[face.b]);
-      face.vertexColors[2] = this.colorVertex(geometry.vertices[face.c]);
-    }
-
-    this.hullMesh = new THREE.Mesh(geometry, material);
-    // =======================  END DRAWING CONVEX HULL ==========================
-
-    this.group.add(this.hullMesh);
-    // COMMENTED OUT BELOW IS THE DECREPRED WAY TO DRAW EDGES
-    // this.edges = new THREE.EdgesHelper(this.hullMesh, this.color, 0.05);
-    // this.edges.material.linewidth = 2;
-    const edgesGeometry = new THREE.EdgesGeometry(geometry, 0.05);
-    this.edges = new THREE.LineSegments(
-      edgesGeometry,
-      new THREE.LineBasicMaterial({
-        color: this.color,
-        linewidth: 2,
-      }),
-    );
-    this.group.add(this.edges);
-  }
-
-
   plotEntries(data) {
     // clear points
     this.group.remove(this.pointCloud);
@@ -277,7 +141,7 @@ class TernaryHullRender {
       const pX = entries[i].composition[0] * 100;
       const pY = entries[i].composition[2] * 100;
       const pZ = entries[i].composition[1] * 100;
-      const pCoord = this.triCoord(pX, pY, pZ);
+      const pCoord = this.TGrid.triCoord(pX, pY, pZ);
 
       const datapoint = new THREE.Vector3(
         pCoord[0],
@@ -367,7 +231,7 @@ class TernaryHullRender {
       const pX = entries[i].composition[0] * 100;
       const pY = entries[i].composition[2] * 100;
       const pZ = entries[i].composition[1] * 100;
-      const pCoord = this.triCoord(pX, pY, pZ);
+      const pCoord = this.TGrid.triCoord(pX, pY, pZ);
 
       const datapoint = new THREE.Vector3(
         pCoord[0],
@@ -417,7 +281,7 @@ class TernaryHullRender {
     // this.camera.right = this.windowHalfX;
     // this.camera.top = this.windowHalfY;
     // this.camera.bottom = - this.windowHalfY;
-    this.camera.updateProjectionMatrix();
+    // this.camera.updateProjectionMatrix();
 
     this.renderer.setSize(this.width, this.height);
     this.render();
@@ -488,8 +352,8 @@ class TernaryHullRender {
       const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
       return new THREE.Line(geometry, material);
     }
-    const faces = this.hullMesh.geometry.faces;
-    const vertices = this.hullMesh.geometry.vertices;
+    const faces = this.THull.hullMesh.geometry.faces;
+    const vertices = this.THull.hullMesh.geometry.vertices;
     let vertex1;
     let vertex2;
     let vertex3;
@@ -532,9 +396,8 @@ class TernaryHullRender {
     const intersection = (intersections.length) > 0 ? intersections[0] : null;
 
     if (intersection !== null) {
-      this.sphere.position.copy(intersection.point);
-      
-      this.findFacet(this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3));
+      this.sphere.position.copy(intersection.point);    
+      // this.findFacet(this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3));
     }
     this.render();
   }
@@ -547,12 +410,7 @@ class TernaryHullRender {
   }
 
   toggleLabels(bool) {
-    this.elementA.visible = bool;
-    this.elementB.visible = bool;
-    this.elementC.visible = bool;
-    this.axisTicks.visible = bool;
-    this.axisLabels.visible = bool;
-    this.axisName.visible = bool;
+    this.TAxis.setVisibility(bool);
   }
 
   onClick(event) {
@@ -580,6 +438,14 @@ class TernaryHullRender {
     // calculate objects intersecting the picking ray
     const intersects = this.raycaster.intersectObjects(this.intersectArray);
     if (intersects.length > 0) {
+      const geometry = new THREE.Geometry();
+      const intersection = (intersects.length) > 0 ? intersects[0] : null;
+      const pt = this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3);
+      geometry.vertices.push(
+        new THREE.Vector3(pt[0], pt[1], pt[2]), new THREE.Vector3(pt[0], pt[1], pt[2]),
+      );
+      const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
+      this.group.add(new THREE.Line(geometry, material));
       const auid = this.pointCloud.pointNames[intersects[0].index];
       // console.log('selecting point: ', auid );
 
