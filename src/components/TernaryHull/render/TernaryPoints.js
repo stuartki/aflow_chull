@@ -2,22 +2,30 @@ import * as THREE from 'three';
 // drawing points
 
 export default class TernaryPoints {
-  constructor(data, gridHeight) {
+  constructor(data, TGrid) {
     this.data = data;
+    this.TGrid = TGrid;
+    this.pointGroup = new THREE.Group();
+  }
 
-    this.gridHeight = gridHeight;
-    this.triSide = this.gridHeight * 2;
-    this.triMargin = 0;
-    this.triHeight = (Math.sqrt(3) / (2)) * this.triSide;
-    this.triCenter = this.triCoord(33, 33, 34);
-    this.hullGroup = new THREE.Group();
+  colorVertex(vertex) {
+    const z = Math.abs(vertex.z / this.gridHeight);
+    const c = new THREE.Color();
+    if (z < 0.1) {
+      c.r = 1;
+      c.g = 0.647;
+      c.b = 0.0;
+    } else {
+      c.r = z * 0.30;
+      c.g = z * 0.33;
+      c.b = z;
+    }
+    return c;
   }
 
   plotEntries(data) {
     // clear points
-    this.group.remove(this.pointCloud);
-
-    const entries = this.filterByEnthalpy(data);
+    const entries = this.filterMinMaxGrid(data);
 
     // create new geometry
     const pointsGeometry = new THREE.BufferGeometry();
@@ -33,12 +41,12 @@ export default class TernaryPoints {
       const pX = entries[i].composition[0] * 100;
       const pY = entries[i].composition[2] * 100;
       const pZ = entries[i].composition[1] * 100;
-      const pCoord = this.triCoord(pX, pY, pZ);
+      const pCoord = this.TGrid.triCoord(pX, pY, pZ);
 
       const datapoint = new THREE.Vector3(
         pCoord[0],
         pCoord[1],
-        (entries[i].enthalpyFormationAtom * this.gridHeight),
+        (entries[i].enthalpyFormationAtom * this.TGrid.gridHeight),
       );
       let pointColor;
       if (this.defaultColor) {
@@ -105,13 +113,13 @@ export default class TernaryPoints {
     });
     this.pointCloud = new THREE.Points(pointsGeometry, pointsMaterial);
     this.pointCloud.pointNames = auids;
-    this.intersectArray = [];
-    this.intersectArray.push(this.pointCloud);
-    this.group.add(this.pointCloud);
+    return this.pointCloud;
   }
 
-  updatePlottedEntries(data) {
-    const entries = this.filterByEnthalpy(data);
+  // seems inefficient...only updating clicked members
+  updatePlottedEntries(data, pointCloud) {
+    const entries = this.filterMinMaxGrid(data);
+
     const positions = new Float32Array(entries.length * 3);
     const colors = new Float32Array(entries.length * 3);
     const sizes = new Float32Array(entries.length);
@@ -123,12 +131,12 @@ export default class TernaryPoints {
       const pX = entries[i].composition[0] * 100;
       const pY = entries[i].composition[2] * 100;
       const pZ = entries[i].composition[1] * 100;
-      const pCoord = this.triCoord(pX, pY, pZ);
+      const pCoord = this.TGrid.triCoord(pX, pY, pZ);
 
       const datapoint = new THREE.Vector3(
         pCoord[0],
         pCoord[1],
-        (entries[i].enthalpyFormationAtom * this.gridHeight),
+        (entries[i].enthalpyFormationAtom * this.TGrid.gridHeight),
       );
       let pointColor;
       if (this.defaultColor) {
@@ -157,5 +165,18 @@ export default class TernaryPoints {
     this.pointCloud.geometry.attributes.position.needsUpdate = true;
 
     this.pointCloud.pointNames = auids;
+  }
+
+  filterMinMaxGrid(data) {
+    return data.filter((row) => {
+      let bool;
+      if (row.enthalpyFormationAtom >= this.TGrid.gridMin &&
+          row.enthalpyFormationAtom <= this.TGrid.gridMax) {
+        bool = true;
+      } else {
+        bool = false;
+      }
+      return bool;
+    });
   }
 }
