@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { colorVertex } from './helper';
 // drawing points
 
 export default class TernaryPoints {
@@ -6,21 +7,6 @@ export default class TernaryPoints {
     this.data = data;
     this.TGrid = TGrid;
     this.pointGroup = new THREE.Group();
-  }
-
-  colorVertex(vertex) {
-    const z = Math.abs(vertex.z / this.gridHeight);
-    const c = new THREE.Color();
-    if (z < 0.1) {
-      c.r = 1;
-      c.g = 0.647;
-      c.b = 0.0;
-    } else {
-      c.r = z * 0.30;
-      c.g = z * 0.33;
-      c.b = z;
-    }
-    return c;
   }
 
   plotEntries(data) {
@@ -48,17 +34,8 @@ export default class TernaryPoints {
         pCoord[1],
         (entries[i].enthalpyFormationAtom * this.TGrid.gridHeight),
       );
-      let pointColor;
-      if (this.defaultColor) {
-        pointColor = new THREE.Color(pX / 100, pY / 100, pZ / 100);
-      } else {
-        pointColor = this.colorVertex(datapoint);
-      }
-      let size = 40;
-      if (entries[i].isClicked) {
-        pointColor = new THREE.Color('#CA6F96');
-        size = 80;
-      }
+      const pointColor = new THREE.Color(pX / 100, pY / 100, pZ / 100);
+      const size = 40;
       datapoint.toArray(positions, i * 3);
       pointColor.toArray(colors, i * 3);
       sizes[i] = size;
@@ -142,7 +119,7 @@ export default class TernaryPoints {
       if (this.defaultColor) {
         pointColor = new THREE.Color(pX / 100, pY / 100, pZ / 100);
       } else {
-        pointColor = this.colorVertex(datapoint);
+        pointColor = colorVertex(datapoint, this.TGrid.gridHeight);
       }
       let size = 40;
       if (entries[i].isClicked) {
