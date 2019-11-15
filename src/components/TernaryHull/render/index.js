@@ -226,7 +226,6 @@ class TernaryHullRender {
 
   updatePlottedEntries(data) {
     const entries = this.filterByEnthalpy(data);
-    const positions = new Float32Array(entries.length * 3);
     const colors = new Float32Array(entries.length * 3);
     const sizes = new Float32Array(entries.length);
 
@@ -234,28 +233,32 @@ class TernaryHullRender {
     // const sprite = THREE.ImageUtils.loadTexture('textures/disc.png');
 
     for (let i = 0; i < entries.length; i++) {
-      const pX = entries[i].composition[0] * 100;
-      const pY = entries[i].composition[2] * 100;
-      const pZ = entries[i].composition[1] * 100;
-      const pCoord = this.TGrid.triCoord(pX, pY, pZ);
+      // const pX = entries[i].composition[0] * 100;
+      // const pY = entries[i].composition[2] * 100;
+      // const pZ = entries[i].composition[1] * 100;
+      // const pCoord = this.TGrid.triCoord(pX, pY, pZ);
 
-      const datapoint = new THREE.Vector3(
-        pCoord[0],
-        pCoord[1],
-        (entries[i].enthalpyFormationAtom * this.gridHeight),
-      );
-      let pointColor;
-      if (this.defaultColor) {
-        pointColor = new THREE.Color(pX / 100, pY / 100, pZ / 100);
-      } else {
-        pointColor = this.colorVertex(datapoint);
-      }
+      // const datapoint = new THREE.Vector3(
+      //   pCoord[0],
+      //   pCoord[1],
+      //   (entries[i].enthalpyFormationAtom * this.gridHeight),
+      // );
+      // let pointColor;
+      // if (this.defaultColor) {
+      //   pointColor = new THREE.Color(pX / 100, pY / 100, pZ / 100);
+      // } else {
+      //   pointColor = this.colorVertex(datapoint);
+      // }
       let size = 40;
+      let pointColor;
       if (entries[i].isClicked) {
         pointColor = new THREE.Color('#CA6F96');
         size = 80;
+      } else {
+        // eslint-disable-next-line max-len
+        pointColor = new THREE.Color(...this.pointCloud.geometry.attributes.customColor.array.slice(i * 3, (i * 3) + 3));
       }
-      datapoint.toArray(positions, i * 3);
+      // datapoint.toArray(positions, i * 3);
       pointColor.toArray(colors, i * 3);
       sizes[i] = size;
       auids[i] = entries[i].auid;
@@ -267,8 +270,8 @@ class TernaryHullRender {
     this.pointCloud.geometry.attributes.customColor.set(colors);
     this.pointCloud.geometry.attributes.customColor.needsUpdate = true;
 
-    this.pointCloud.geometry.attributes.position.set(positions);
-    this.pointCloud.geometry.attributes.position.needsUpdate = true;
+    // this.pointCloud.geometry.attributes.position.set(positions);
+    // this.pointCloud.geometry.attributes.position.needsUpdate = true;
 
     this.pointCloud.pointNames = auids;
   }
