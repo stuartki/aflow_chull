@@ -3,6 +3,7 @@ import TrackballControls from './TrackballControls';
 import TernaryGrid from './TernaryGrid';
 import TernaryAxis from './TernaryAxis';
 import TernaryHull from './TernaryHull';
+import TernaryPoints from './TernaryPoints';
 // import OrbitControls from './OrbitControls';
 
 
@@ -24,7 +25,12 @@ class TernaryHullRender {
 
     // all drawing of axis labels are in TAxis
     this.TAxis = new TernaryAxis(-1.0, 1.0, this.TGrid.gridHeight);
+
+    // all hull faces and colors
     this.THull = new TernaryHull(this.hull, this.TGrid);
+
+    // all plotting of points
+    this.TPoints = new TernaryPoints(this.hull.entries, this.TGrid);
 
     // grid attributes
     this.gridMin = -1.0;
@@ -92,7 +98,7 @@ class TernaryHullRender {
     // Draw hull mesh
     this.group.add(this.THull.drawHull());
 
-    // if(this.showEntries) this.plotEntries(this.hull.entries);
+    if (this.showEntries) this.plotEntries(this.hull.entries);
 
     this.renderer.setClearColor(0xFFFFFF, 1);
     this.renderer.setSize(
@@ -396,7 +402,7 @@ class TernaryHullRender {
     const intersection = (intersections.length) > 0 ? intersections[0] : null;
 
     if (intersection !== null) {
-      this.sphere.position.copy(intersection.point);    
+      this.sphere.position.copy(intersection.point);
       // this.findFacet(this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3));
     }
     this.render();
