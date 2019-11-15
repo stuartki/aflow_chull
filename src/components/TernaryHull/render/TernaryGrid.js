@@ -2,9 +2,12 @@ import * as THREE from 'three';
 
 
 export default class TernaryGrid {
-  constructor(gridHeight = 300, triMargin = 0) {
+  constructor(gridHeight = 300, triMargin = 0, gridMin = -1.0, gridMax = 1.0) {
     this.gridHeight = gridHeight;
     this.triMargin = triMargin;
+
+    this.gridMin = gridMin;
+    this.gridMax = gridMax;
 
     this.triSide = this.gridHeight * 2;
     this.triHeight = (Math.sqrt(3) / (2)) * this.triSide;
