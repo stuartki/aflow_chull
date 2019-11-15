@@ -71,15 +71,15 @@ class TernaryHull extends React.Component {
     }
   }
 
-  componentWillUpdate() {
-    if (this.props.plotEntries) {
-      if (this.props.hull.showHullPoints) {
-        this.state.THREEscene.updatePlottedEntries(this.props.hull.entries);
-      } else {
-        this.state.THREEscene.updatePlottedEntries(this.props.hull.entries);
-      }
-    }
-  }
+  // componentWillUpdate() {
+  //   if (this.props.plotEntries) {
+  //     if (this.props.hull.showHullPoints) {
+  //       this.state.THREEscene.updatePlottedEntries(this.props.hull.entries);
+  //     } else {
+  //       this.state.THREEscene.updatePlottedEntries(this.props.hull.entries);
+  //     }
+  //   }
+  // }
 
   componentDidUpdate(prevProps) {
     if (this.props.hull.name !== prevProps.hull.name) {
@@ -88,6 +88,8 @@ class TernaryHull extends React.Component {
       if (this.props.plotEntries) {
         this.state.THREEscene.plotEntries(this.props.hull.entries);
       }
+    } else {
+      this.state.THREEscene.updatePlottedEntries(this.props.hull.entries);
     }
   }
 
