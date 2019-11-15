@@ -85,9 +85,9 @@ class TernaryHull extends React.Component {
     if (this.props.hull.name !== prevProps.hull.name) {
       this.div.innerHTML = '';
       this.state.THREEscene.init(this.props.container);
-      if (this.props.plotEntries) {
-        this.state.THREEscene.plotEntries(this.props.hull.entries);
-      }
+      // if (this.props.plotEntries) {
+      //   this.state.THREEscene.plotEntries(this.props.hull.entries);
+      // }
     } else {
       this.state.THREEscene.updatePlottedEntries(this.props.hull.entries);
     }
