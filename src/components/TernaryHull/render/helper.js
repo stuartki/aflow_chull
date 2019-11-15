@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 // create 2D text
 // used for axis names, element names
-export default function createText2D(text, color, font, size, segW, segH) {
+export function createText2D(text, color, font, size, segW, segH) {
   function createTextCanvas() {
     const textSize = size || 64;
     const canvas = document.createElement('canvas');
@@ -37,4 +37,32 @@ export default function createText2D(text, color, font, size, segW, segH) {
   mesh.scale.set(0.5, 0.5, 0.5);
   mesh.doubleSided = true;
   return mesh;
+}
+
+export function colorVertex(vertex, gridHeight, color = '#787CB5', defaultColor = true) {
+  let z;
+  let c;
+  if (defaultColor) {
+    z = Math.abs(vertex.z / gridHeight);
+    c = new THREE.Color();
+    if (z < 0.1) {
+      c.r = 1;
+      c.g = 0.647;
+      c.b = 0.0;
+    } else {
+      c.r = z * 0.30;
+      c.g = z * 0.33;
+      c.b = z;
+    }
+    return c;
+  }
+  c = new THREE.Color(color);
+  if (vertex.z > 0) {
+    return c;
+  }
+  z = 1 - Math.abs(vertex.z / gridHeight);
+  const hsl = c.getHSL();
+
+  c.setHSL(hsl.h, hsl.s, 1 - (hsl.l * z));
+  return c;
 }

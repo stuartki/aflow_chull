@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+// import { colorVertex } from './helper';
 // drawing hull
 
 export default class TernaryHull {
@@ -10,29 +11,32 @@ export default class TernaryHull {
     this.hullGroup = new THREE.Group();
   }
 
-  colorVertex(vertex) {
-    const z = Math.abs(vertex.z / this.gridHeight);
-    const c = new THREE.Color();
-    if (z < 0.1) {
-      c.r = 1;
-      c.g = 0.647;
-      c.b = 0.0;
-    } else {
-      c.r = z * 0.30;
-      c.g = z * 0.33;
-      c.b = z;
+  colorVertex(vertex, color = '#787CB5', defaultColor = true) {
+    let z;
+    let c;
+    if (defaultColor) {
+      z = Math.abs(vertex.z / this.gridHeight);
+      c = new THREE.Color();
+      if (z < 0.1) {
+        c.r = 1;
+        c.g = 0.647;
+        c.b = 0.0;
+      } else {
+        c.r = z * 0.30;
+        c.g = z * 0.33;
+        c.b = z;
+      }
+      return c;
     }
+    c = new THREE.Color(color);
+    if (vertex.z > 0) {
+      return c;
+    }
+    z = 1 - Math.abs(vertex.z / this.gridHeight);
+    const hsl = c.getHSL();
+
+    c.setHSL(hsl.h, hsl.s, 1 - (hsl.l * z));
     return c;
-
-    // c = new THREE.Color(this.color);
-    // if (vertex.z > 0) {
-    //   return c;
-    // }
-    // z = 1 - Math.abs(vertex.z / this.gridHeight);
-    // const hsl = c.getHSL();
-
-    // c.setHSL(hsl.h, hsl.s, 1 - (hsl.l * z));
-    // return c;
   }
 
   drawHull() {
@@ -91,9 +95,9 @@ export default class TernaryHull {
 
     for (let i = 0; i < geometry.faces.length; ++i) {
       const face = geometry.faces[i];
-      face.vertexColors[0] = this.colorVertex(geometry.vertices[face.a]);
-      face.vertexColors[1] = this.colorVertex(geometry.vertices[face.b]);
-      face.vertexColors[2] = this.colorVertex(geometry.vertices[face.c]);
+      face.vertexColors[0] = this.colorVertex(geometry.vertices[face.a], this.TGrid.gridHeight);
+      face.vertexColors[1] = this.colorVertex(geometry.vertices[face.b], this.TGrid.gridHeight);
+      face.vertexColors[2] = this.colorVertex(geometry.vertices[face.c], this.TGrid.gridHeight);
     }
 
     this.hullMesh = new THREE.Mesh(geometry, material);
