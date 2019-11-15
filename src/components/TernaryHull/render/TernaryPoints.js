@@ -34,8 +34,13 @@ export default class TernaryPoints {
         pCoord[1],
         (entries[i].enthalpyFormationAtom * this.TGrid.gridHeight),
       );
-      const pointColor = new THREE.Color(pX / 100, pY / 100, pZ / 100);
-      const size = 40;
+      let pointColor = new THREE.Color(pX / 100, pY / 100, pZ / 100);
+
+      let size = 40;
+      if (entries[i].isClicked) {
+        pointColor = new THREE.Color('#CA6F96');
+        size = 80;
+      }
       datapoint.toArray(positions, i * 3);
       pointColor.toArray(colors, i * 3);
       sizes[i] = size;
