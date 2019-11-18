@@ -36,9 +36,9 @@ class TernaryHull extends React.Component {
 
   componentDidMount() {
     this.state.THREEscene.init(this.props.container);
-    if (this.props.plotEntries) {
-      this.state.THREEscene.plotEntries(this.props.hull.entries);
-    }
+    // if (this.props.plotEntries) {
+    //   this.state.THREEscene.plotEntries(this.props.hull.entries);
+    // }
   }
 
   componentWillReceiveProps(nextProps) {
