@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { colorVertex } from './helper';
+// import { colorVertex } from './helper';
 // drawing points
 
 export default class TernaryPoints {
@@ -9,9 +9,9 @@ export default class TernaryPoints {
     this.pointGroup = new THREE.Group();
   }
 
-  plotEntries(data) {
+  plotEntries() {
     // clear points
-    const entries = this.filterMinMaxGrid(data);
+    const entries = this.filterMinMaxGrid(this.data);
 
     // create new geometry
     const pointsGeometry = new THREE.BufferGeometry();
@@ -98,59 +98,8 @@ export default class TernaryPoints {
     return this.pointCloud;
   }
 
-  // seems inefficient...only updating clicked members
-  updatePlottedEntries(data, pointCloud) {
-    const entries = this.filterMinMaxGrid(data);
-
-    const positions = new Float32Array(entries.length * 3);
-    const colors = new Float32Array(entries.length * 3);
-    const sizes = new Float32Array(entries.length);
-
-    const auids = [];
-    // const sprite = THREE.ImageUtils.loadTexture('textures/disc.png');
-
-    for (let i = 0; i < entries.length; i++) {
-      const pX = entries[i].composition[0] * 100;
-      const pY = entries[i].composition[2] * 100;
-      const pZ = entries[i].composition[1] * 100;
-      const pCoord = this.TGrid.triCoord(pX, pY, pZ);
-
-      const datapoint = new THREE.Vector3(
-        pCoord[0],
-        pCoord[1],
-        (entries[i].enthalpyFormationAtom * this.TGrid.gridHeight),
-      );
-      let pointColor;
-      if (this.defaultColor) {
-        pointColor = new THREE.Color(pX / 100, pY / 100, pZ / 100);
-      } else {
-        pointColor = colorVertex(datapoint, this.TGrid.gridHeight);
-      }
-      let size = 40;
-      if (entries[i].isClicked) {
-        pointColor = new THREE.Color('#CA6F96');
-        size = 80;
-      }
-      datapoint.toArray(positions, i * 3);
-      pointColor.toArray(colors, i * 3);
-      sizes[i] = size;
-      auids[i] = entries[i].auid;
-    }
-
-    this.pointCloud.geometry.attributes.size.set(sizes);
-    this.pointCloud.geometry.attributes.size.needsUpdate = true;
-
-    this.pointCloud.geometry.attributes.customColor.set(colors);
-    this.pointCloud.geometry.attributes.customColor.needsUpdate = true;
-
-    this.pointCloud.geometry.attributes.position.set(positions);
-    this.pointCloud.geometry.attributes.position.needsUpdate = true;
-
-    this.pointCloud.pointNames = auids;
-  }
-
-  filterMinMaxGrid(data) {
-    return data.filter((row) => {
+  filterMinMaxGrid() {
+    return this.data.filter((row) => {
       let bool;
       if (row.enthalpyFormationAtom >= this.TGrid.gridMin &&
           row.enthalpyFormationAtom <= this.TGrid.gridMax) {
