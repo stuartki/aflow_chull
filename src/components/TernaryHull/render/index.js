@@ -48,9 +48,9 @@ class TernaryHullRender {
     // this.camera;
     this.scene = new THREE.Scene();
     this.group = new THREE.Group();
-    this.group.applyMatrix(
-      new THREE.Matrix4().makeTranslation(-this.TGrid.triCenter[0], -this.TGrid.triCenter[1], 0),
-    );
+    // this.group.applyMatrix(
+    //   new THREE.Matrix4().makeTranslation(-this.TGrid.triCenter[0], -this.TGrid.triCenter[1], 0),
+    // );
     // this.controls;
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
 
@@ -74,14 +74,13 @@ class TernaryHullRender {
       1,
       10000,
     );
-    this.camera.position.set(0, 0, 1500);
-
-    this.camera.lookAt(this.scene.position);
+    this.camera.position.set(this.TGrid.triCenter[0], this.TGrid.triCenter[1], 1000);
     this.scene.add(this.camera);
     this.scene.add(this.group);
 
     this.controls = new TrackballControls(this.camera, this.container);
     this.controls.rotateSpeed = 1.0;
+    this.controls.target = new THREE.Vector3(this.TGrid.triCenter[0], this.TGrid.triCenter[1], 0);
 
 
     // TODO: add tooltip stuff
@@ -97,8 +96,8 @@ class TernaryHullRender {
     this.group.add(this.TAxis.drawThreeElements(this.hull.species));
     // Draw hull mesh
     this.group.add(this.THull.drawHull());
-
-    if (this.showEntries) this.plotEntries(this.hull.entries);
+    // Draw Points
+    if (this.showEntries) this.plotEntries();
 
     this.renderer.setClearColor(0xFFFFFF, 1);
     this.renderer.setSize(
@@ -127,15 +126,16 @@ class TernaryHullRender {
     this.animate();
   }
 
-  plotEntries(data) {
-    this.pointCloud = this.TPoints.plotEntries(data);
+  plotEntries() {
+    this.pointCloud = this.TPoints.plotEntries();
     this.intersectArray = [];
     this.intersectArray.push(this.pointCloud);
     this.group.add(this.pointCloud);
   }
 
+  // slightly cleaned so that it only updates colors and sizes
   updatePlottedEntries(data) {
-    const entries = this.filterByEnthalpy(data);
+    const entries = this.TPoints.filterMinMaxGrid(data);
     const colors = new Float32Array(entries.length * 3);
     const sizes = new Float32Array(entries.length);
 
@@ -204,47 +204,6 @@ class TernaryHullRender {
 
     this.renderer.setSize(this.width, this.height);
     this.render();
-  }
-
-  filterByEnthalpy(data) {
-    return data.filter((row) => {
-      let bool;
-      if (row.enthalpyFormationAtom >= this.gridMin &&
-          row.enthalpyFormationAtom <= this.gridMax) {
-        bool = true;
-      } else {
-        bool = false;
-      }
-      return bool;
-    });
-  }
-
-  colorVertex(vertex) {
-    let z;
-    let c;
-    if (this.defaultColor) {
-      z = Math.abs(vertex.z / this.gridHeight);
-      c = new THREE.Color();
-      if (z < 0.1) {
-        c.r = 1;
-        c.g = 0.647;
-        c.b = 0.0;
-      } else {
-        c.r = z * 0.30;
-        c.g = z * 0.33;
-        c.b = z;
-      }
-      return c;
-    }
-    c = new THREE.Color(this.color);
-    if (vertex.z > 0) {
-      return c;
-    }
-    z = 1 - Math.abs(vertex.z / this.gridHeight);
-    const hsl = c.getHSL();
-
-    c.setHSL(hsl.h, hsl.s, 1 - (hsl.l * z));
-    return c;
   }
 
   findFacet(point) {
