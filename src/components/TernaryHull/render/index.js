@@ -230,25 +230,59 @@ class TernaryHullRender {
       const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
       return new THREE.Line(geometry, material);
     }
+
+    function hullDistance(endpoints, curX) {
+      const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
+      const b = endpoints[0].y - (m * endpoints[0].x);
+      return ((m * curX) + b);
+    }
+
     const faces = this.THull.hullMesh.geometry.faces;
     const vertices = this.THull.hullMesh.geometry.vertices;
     let vertex1;
     let vertex2;
     let vertex3;
+    let newLine = null;
+    const thisPoint = { x: point[0], y: point[1], z: point[2] };
     for (let i = 0; i < faces.length; i++) {
       vertex1 = vertices[faces[i].a];
       vertex2 = vertices[faces[i].b];
       vertex3 = vertices[faces[i].c];
       if (inEdge(point, vertex1, vertex2)) {
         this.group.add(makeLine(vertex1, vertex2));
+        newLine = makeLine(thisPoint,
+          {
+            x: thisPoint.x,
+            y: hullDistance([vertex1, vertex2], thisPoint.x),
+          },
+        );
+        this.group.add(newLine);
       }
       if (inEdge(point, vertex2, vertex3)) {
         this.group.add(makeLine(vertex2, vertex3));
+        newLine = makeLine(thisPoint,
+          {
+            x: thisPoint.x,
+            y: hullDistance([vertex2, vertex3], thisPoint.x),
+          },
+        );
+        this.group.add(newLine);
       }
       if (inEdge(point, vertex3, vertex1)) {
         this.group.add(makeLine(vertex3, vertex1));
+        newLine = makeLine(thisPoint,
+          {
+            x: thisPoint.x,
+            y: hullDistance([vertex3, vertex1], thisPoint.x),
+          },
+        );
+        this.group.add(newLine);
       }
     }
+  }
+
+  distanceToHull(point) {
+    
   }
 
   onMouseMove(event) {
@@ -320,7 +354,7 @@ class TernaryHullRender {
       const intersection = (intersects.length) > 0 ? intersects[0] : null;
       const pt = this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3);
       geometry.vertices.push(
-        new THREE.Vector3(pt[0], pt[1], pt[2]), new THREE.Vector3(pt[0], pt[1], pt[2]),
+        new THREE.Vector3(pt[0], pt[1], pt[2]), new THREE.Vector3(pt[0], pt[1], pt[2] - 100),
       );
       const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
       this.group.add(new THREE.Line(geometry, material));
