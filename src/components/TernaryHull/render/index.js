@@ -428,11 +428,13 @@ class TernaryHullRender {
     const intersects = this.raycaster.intersectObjects(this.intersectArray);
     if (intersects.length > 0) {
       const auid = this.pointCloud.pointNames[intersects[0].index];
+      const intersection = (intersects.length) > 0 ? intersects[0] : null;
       // console.log('selecting point: ', auid );
       if (this.clickedOrBinPoint(intersection)) {
         const pt = this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3);
         this.distanceToHull(pt);
         this.group.add(this.lineGroup);
+      }
       this.pointClickHandler(auid);
 
       // this.pointCloud.geometry.attributes.size.array[intersects[0].index] = 80;
