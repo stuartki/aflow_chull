@@ -48,6 +48,7 @@ class TernaryHullRender {
     // this.camera;
     this.scene = new THREE.Scene();
     this.group = new THREE.Group();
+    this.lineGroup = new THREE.Group();
     // this.group.applyMatrix(
     //   new THREE.Matrix4().makeTranslation(-this.TGrid.triCenter[0], -this.TGrid.triCenter[1], 0),
     // );
@@ -136,6 +137,7 @@ class TernaryHullRender {
   // slightly cleaned so that it only updates colors and sizes
   updatePlottedEntries(data) {
     const entries = this.TPoints.filterMinMaxGrid(data);
+    this.lineGroup.remove(...this.lineGroup.children);
     const colors = new Float32Array(entries.length * 3);
     const sizes = new Float32Array(entries.length);
 
@@ -309,10 +311,12 @@ class TernaryHullRender {
 
     function hullPoint(normal, v1, curPoint) {
       const pt = curPoint.clone();
-      pt.add(v1.multiplyScalar(-1));
+      const ptOnPlane = v1.clone();
+      pt.add(ptOnPlane.multiplyScalar(-1));
       const b = normal.dot(pt);
-      return new THREE.Vector3(curPoint.x, curPoint.y, b / normal.z);
+      return new THREE.Vector3(curPoint.x, curPoint.y, curPoint.z - b / normal.z);
     }
+
     this.THull.hullMesh.geometry.computeFaceNormals();
     const faces = this.THull.hullMesh.geometry.faces;
     const vertices = this.THull.hullMesh.geometry.vertices;
@@ -328,9 +332,27 @@ class TernaryHullRender {
       vertex3 = vertices[faces[i].c];
       if (inTriangle(thisPoint, [vertex1, vertex2, vertex3])) {
         const p = new THREE.Vector3(thisPoint.x, thisPoint.y, thisPoint.z);
-        this.group.add(makeLine(p, hullPoint(faces[i].normal, vertex1, p)));
+        this.lineGroup.add(makeLine(p, hullPoint(faces[i].normal, vertex1, p)));
       }
     }
+  }
+
+  clickedOrBinPoint(intersection) {
+    function binPoint(entries, i) {
+      const pX = !entries[i].composition[0];
+      const pY = !entries[i].composition[2];
+      const pZ = !entries[i].composition[1];
+
+      return !(pX || pY || pZ);
+    }
+    const auid = this.pointCloud.pointNames[intersection.index];
+    let index;
+    for (let i = 0; i < this.hull.entries.length; i++) {
+      if (auid === this.hull.entries[i].auid) {
+        index = i;
+      }
+    }
+    return this.hull.entries[index].isClicked && binPoint(this.hull.entries, index);
   }
 
   onMouseMove(event) {
@@ -357,7 +379,14 @@ class TernaryHullRender {
 
     if (intersection !== null) {
       this.sphere.position.copy(intersection.point);
-      // this.findFacet(this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3));
+      if (this.clickedOrBinPoint(intersection)) {
+        const pt = this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3);
+        this.distanceToHull(pt);
+        this.group.add(this.lineGroup);
+      }
+    } else {
+      this.group.remove(this.lineGroup);
+      this.lineGroup.remove(...this.lineGroup.children);
     }
     this.render();
   }
@@ -398,12 +427,12 @@ class TernaryHullRender {
     // calculate objects intersecting the picking ray
     const intersects = this.raycaster.intersectObjects(this.intersectArray);
     if (intersects.length > 0) {
-      const intersection = (intersects.length) > 0 ? intersects[0] : null;
-      const pt = this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3);
-      this.group.add(this.distanceToHull(pt));
       const auid = this.pointCloud.pointNames[intersects[0].index];
       // console.log('selecting point: ', auid );
-
+      if (this.clickedOrBinPoint(intersection)) {
+        const pt = this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3);
+        this.distanceToHull(pt);
+        this.group.add(this.lineGroup);
       this.pointClickHandler(auid);
 
       // this.pointCloud.geometry.attributes.size.array[intersects[0].index] = 80;
