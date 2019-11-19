@@ -282,7 +282,55 @@ class TernaryHullRender {
   }
 
   distanceToHull(point) {
-    
+    function inTriangle(pt, vertices) {
+      function sgn(p1, p2, p3) {
+        // eslint-disable-next-line no-mixed-operators
+        return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+      }
+
+      const d1 = sgn(pt, vertices[0], vertices[1]);
+      const d2 = sgn(pt, vertices[1], vertices[2]);
+      const d3 = sgn(pt, vertices[2], vertices[0]);
+
+      const hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+      const hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+
+      return !(hasNeg && hasPos);
+    }
+
+    function makeLine(v1, v2) {
+      const geometry = new THREE.Geometry();
+      geometry.vertices.push(
+        v1, v2,
+      );
+      const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
+      return new THREE.Line(geometry, material);
+    }
+
+    function hullPoint(normal, v1, curPoint) {
+      const pt = curPoint.clone();
+      pt.add(v1.multiplyScalar(-1));
+      const b = normal.dot(pt);
+      return new THREE.Vector3(curPoint.x, curPoint.y, b / normal.z);
+    }
+    this.THull.hullMesh.geometry.computeFaceNormals();
+    const faces = this.THull.hullMesh.geometry.faces;
+    const vertices = this.THull.hullMesh.geometry.vertices;
+
+    let vertex1;
+    let vertex2;
+    let vertex3;
+
+    const thisPoint = { x: point[0], y: point[1], z: point[2] };
+    for (let i = 0; i < faces.length; i++) {
+      vertex1 = vertices[faces[i].a];
+      vertex2 = vertices[faces[i].b];
+      vertex3 = vertices[faces[i].c];
+      if (inTriangle(thisPoint, [vertex1, vertex2, vertex3])) {
+        const p = new THREE.Vector3(thisPoint.x, thisPoint.y, thisPoint.z);
+        this.group.add(makeLine(p, hullPoint(faces[i].normal, vertex1, p)));
+      }
+    }
   }
 
   onMouseMove(event) {
@@ -350,14 +398,9 @@ class TernaryHullRender {
     // calculate objects intersecting the picking ray
     const intersects = this.raycaster.intersectObjects(this.intersectArray);
     if (intersects.length > 0) {
-      const geometry = new THREE.Geometry();
       const intersection = (intersects.length) > 0 ? intersects[0] : null;
       const pt = this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3);
-      geometry.vertices.push(
-        new THREE.Vector3(pt[0], pt[1], pt[2]), new THREE.Vector3(pt[0], pt[1], pt[2] - 100),
-      );
-      const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
-      this.group.add(new THREE.Line(geometry, material));
+      this.group.add(this.distanceToHull(pt));
       const auid = this.pointCloud.pointNames[intersects[0].index];
       // console.log('selecting point: ', auid );
 
