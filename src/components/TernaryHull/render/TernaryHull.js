@@ -1,12 +1,13 @@
 import * as THREE from 'three';
+import axios from 'axios';
 // import { colorVertex } from './helper';
 // drawing hull
 
+
 export default class TernaryHull {
   constructor(data, TGrid) {
-    this.data = data;
     this.TGrid = TGrid;
-
+    this.data = data;
     this.gridHeight = this.TGrid.gridHeight;
     this.hullGroup = new THREE.Group();
   }
@@ -39,8 +40,8 @@ export default class TernaryHull {
     return c;
   }
 
-  drawHull() {
-    const hullData = this.data;
+  drawHull(data = this.data) {
+    const hullData = data;
 
     // ski - I dont believe this is necessary after cleaning at init
     // clean previous elements
@@ -116,5 +117,70 @@ export default class TernaryHull {
     );
     this.hullGroup.add(this.edges);
     return this.hullGroup;
+  }
+
+  stabilityCriterion(vertex) {
+    const url = 'http://localhost:3000/data';
+
+    axios.get(url).then((res) => {
+      const vertices = res.data.facets_data;
+      const newHullSet = [];
+      Object.values(vertices).forEach(d =>
+        d.forEach(e => e.vertices_auid.forEach(element => newHullSet.push(element))),
+      );
+      const scData = this.data.entries.filter(entry => newHullSet.includes(entry.auid));
+      const scFaces = THREE.ShapeUtils.triangulateShape(scData);
+      const hullData = { vertices: scData, faces: scFaces };
+
+    });
+  }
+
+  n1EnthalpyGain() {
+    const hullData = this.data.vertices;
+    let minBHull1;
+    let minBHull2;
+    let minBHull3;
+    let minHull;
+    let minBHull;
+
+    for (let i = 0; i < hullData.length; i++) {
+      if (hullData[i].composition[0] === 0) {
+        if (minBHull1 === undefined) {
+          minBHull1 = hullData[i];
+        } else if (minBHull1.enthalpyFormationAtom > hullData[i].enthalpyFormationAtom) {
+          minBHull1 = hullData[i];
+        }
+      }
+      if (hullData[i].composition[1] === 0) {
+        if (minBHull2 === undefined) {
+          minBHull2 = hullData[i];
+        } else if (minBHull2.enthalpyFormationAtom > hullData[i].enthalpyFormationAtom) {
+          minBHull2 = hullData[i];
+        }
+      }
+      if (hullData[i].composition[2] === 0) {
+        if (minBHull3 === undefined) {
+          minBHull3 = hullData[i];
+        } else if (minBHull3.enthalpyFormationAtom > hullData[i].enthalpyFormationAtom) {
+          minBHull3 = hullData[i];
+        }
+      }
+      if (minHull === undefined) {
+        minHull = hullData[i];
+      } else if (minHull.enthalpyFormationAtom > hullData[i].enthalpyFormationAtom) {
+        minHull = hullData[i];
+      }
+    }
+    const vertices = [minBHull1, minBHull2, minBHull3];
+    this.drawHull({ vertices: [minBHull1, minBHull2, minBHull3], faces: [[0, 1, 2]] });
+    minBHull = minBHull1;
+    vertices.forEach((v) => {
+      if (minBHull.enthalpyFormationAtom > v.enthalpyFormationAtom) {
+        minBHull = v;
+      }
+    });
+    if (minBHull.enthalpyFormationAtom !== minHull.enthalpyFormationAtom) {
+      this.minHull.isClicked = true;
+    }
   }
 }
