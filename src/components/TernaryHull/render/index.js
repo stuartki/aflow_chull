@@ -1,11 +1,14 @@
 import * as THREE from 'three';
+import axios from 'axios';
+
 import TrackballControls from './TrackballControls';
 import TernaryGrid from './TernaryGrid';
 import TernaryAxis from './TernaryAxis';
 import TernaryHull from './TernaryHull';
 import TernaryPoints from './TernaryPoints';
-// import OrbitControls from './OrbitControls';
 
+import MeshLine from './MeshLine';
+// import OrbitControls from './OrbitControls';
 
 class TernaryHullRender {
   constructor(hull, showEntries, defaultColor, pointClickHandler) {
@@ -305,7 +308,12 @@ class TernaryHullRender {
       geometry.vertices.push(
         v1, v2,
       );
-      const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
+      geometry.computeLineDistances();
+      const material = new THREE.LineDashedMaterial(
+        {
+          color: 0xff0000,
+          linewidth: 100,
+        });
       return new THREE.Line(geometry, material);
     }
 
@@ -345,6 +353,7 @@ class TernaryHullRender {
 
       return !(pX || pY || pZ);
     }
+
     const auid = this.pointCloud.pointNames[intersection.index];
     let index;
     for (let i = 0; i < this.hull.entries.length; i++) {
@@ -352,7 +361,14 @@ class TernaryHullRender {
         index = i;
       }
     }
-    return this.hull.entries[index].isClicked && binPoint(this.hull.entries, index);
+    if (this.hull.entries[index].isClicked && binPoint(this.hull.entries, index)) {
+      return 1;
+    } else if (binPoint(this.hull.entries, index)) {
+      return 2;
+    } else if (this.hull.entries[index].distanceToHull === 0) {
+      return 3;
+    }
+    return -1;
   }
 
   onMouseMove(event) {
@@ -379,10 +395,14 @@ class TernaryHullRender {
 
     if (intersection !== null) {
       this.sphere.position.copy(intersection.point);
-      if (this.clickedOrBinPoint(intersection)) {
+      const indicator = this.clickedOrBinPoint(intersection);
+      if (indicator === 1) {
         const pt = this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3);
         this.distanceToHull(pt);
         this.group.add(this.lineGroup);
+      } else if (indicator === 3) {
+        // this.THull.stabilityCriterion(intersection);
+        this.THull.n1EnthalpyGain();
       }
     } else {
       this.group.remove(this.lineGroup);
@@ -403,6 +423,46 @@ class TernaryHullRender {
   }
 
   onClick(event) {
+    event.preventDefault();
+    const viewport = document.getElementById('viewport'); // boostrap fix
+    // eslint-disable-next-line no-unused-vars
+    const top = window.pageYOffset || document.documentElement.scrollTop;
+    const left = window.pageXOffset || document.documentElement.scrollLeft;
+    // viewport for scrolls + domElement in respect to sidebar, etc. + already scrolled
+    this.mouse.x = (
+      // eslint-disable-next-line no-mixed-operators
+      (event.clientX - this.renderer.domElement.offsetLeft - viewport.offsetLeft + left + 5) /
+      this.renderer.domElement.width
+    // eslint-disable-next-line no-mixed-operators
+    ) * 2 - 1; // NOTE: the +5 is a hack to get raycaster centered on point in nwjs
+    this.mouse.y = -(
+      // eslint-disable-next-line no-mixed-operators
+      // eslint-disable-next-line max-len
+      (event.clientY - this.renderer.domElement.offsetTop - viewport.offsetTop + viewport.scrollTop) /
+    // eslint-disable-next-line no-mixed-operators
+    this.renderer.domElement.height) * 2 + 1;
+    // update the picking ray with the camera and mouse position
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    // console.log('mouse', this.mouse);
+    // calculate objects intersecting the picking ray
+    const intersects = this.raycaster.intersectObjects(this.intersectArray);
+    if (intersects.length > 0) {
+      const auid = this.pointCloud.pointNames[intersects[0].index];
+      const intersection = (intersects.length) > 0 ? intersects[0] : null;
+      // console.log('selecting point: ', auid );
+      if (this.clickedOrBinPoint(intersection) === 1) {
+        const pt = this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3);
+        this.distanceToHull(pt);
+        this.group.add(this.lineGroup);
+      }
+      this.pointClickHandler(auid);
+
+      // this.pointCloud.geometry.attributes.size.array[intersects[0].index] = 80;
+      // this.pointCloud.geometry.attributes.size.needsUpdate = true;
+    }
+  }
+
+  onContextMenu(event) {
     event.preventDefault();
     const viewport = document.getElementById('viewport'); // boostrap fix
     // eslint-disable-next-line no-unused-vars
@@ -550,13 +610,11 @@ class TernaryHullRender {
   removeEventListeners() {
     this.controls.removeEventListener('change', () => this.render());
     window.removeEventListener('resize', this.onWindowResize.bind(this), false);
-    /*
     this.container.removeEventListener(
       'mousemove',
       this.onMouseMove.bind(this),
-      false
+      false,
     );
-    */
     this.container.removeEventListener(
       'mousedown',
       this.onClick.bind(this),
