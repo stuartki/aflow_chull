@@ -55,8 +55,12 @@ const propTypes = {
 };
 
 const Points = (props) => {
+  // svg rendering order dictates the z-index
+  // first order rendering
   const data = props.data;
+  // second order rendering
   const vertexData = [];
+  // third order rendering
   const selectedData = [];
   const scHull = ['aflow:05636011068d8aed', 'aflow:b470c4d5c2656c07', 'aflow:7fc6963bdde3fe0f', 'aflow:17f59ed82fc797fa', 'aflow:edde65439f6a128f', 'aflow:f7a8e64312435b20', 'aflow:8d7250321f32196e'];
   const scHullVertices = data.filter(vertex => scHull.includes(vertex.auid))
@@ -66,6 +70,8 @@ const Points = (props) => {
         x: d.composition[1],
       }
     ));
+
+  // first order rendering: general points
   const circles = data.map((d) => {
     let point;
     const fill = props.color;
@@ -82,18 +88,18 @@ const Points = (props) => {
           yScale={props.yScale}
           distanceToHull={d.distanceToHull}
           fill={fill}
-          key={d.auid}
           auid={d.auid}
           vertices={props.vertices}
           isClicked={d.isClicked}
           line={props.line}
           pointClickHandler={props.pointClickHandler}
-          pointHoverHandler={props.pointHoverHandler}
         />
       );
     }
     return (point);
   });
+
+  // second order rendering: hull points
   const vertexCircles = vertexData.map((d) => {
     let fill = props.color;
     if (d.isClicked) {
@@ -106,17 +112,17 @@ const Points = (props) => {
         cy={props.yScale(d.enthalpyFormationAtom)}
         yScale={props.yScale}
         fill={fill}
-        key={d.auid}
         auid={d.auid}
         scHullVertices={scHullVertices}
         isClicked={d.isClicked}
         line={props.line}
         pointClickHandler={props.pointClickHandler}
-        pointHoverHandler={props.pointHoverHandler}
       />
     );
     return (point);
   });
+
+  // third order rendering: selected points
   const selectedCircles = selectedData.map((d) => {
     const fill = '#CA6F96';
     const point = (
@@ -127,14 +133,12 @@ const Points = (props) => {
         yScale={props.yScale}
         distanceToHull={d.distanceToHull}
         fill={fill}
-        key={d.auid}
         auid={d.auid}
         vertices={props.vertices}
         scHullVertices={scHullVertices}
         isClicked={d.isClicked}
         line={props.line}
         pointClickHandler={props.pointClickHandler}
-        pointHoverHandler={props.pointHoverHandler}
       />
     );
     return (point);
