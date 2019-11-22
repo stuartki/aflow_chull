@@ -62,7 +62,6 @@ class Vertex extends React.Component {
         <circle
           className="point"
           r="5"
-          // mev = 1000
           cx={xScale(d.x)}
           cy={yScale(d.y)}
           fill="none"
