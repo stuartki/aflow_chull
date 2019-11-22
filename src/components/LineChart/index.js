@@ -207,7 +207,7 @@ class LineChart extends React.Component {
         }}
       >
         <svg id={this.props.chartId} width={this.state.width} height={svgHeight}>
-          <Gradient color1={this.props.color} color2="#fff" id={`area-${this.props.chartId}`} />
+          <Gradient className="gradient" color1={this.props.color} color2="#fff" id={`area-${this.props.chartId}`} />
           <g transform={transform}>
             <Grid height={h} grid={yGrid} gridType="y" />
             <Axis height={h} axis={yAxis} axisType="y" />

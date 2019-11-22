@@ -146,7 +146,6 @@ class Point extends React.Component {
               fill="none"
               stroke="#ff0000"
             />
-
           </g>
         );
       }
