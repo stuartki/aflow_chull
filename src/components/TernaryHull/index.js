@@ -95,13 +95,43 @@ class TernaryHull extends React.Component {
 
   render() {
     return (
-      <div
-        id={this.props.container}
-        ref={(c) => {
-          this.div = c;
-        }}
-        className="three-container"
-      />
+      <div id="container">
+        <button
+          // id="reset"
+          className="camera-button"
+          onClick={(e) => {
+            this.state.THREEscene.setCamera('init');
+            // this.state.THREEscene.render();
+          }}
+        >
+        Reset
+        </button>
+        <button
+          // id="reset"
+          className="camera-button"
+          onClick={(e) => {
+            this.state.THREEscene.setCamera(1);
+          }}
+        >
+        1
+        </button>
+        <button
+          // id="reset"
+          className="camera-button"
+          onClick={(e) => {
+            this.state.THREEscene.setCamera(2);
+          }}
+        >
+        2
+        </button>
+        <div
+          id={this.props.container}
+          // ref={(c) => {
+          //   this.div = c;
+          // }}
+          className="three-container"
+        />
+      </div>
     );
   }
 }
