@@ -45,7 +45,6 @@ const propTypes = {
   yScale: PropTypes.func.isRequired,
   color: PropTypes.string.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
-  pointHoverHandler: PropTypes.func.isRequired,
   vertices: PropTypes.arrayOf(
     PropTypes.shape({
       x: React.PropTypes.number.isRequired,
@@ -62,14 +61,6 @@ const Points = (props) => {
   const vertexData = [];
   // third order rendering
   const selectedData = [];
-  const scHull = ['aflow:05636011068d8aed', 'aflow:b470c4d5c2656c07', 'aflow:7fc6963bdde3fe0f', 'aflow:17f59ed82fc797fa', 'aflow:edde65439f6a128f', 'aflow:f7a8e64312435b20', 'aflow:8d7250321f32196e'];
-  const scHullVertices = data.filter(vertex => scHull.includes(vertex.auid))
-    .map(d => (
-      { auid: d.auid,
-        y: d.enthalpyFormationAtom,
-        x: d.composition[1],
-      }
-    ));
 
   // first order rendering: general points
   const circles = data.map((d) => {
@@ -113,7 +104,6 @@ const Points = (props) => {
         yScale={props.yScale}
         fill={fill}
         auid={d.auid}
-        scHullVertices={scHullVertices}
         isClicked={d.isClicked}
         line={props.line}
         pointClickHandler={props.pointClickHandler}
@@ -135,7 +125,6 @@ const Points = (props) => {
         fill={fill}
         auid={d.auid}
         vertices={props.vertices}
-        scHullVertices={scHullVertices}
         isClicked={d.isClicked}
         line={props.line}
         pointClickHandler={props.pointClickHandler}
