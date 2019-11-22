@@ -345,7 +345,7 @@ class TernaryHullRender {
     }
   }
 
-  clickedOrBinPoint(intersection) {
+  pointIndicator(intersection) {
     function binPoint(entries, i) {
       const pX = !entries[i].composition[0];
       const pY = !entries[i].composition[2];
@@ -395,7 +395,7 @@ class TernaryHullRender {
 
     if (intersection !== null) {
       this.sphere.position.copy(intersection.point);
-      const indicator = this.clickedOrBinPoint(intersection);
+      const indicator = this.pointIndicator(intersection);
       if (indicator === 1) {
         const pt = this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3);
         this.distanceToHull(pt);
@@ -450,12 +450,12 @@ class TernaryHullRender {
       const auid = this.pointCloud.pointNames[intersects[0].index];
       const intersection = (intersects.length) > 0 ? intersects[0] : null;
       // console.log('selecting point: ', auid );
-      if (this.clickedOrBinPoint(intersection) === 1) {
+      this.pointClickHandler(auid);
+      if (this.pointIndicator(intersection) === 1) {
         const pt = this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3);
         this.distanceToHull(pt);
         this.group.add(this.lineGroup);
       }
-      this.pointClickHandler(auid);
 
       // this.pointCloud.geometry.attributes.size.array[intersects[0].index] = 80;
       // this.pointCloud.geometry.attributes.size.needsUpdate = true;
@@ -490,7 +490,7 @@ class TernaryHullRender {
       const auid = this.pointCloud.pointNames[intersects[0].index];
       const intersection = (intersects.length) > 0 ? intersects[0] : null;
       // console.log('selecting point: ', auid );
-      if (this.clickedOrBinPoint(intersection)) {
+      if (this.pointIndicator(intersection)) {
         const pt = this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3);
         this.distanceToHull(pt);
         this.group.add(this.lineGroup);
