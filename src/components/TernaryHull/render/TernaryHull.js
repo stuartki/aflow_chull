@@ -40,7 +40,7 @@ export default class TernaryHull {
     return c;
   }
 
-  drawHull(data = this.data) {
+  drawHull(data = this.data, init = true) {
     const hullData = data;
 
     // ski - I dont believe this is necessary after cleaning at init
@@ -101,22 +101,28 @@ export default class TernaryHull {
       face.vertexColors[2] = this.colorVertex(geometry.vertices[face.c], this.TGrid.gridHeight);
     }
 
-    this.hullMesh = new THREE.Mesh(geometry, material);
-    this.hullGroup.add(this.hullMesh);
+    const hullMesh = new THREE.Mesh(geometry, material);
+    const hullGroup = new THREE.Group();
+    hullGroup.add(hullMesh);
     // =======================  END DRAWING CONVEX HULL ==========================
     // COMMENTED OUT BELOW IS THE DECREPRED WAY TO DRAW EDGES
     // this.edges = new THREE.EdgesHelper(this.hullMesh, this.color, 0.05);
     // this.edges.material.linewidth = 2;
     const edgesGeometry = new THREE.EdgesGeometry(geometry, 0.05);
-    this.edges = new THREE.LineSegments(
+    const edges = new THREE.LineSegments(
       edgesGeometry,
       new THREE.LineBasicMaterial({
         color: '#787CB5',
         linewidth: 2,
       }),
     );
-    this.hullGroup.add(this.edges);
-    return this.hullGroup;
+    hullGroup.add(edges);
+    if (init) {
+      this.hullGroup = hullGroup;
+      this.hullMesh = hullMesh;
+      this.edges = edges;
+    }
+    return hullGroup;
   }
 
   stabilityCriterion(vertex) {
@@ -172,7 +178,7 @@ export default class TernaryHull {
       }
     }
     const vertices = [minBHull1, minBHull2, minBHull3];
-    this.drawHull({ vertices: [minBHull1, minBHull2, minBHull3], faces: [[0, 1, 2]] });
+    this.hullGroup.add(this.drawHull({ vertices: [minBHull1, minBHull2, minBHull3], faces: [[0, 1, 2]] }, false));
     minBHull = minBHull1;
     vertices.forEach((v) => {
       if (minBHull.enthalpyFormationAtom > v.enthalpyFormationAtom) {
