@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
 const propTypes = {
   cx: PropTypes.number.isRequired,
@@ -8,13 +9,6 @@ const propTypes = {
   yScale: PropTypes.func.isRequired,
   fill: PropTypes.string.isRequired,
   auid: PropTypes.string.isRequired,
-  scHullVertices: PropTypes.arrayOf(
-    PropTypes.shape({
-      auid: React.PropTypes.string.isRequired,
-      x: React.PropTypes.number.isRequired,
-      y: React.PropTypes.number.isRequired,
-    }),
-  ).isRequired,
   isClicked: PropTypes.bool.isRequired,
   line: PropTypes.func.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
@@ -29,6 +23,7 @@ class Vertex extends React.Component {
     this.onClick = this.onClick.bind(this);
     this.onMouseOver = this.onMouseOver.bind(this);
     this.onMouseOut = this.onMouseOut.bind(this);
+    this.findStabilityCriterion = this.findStabilityCriterion.bind(this);
   }
 
   onClick() {
@@ -43,28 +38,45 @@ class Vertex extends React.Component {
     this.setState({ sc: false });
   }
 
+  findStabilityCriterion(auid) {
+    const url = 'http://localhost:4000/data';
+    axios.get(url).then((res) => {
+      this.scHullVertices = res.data.vertices.map(d => (
+        { auid: d.auid,
+          y: d.enthalpyFormationAtom * 1000,
+          x: d.composition[1],
+        }
+      ));
+    });
+    setTimeout(() => console.log(this.scHullVertices), 100);
+  }
+
   render() {
-    let newHull = null;
     let point = null;
+    let ssHull = null;
+    const xScale = this.props.xScale;
+    const yScale = this.props.yScale;
     if (this.state.sc && this.props.isClicked) {
-      const circles = this.props.scHullVertices.map(d => (
+      this.findStabilityCriterion(this.props.auid);
+      const circles = this.scHullVertices.map(d => (
         <circle
           className="point"
           r="5"
-          cx={this.props.xScale(d.x)}
-          cy={this.props.yScale(d.y)}
+          // mev = 1000
+          cx={xScale(d.x)}
+          cy={yScale(d.y)}
           fill="none"
           strokeWidth="2px"
           stroke="#ff0000"
         />
       ));
-      newHull =
+      ssHull =
         (
           <g>
             <path
               className="line shadow"
               stroke="blue"
-              d={this.props.line(this.props.scHullVertices)}
+              d={this.props.line(this.scHullVertices)}
               strokeLinecap="round"
             />
             {circles}
@@ -89,7 +101,7 @@ class Vertex extends React.Component {
         );
     return (
       <g>
-        {newHull}
+        {ssHull}
         {point}
       </g>
     );
