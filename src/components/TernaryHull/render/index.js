@@ -411,7 +411,6 @@ class TernaryHullRender {
     this.render();
   }
 
-
   togglePointCloudVisibility(bool) {
     if (this.pointCloud) {
       this.pointCloud.visible = bool;
