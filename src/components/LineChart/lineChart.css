@@ -74,32 +74,30 @@ h3{
     fill: none;
     /* stroke: #7dc7f4; */
     stroke-width: 3px;
-    transition: all 1s ease-in-out;
+    /* transition: all 1s ease-in-out; */
 }
 
 .tieline {
     stroke: green;
     stroke-width: 5px;
-    transition: all 1s ease-in-out;
+    /* transition: all 1s ease-in-out; */
 }
 
 .hline {
     stroke: red;
     stroke-width: 4px;
-    -webkit-transition: all 1s ease-in-out;
-    -moz-transition: all 1s ease-in-out;
-    transition: all 1s ease-in-out;
+    /* transition: all 1s ease-in-out; */
 }
 
 .axis{
     /*fill:#bbc7d9; */
     fill: #A3A3A7;
     opacity: 1;
-    transition: all 1s ease-in-out;
+    /* transition: all 1s ease-in-out; */
 }
 
 .point {
-    transition: all 1s ease-in-out;
+    /* transition: all 1s ease-in-out; */
 }
 
 .axis path,
