@@ -104,16 +104,16 @@ class TernaryHull extends React.Component {
             // this.state.THREEscene.render();
           }}
         >
-        Reset
+        Reset Camera
         </button>
         <button
           // id="reset"
           className="camera-button"
           onClick={(e) => {
-            this.state.THREEscene.setCamera(1);
+            this.state.THREEscene.THull.n1EnthalpyGain();
           }}
         >
-        1
+        N+1 Enthalpy Gain
         </button>
         <button
           // id="reset"

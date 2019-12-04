@@ -9,6 +9,7 @@ export default class TernaryHull {
     this.TGrid = TGrid;
     this.data = data;
     this.gridHeight = this.TGrid.gridHeight;
+    this.n1EG = undefined;
     this.hullGroup = new THREE.Group();
   }
 
@@ -142,51 +143,59 @@ export default class TernaryHull {
   }
 
   n1EnthalpyGain() {
-    const hullData = this.data.vertices;
-    let minBHull1;
-    let minBHull2;
-    let minBHull3;
-    let minHull;
-    let minBHull;
+    if (this.n1EG === undefined) {
 
-    for (let i = 0; i < hullData.length; i++) {
-      if (hullData[i].composition[0] === 0) {
-        if (minBHull1 === undefined) {
-          minBHull1 = hullData[i];
-        } else if (minBHull1.enthalpyFormationAtom > hullData[i].enthalpyFormationAtom) {
-          minBHull1 = hullData[i];
+    
+      const hullData = this.data.vertices;
+      let minBHull1;
+      let minBHull2;
+      let minBHull3;
+      let minHull;
+      let minBHull;
+
+      for (let i = 0; i < hullData.length; i++) {
+        if (hullData[i].composition[0] === 0) {
+          if (minBHull1 === undefined) {
+            minBHull1 = hullData[i];
+          } else if (minBHull1.enthalpyFormationAtom > hullData[i].enthalpyFormationAtom) {
+            minBHull1 = hullData[i];
+          }
+        }
+        if (hullData[i].composition[1] === 0) {
+          if (minBHull2 === undefined) {
+            minBHull2 = hullData[i];
+          } else if (minBHull2.enthalpyFormationAtom > hullData[i].enthalpyFormationAtom) {
+            minBHull2 = hullData[i];
+          }
+        }
+        if (hullData[i].composition[2] === 0) {
+          if (minBHull3 === undefined) {
+            minBHull3 = hullData[i];
+          } else if (minBHull3.enthalpyFormationAtom > hullData[i].enthalpyFormationAtom) {
+            minBHull3 = hullData[i];
+          }
+        }
+        if (minHull === undefined) {
+          minHull = hullData[i];
+        } else if (minHull.enthalpyFormationAtom > hullData[i].enthalpyFormationAtom) {
+          minHull = hullData[i];
         }
       }
-      if (hullData[i].composition[1] === 0) {
-        if (minBHull2 === undefined) {
-          minBHull2 = hullData[i];
-        } else if (minBHull2.enthalpyFormationAtom > hullData[i].enthalpyFormationAtom) {
-          minBHull2 = hullData[i];
-        }
-      }
-      if (hullData[i].composition[2] === 0) {
-        if (minBHull3 === undefined) {
-          minBHull3 = hullData[i];
-        } else if (minBHull3.enthalpyFormationAtom > hullData[i].enthalpyFormationAtom) {
-          minBHull3 = hullData[i];
-        }
-      }
-      if (minHull === undefined) {
-        minHull = hullData[i];
-      } else if (minHull.enthalpyFormationAtom > hullData[i].enthalpyFormationAtom) {
-        minHull = hullData[i];
-      }
-    }
-    const vertices = [minBHull1, minBHull2, minBHull3];
-    this.hullGroup.add(this.drawHull({ vertices: [minBHull1, minBHull2, minBHull3], faces: [[0, 1, 2]] }, false));
-    minBHull = minBHull1;
-    vertices.forEach((v) => {
-      if (minBHull.enthalpyFormationAtom > v.enthalpyFormationAtom) {
-        minBHull = v;
-      }
-    });
-    if (minBHull.enthalpyFormationAtom !== minHull.enthalpyFormationAtom) {
-      this.minHull.isClicked = true;
+      const vertices = [minBHull1, minBHull2, minBHull3];
+      this.n1EG = this.drawHull({ vertices: vertices, faces: [[0, 1, 2]] }, false);
+      this.hullGroup.add(this.n1EG);
+      // minBHull = minBHull1;
+      // vertices.forEach((v) => {
+      //   if (minBHull.enthalpyFormationAtom > v.enthalpyFormationAtom) {
+      //     minBHull = v;
+      //   }
+      // });
+      // if (minBHull.enthalpyFormationAtom !== minHull.enthalpyFormationAtom) {
+      //   this.minHull.isClicked = true;
+      // }
+    } else {
+      this.hullGroup.remove(this.n1EG);
+      this.n1EG = undefined;
     }
   }
 }

@@ -78,14 +78,10 @@ class TernaryHullRender {
       1,
       10000,
     );
-    this.camera.position.set(this.TGrid.triCenter[0], this.TGrid.triCenter[1], 1000);
+
+    this.setCamera('init');
     this.scene.add(this.camera);
     this.scene.add(this.group);
-
-    this.controls = new TrackballControls(this.camera, this.container);
-    this.controls.rotateSpeed = 1.0;
-    this.controls.target = new THREE.Vector3(this.TGrid.triCenter[0], this.TGrid.triCenter[1], 0);
-
 
     // TODO: add tooltip stuff
 
@@ -113,7 +109,6 @@ class TernaryHullRender {
     // eslint-disable-next-line max-len
     // window.addEventListener('keydown', this.onKeyDown.bind(this), false); // part of work in progress
 
-    this.controls.addEventListener('change', () => this.render());
     window.addEventListener('resize', this.onWindowResize.bind(this), false);
 
     this.container.addEventListener(
@@ -128,6 +123,18 @@ class TernaryHullRender {
       false,
     );
     this.animate();
+  }
+
+  setCamera(type) {
+    if (type === 'init') {
+      this.camera.up = new THREE.Vector3(0, 1, 0);
+      this.camera.position.set(this.TGrid.triCenter[0], this.TGrid.triCenter[1], 1000);
+      this.controls = new TrackballControls(this.camera, this.container);
+      this.controls.rotateSpeed = 1.0;
+      // this.camera.lookAt(new THREE.Vector3(this.TGrid.triCenter[0], this.TGrid.triCenter[1], 0));
+      this.controls.target = new THREE.Vector3(this.TGrid.triCenter[0], this.TGrid.triCenter[1], 0);
+      this.controls.addEventListener('change', () => this.render());
+    }
   }
 
   plotEntries() {
@@ -398,8 +405,9 @@ class TernaryHullRender {
       const indicator = this.pointIndicator(intersection);
       if (indicator === 1) {
         const pt = this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3);
-        this.distanceToHull(pt);
-        this.group.add(this.lineGroup);
+        // this.distanceToHull(pt);
+        // this.group.add(this.lineGroup);
+        this.findFacet(pt);
       } else if (indicator === 3) {
         // this.THull.stabilityCriterion(intersection);
         this.THull.n1EnthalpyGain();
