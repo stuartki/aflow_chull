@@ -63,16 +63,7 @@ function hoverVertexInSelectedHulls(auid, selectedHulls) {
   for (let i = 0; i < hullList.length; i++) {
     for (let j = 0; j < hullList[i].entries.length; j++) {
       if (hullList[i].entries[j].auid === auid && hullList[i].entries[j].auid !== null) {
-        const clickedEntry = hullList[i].entries[j];
-        let b;
-        const ver = hullList[i].vertices;
-        for (b = 0; b < ver.length; b++) {
-          if (clickedEntry.composition[0] < ver[b].x) {
-            hullList[i].vertices[b - 1].tielineClicked = !hullList[i].vertices[b - 1].tielineClicked;
-            break;
-          }
-        }
-        // hullList[i].entries[j].tielineClicked = !hullList[i].entries[j].tielineClicked;
+        hullList[i].entries[j].isHovered = !hullList[i].entries[j].isHovered;
       }
     }
   }
@@ -176,12 +167,12 @@ export function hulls(state = hullDefaultState, action) {
         selectedEntriesAuids: auids,
       });
     }
-    case actionType.POINT_HOVER_HANDLER: {
+    case actionType.HIGHLIGHT_POINT: {
       console.log("HOVER");
-      const selectedHulls = hoverVertexInSelectedHulls(action.auid, state.selectedHulls);
-      return Object.assign({}, state, {
-        selectedHulls,
-      });
+      // const selectedHulls = hoverVertexInSelectedHulls(action.auid, state.selectedHulls);
+      // return Object.assign({}, state, {
+      //   selectedHulls,
+      // });
     }
     case actionType.SET_POINTS_VISIBLITY:
       return Object.assign({}, state, {
