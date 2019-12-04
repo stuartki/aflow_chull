@@ -4,7 +4,9 @@ import SelectedPointsEntry from './SidebarSelectedPointsEntry';
 
 const propTypes = {
   selectedEntriesAuids: PropTypes.array.isRequired,
-  removeEntry: PropTypes.func.isRequired,
+  // removeEntry: PropTypes.func.isRequired,
+  pointClickHandler: PropTypes.func.isRequired,
+  highlightPoint: PropTypes.func.isRequired,
 };
 
 class SelectedPoints extends React.Component {
@@ -36,7 +38,9 @@ class SelectedPoints extends React.Component {
         compound={d.compound}
         id={d.auid}
         key={d.auid}
-        removeEntry={this.props.removeEntry}
+        // removeEntry={this.props.removeEntry}
+        highlightPoint={this.props.highlightPoint}
+        pointClickHandler={this.props.pointClickHandler}
       />
     ));
     return (

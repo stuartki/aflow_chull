@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
@@ -10,13 +11,20 @@ import { Link } from 'react-router';
 const propTypes = {
   id: PropTypes.string.isRequired,
   compound: PropTypes.string.isRequired,
-  removeEntry: PropTypes.func.isRequired,
+  // removeEntry: PropTypes.func.isRequired,
+  pointClickHandler: PropTypes.func.isRequired,
+  highlightPoint: PropTypes.func.isRequired,
 };
 
 class SelectedPointsEntry extends React.Component {
   constructor(props) {
     super(props);
     this.removeOnClick = this.removeOnClick.bind(this);
+    this.onMouseOver = this.onMouseOver.bind(this);
+  }
+
+  onMouseOver() {
+    this.props.highlightPoint(this.props.id);
   }
 
   removeOnClick() {
@@ -24,15 +32,16 @@ class SelectedPointsEntry extends React.Component {
     // still appear highlighted on the hulls. Therefore, the point click action
     // is called instead which will handle everything.
 
-    // hullActions.pointClickHandler(this.props.id);
-    this.props.removeEntry(this.props.id);
+    // im not sure why there is a separate removeEntry...will investigate
+    this.props.pointClickHandler(this.props.id);
+    // this.props.removeEntry(this.props.id);
   }
 
   render() {
     return (
       <div className="info-element">
         <div className="info-element-inner">
-          <Link to={`info#${this.props.id}`}>
+          <Link to={`info#${this.props.id}`} onMouseOver={this.onMouseOver}>
             {this.props.compound}
           </Link>
           <span onClick={this.removeOnClick} className="pull-right">

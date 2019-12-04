@@ -10,7 +10,9 @@ import SelectedPoints from './SidebarSelectedPoints';
 import { addElements, fetchAvailableElements } from '../../actions/periodicTableActions';
 import {
   fetchHull,
-  removeEntry,
+  // removeEntry,
+  highlightPoint,
+  pointClickHandler,
   setHullPointsVisibility,
   showAllPoints,
   resetHull,
@@ -29,7 +31,9 @@ const propTypes = {
   resetHull: PropTypes.func.isRequired,
   addElements: PropTypes.func.isRequired,
   addHull: PropTypes.func.isRequired,
-  removeEntry: PropTypes.func.isRequired,
+  // removeEntry: PropTypes.func.isRequired,
+  highlightPoint: PropTypes.func.isRequired,
+  pointClickHandler: PropTypes.func.isRequired,
   isVisible: PropTypes.bool,
   selectedElements: PropTypes.string.isRequired,
   selectedHulls: PropTypes.array.isRequired,
@@ -74,10 +78,13 @@ const Sidebar = function render(props) {
           addElements={props.addElements}
           addHull={props.addHull}
           selectedHulls={props.selectedHulls}
+          pointClickHandler={props.pointClickHandler}
         />
         <SelectedPoints
           selectedEntriesAuids={props.selectedEntriesAuids}
-          removeEntry={props.removeEntry}
+          // removeEntry={props.removeEntry}
+          pointClickHandler={props.pointClickHandler}
+          highlightPoint={props.highlightPoint}
         />
         {hullOptions}
       </div>
@@ -107,10 +114,12 @@ function mapDispatchToProps(dispatch) {
       dispatch(fetchAvailableElements());
     },
     addHull: (name, selectedHulls) => dispatch(fetchHull(name, selectedHulls)),
-    removeEntry: (auid) => {
-      dispatch(removeEntry(auid));
-      // dispatch(pointClickHandler(auid));
-    },
+    // removeEntry: (auid) => {
+    //   dispatch(removeEntry(auid));
+    //   // dispatch(pointClickHandler(auid));
+    // },
+    pointClickHandler: auid => dispatch(pointClickHandler(auid)),
+    highlightPoint: auid => dispatch(highlightPoint(auid)),
     toggleHullPoints: () => dispatch(setHullPointsVisibility()),
     showAllPoints: name => dispatch(showAllPoints(name)),
     toggleLabels: name => dispatch(toggleLabels(name)),
