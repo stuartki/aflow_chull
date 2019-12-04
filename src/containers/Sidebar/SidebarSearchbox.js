@@ -19,6 +19,7 @@ const propTypes = {
   addElements: PropTypes.func.isRequired,
   selectedHulls: PropTypes.array.isRequired,
   selectedElements: PropTypes.string.isRequired,
+  pointClickHandler: PropTypes.func.isRequired,
 };
 
 class Searchbox extends React.Component {
@@ -44,7 +45,15 @@ class Searchbox extends React.Component {
 
   onEnter(e) {
     if (e.charCode === 13 && e.target.value !== '') {
-      if (this.props.pathname === '/history') {
+      if (e.target.value.charAt(0) === 'e') {
+        // eslint-disable-next-line max-len
+        const entry = this.props.selectedHulls.map(hull => hull.entries.filter(d => d.compound === e.target.value.slice(1)));
+        if (entry.length > 0) {
+          this.props.pointClickHandler(entry[0][0].auid);
+        }
+      } else if (e.target.value.includes('aflow:')) {
+        this.props.pointClickHandler(e.target.value);
+      } else if (this.props.pathname === '/history') {
         /*
         if (hullStore.getHullFromStore(this.state.selectedElements) === null) {
           hullActions.addHull(this.state.selectedElements);
@@ -99,7 +108,6 @@ class Searchbox extends React.Component {
       <div className="search-group">
         <input
           autoComplete="off"
-          maxLength="6"
           className="hull-input inline"
           placeholder="Add a Hull..."
           value={this.props.selectedElements}
