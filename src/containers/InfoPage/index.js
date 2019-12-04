@@ -7,8 +7,6 @@ import InfoCard from './InfoCard';
 import { getSelectedEntries, removeEntry } from '../../actions/hullActions';
 import './infoPage.css';
 
-
-
 const propTypes = {
   selectedEntries: PropTypes.array.isRequired,
   selectedEntriesAuids: PropTypes.array.isRequired,

@@ -38,6 +38,7 @@ class Point extends React.Component {
 
   onClick() {
     this.props.pointClickHandler(this.props.auid);
+    this.setState({ tielineStay: false });
   }
 
   onMouseOver() {
@@ -47,137 +48,131 @@ class Point extends React.Component {
   onMouseOut() {
     this.timer = setTimeout(() => {
       this.setState({ tielineClicked: false });
-    }, 2000);
+    }, 1000);
   }
 
   onLineClick() {
     clearTimeout(this.timer);
     this.setState({ tielineStay: !this.state.tielineStay });
+    if (!this.state.tielineStay) {
+      this.setState({ tielineClicked: false });
+    }
   }
-  // already inverted
-  // eslint-disable-next-line class-methods-use-this
-  hullDistance(endpoints, curX) {
-    const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
-    const b = endpoints[0].y - (m * endpoints[0].x);
-    return ((m * curX) + b);
-  }
-
-  // fade(element) {
-  //   var op = 1;  // initial opacity
-  //   var timer = setInterval(function () {
-  //       if (op <= 0.1){
-  //           clearInterval(timer);
-  //           element.style.display = 'none';
-  //       }
-  //       element.style.opacity = op;
-  //       element.style.filter = 'alpha(opacity=' + op * 100 + ")";
-  //       op -= op * 0.1;
-  //   }, 50);
-  // }
 
   render() {
-    let tieline = null;
-    let point = null;
-    if (this.props.isClicked) {
-      let i;
-      let t;
-      let tielineClicked;
-      const ver = this.props.vertices;
+    // find hull distance in scale of graph
+    function hullDistance(endpoints, curX) {
+      const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
+      const b = endpoints[0].y - (m * endpoints[0].x);
+      return ((m * curX) + b);
+    }
 
-      for (i = 0; i < ver.length; i++) {
-        if (this.props.xScale.invert(this.props.cx) < ver[i].x) {
-          t = ver.slice(i - 1, i + 1);
-          tielineClicked = ver[i].tielineClicked;
+    // find decomposition points
+    // TODO: turn this into getting decomposition reaction
+    function findDecomp(xPos, vertices) {
+      let decompPoints;
+      for (let i = 0; i < vertices.length; i++) {
+        if (xPos < vertices[i].x) {
+          const temp = vertices.slice(i - 1, i + 1);
+          decompPoints = [
+            { x: temp[0].x, y: temp[0].y },
+            { x: temp[1].x, y: temp[1].y },
+          ];
           break;
         }
       }
+      return decompPoints;
+    }
+
+    // function hullLine(points) {
+    //   continue;
+    // }
+
+    // svg components
+    let tieline = null;
+    let point = null;
+
+    // if it is clicked and not a hull point
+    if (this.props.isClicked && this.props.distanceToHull > 0) {
+      // invert x back to local stoichiometric/enthalpy x/y coordinates
       const x = this.props.xScale.invert(this.props.cx);
       const y = this.props.yScale.invert(this.props.cy);
+
+      // the math part
+      // find the decomposition reaction
+      const decompPoints = findDecomp(x, this.props.vertices);
       const pathToHull = [
         { x, y },
-        { x, y: this.hullDistance(t, x) },
+        { x, y: hullDistance(decompPoints, x) },
       ];
+
+      // drawing the points
       if (this.state.tielineClicked || this.state.tielineStay) {
-        const stroke = '#ff0000';
         let className = 'line shadow';
+        if (this.state.tielineClicked) {
+          className = 'hline shadow';
+        }
         if (this.state.tielineStay) {
           className = 'tieline shadow';
         }
+
         tieline =
         (
           <g>
             <path
               className={className}
-              stroke={stroke}
               d={this.props.line(pathToHull)}
               onClick={this.onLineClick}
               strokeLinecap="round"
-              strokeDasharray="3"
+              strokeDasharray="3, 10"
             />
             <path
               className={className}
-              stroke="#ff0000"
-              d={this.props.line(t)}
+              d={this.props.line(decompPoints)}
+              onClick={this.onLineClick}
               strokeLinecap="round"
             />
             <circle
               className="point"
               r="6"
-              cx={this.props.xScale(t[1].x)}
-              cy={this.props.yScale(t[1].y)}
+              cx={this.props.xScale(decompPoints[0].x)}
+              cy={this.props.yScale(decompPoints[0].y)}
               fill="none"
               stroke="#ff0000"
             />
             <circle
               className="point"
               r="6"
-              cx={this.props.xScale(t[0].x)}
-              cy={this.props.yScale(t[0].y)}
+              cx={this.props.xScale(decompPoints[1].x)}
+              cy={this.props.yScale(decompPoints[1].y)}
               fill="none"
               stroke="#ff0000"
             />
-
           </g>
         );
       }
     }
-    // validation if we have already mapped this point with hover
-    if (this.props.distanceToHull > -1) {
-      point =
-          (
-            <g>
-              <circle
-                className="point"
-                r="5"
-                cx={this.props.cx}
-                cy={this.props.cy}
-                fill={this.props.fill}
-                onClick={this.onClick}
-                onMouseOver={this.onMouseOver}
-                onMouseOut={this.onMouseOut}
-                strokeWidth="2px"
-              />
-            </g>
-          );
-    }
+
+    point =
+        (
+          <g>
+            <circle
+              className="point"
+              r="5"
+              cx={this.props.cx}
+              cy={this.props.cy}
+              fill={this.props.fill}
+              onClick={this.onClick}
+              onMouseOver={this.onMouseOver}
+              onMouseOut={this.onMouseOut}
+              strokeWidth="2px"
+            />
+          </g>
+        );
     return (
       <g>
         {tieline}
-<<<<<<< HEAD
-        <circle
-          className="point"
-          r="5"
-          cx={this.props.cx}
-          cy={this.props.cy}
-          fill={this.props.fill}
-          onClick={this.onClick}
-          onMouseOver={this.onMouseOver}
-          onMouseOut={this.onMouseOut}
-          strokeWidth="2px"
-        />
-=======
         {point}
->>>>>>> local_tieline
       </g>
     );
   }

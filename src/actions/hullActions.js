@@ -299,10 +299,10 @@ export function getSelectedEntries(auids) {
           lattice: temp[i].lattice_system_relax,
           density: Number(temp[i].density),
           prototype: temp[i].prototype,
-          np1enthalpygain : np1, //wws16
-          stabilitycriterion : sc,
-          distancetohull : Number(hdata[tindex].points[tindex2].distanceToHull).toFixed(3),
-          grstate : gstate,
+          np1enthalpygain: np1, // wws16
+          stabilitycriterion: sc,
+          distancetohull: Number(hdata[tindex].points[tindex2].distanceToHull).toFixed(3),
+          grstate: gstate,
         };
         entries.push(entry);
       }
@@ -336,7 +336,8 @@ export function fetchHull(name, selectedHulls) {
 
     // const url = `${URL_ROOT}/api/v2/hulls/${selectedHull}`;
     // const url = `http://aflowlib.duke.edu/users/egossett/ahull-cmds/api/hulls/?hull=${selectedHull}`; // AFLOW direct
-    const url = `http://aflowlib.duke.edu/search/ui/API/chull/v1.1/?hull=${selectedHull}`; // AFLOW direct
+    // const url = `http://aflowlib.duke.edu/search/ui/API/chull/v1.1/?hull=${selectedHull}`; // AFLOW direct
+    const url = 'http://localhost:3000/data';
     return axios.get(url).then((res) => {
       const meV = 1000; // scales from eV to meV
       const entries = [];

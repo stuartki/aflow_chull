@@ -36,9 +36,9 @@ class TernaryHull extends React.Component {
 
   componentDidMount() {
     this.state.THREEscene.init(this.props.container);
-    if (this.props.plotEntries) {
-      this.state.THREEscene.plotEntries(this.props.hull.entries);
-    }
+    // if (this.props.plotEntries) {
+    //   this.state.THREEscene.plotEntries(this.props.hull.entries);
+    // }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -71,35 +71,67 @@ class TernaryHull extends React.Component {
     }
   }
 
-  componentWillUpdate() {
-    if (this.props.plotEntries) {
-      if (this.props.hull.showHullPoints) {
-        this.state.THREEscene.updatePlottedEntries(this.props.hull.entries);
-      } else {
-        this.state.THREEscene.updatePlottedEntries(this.props.hull.entries);
-      }
-    }
-  }
+  // componentWillUpdate() {
+  //   if (this.props.plotEntries) {
+  //     if (this.props.hull.showHullPoints) {
+  //       this.state.THREEscene.updatePlottedEntries(this.props.hull.entries);
+  //     } else {
+  //       this.state.THREEscene.updatePlottedEntries(this.props.hull.entries);
+  //     }
+  //   }
+  // }
 
   componentDidUpdate(prevProps) {
     if (this.props.hull.name !== prevProps.hull.name) {
       this.div.innerHTML = '';
       this.state.THREEscene.init(this.props.container);
-      if (this.props.plotEntries) {
-        this.state.THREEscene.plotEntries(this.props.hull.entries);
-      }
+      // if (this.props.plotEntries) {
+      //   this.state.THREEscene.plotEntries(this.props.hull.entries);
+      // }
+    } else {
+      this.state.THREEscene.updatePlottedEntries(this.props.hull.entries);
     }
   }
 
   render() {
     return (
-      <div
-        id={this.props.container}
-        ref={(c) => {
-          this.div = c;
-        }}
-        className="three-container"
-      />
+      <div id="container">
+        <button
+          // id="reset"
+          className="camera-button"
+          onClick={(e) => {
+            this.state.THREEscene.setCamera('init');
+            // this.state.THREEscene.render();
+          }}
+        >
+        Reset Camera
+        </button>
+        <button
+          // id="reset"
+          className="camera-button"
+          onClick={(e) => {
+            this.state.THREEscene.THull.n1EnthalpyGain();
+          }}
+        >
+        N+1 Enthalpy Gain
+        </button>
+        <button
+          // id="reset"
+          className="camera-button"
+          onClick={(e) => {
+            this.state.THREEscene.setCamera(2);
+          }}
+        >
+        2
+        </button>
+        <div
+          id={this.props.container}
+          // ref={(c) => {
+          //   this.div = c;
+          // }}
+          className="three-container"
+        />
+      </div>
     );
   }
 }

@@ -146,6 +146,40 @@ class BinaryHull extends React.Component {
             }}
           />
         </div>
+        <div>
+          <button
+            id="reset"
+            // eslint-disable-next-line no-unused-vars
+            onClick={(e) => {
+              this.props.resizeHullAxes(this.props.hull.name, Number(-1000), Number(1000));
+              this.setState({
+                yMax: Number(1000),
+                yMin: Number(-1000),
+              });
+            }}
+          >
+            Reset
+          </button>
+          <button
+            id="hullresize"
+            // eslint-disable-next-line no-unused-vars
+            onClick={(e) => {
+              const vertices = this.props.hull.vertices.map(v => v.y);
+              const hullyMin = Math.min(...vertices);
+              const hullyMax = Math.max(...vertices);
+              const offset = hullyMax - hullyMin;
+              this.props.resizeHullAxes(this.props.hull.name,
+                Math.min(Number(hullyMin) - offset, Number(-100)),
+                Math.max(Number(hullyMax) + offset, Number(100)));
+              // this.setState({
+              //   yMax: Math.max(Number(hullyMax) + offset, Number(100)),
+              //   yMin: Math.min(Number(hullyMin) - offset, Number(-100)),
+              // });
+            }}
+          >
+            Resize Hull
+          </button>
+        </div>
       </div>
     );
   }

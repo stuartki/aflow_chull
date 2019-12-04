@@ -3,3 +3,14 @@
   height: 100%;
   background-color: #FFF;
 }
+
+#container{
+  width: 100%;
+  height: 100%;
+  background-color: #FFF;
+}
+
+.camera-button{
+  height: 25px;
+  position: relative;
+}

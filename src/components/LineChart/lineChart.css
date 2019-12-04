@@ -66,29 +66,39 @@ h3{
     text-align: center;
 }
 
+.gradient {
+    transition: all 1s ease-in-out;
+}
+
 .line {
     fill: none;
     /* stroke: #7dc7f4; */
-    stroke-width: 2px;
-
+    stroke-width: 3px;
+    /* transition: all 1s ease-in-out; */
 }
 
 .tieline {
-    fill: green;
-    stroke-width: 3px;
+    stroke: green;
+    stroke-width: 5px;
+    /* transition: all 1s ease-in-out; */
+}
+
+.hline {
+    stroke: red;
+    stroke-width: 4px;
+    /* transition: all 1s ease-in-out; */
 }
 
 .axis{
     /*fill:#bbc7d9; */
     fill: #A3A3A7;
     opacity: 1;
+    /* transition: all 1s ease-in-out; */
 }
 
-/*
-.point:hover {
-  cursor: pointer;
+.point {
+    /* transition: all 1s ease-in-out; */
 }
-*/
 
 .axis path,
 .axis line {
@@ -120,7 +130,8 @@ h3{
     opacity: 1;
 }
 
-
+/* 
 .default-svg{
 
-}
+} 
+*/
