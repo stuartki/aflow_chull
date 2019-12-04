@@ -65,6 +65,8 @@ export function removeHull(name) {
   };
 }
 
+// SIDEBAR ACTIONS
+
 export function showAllPoints(name) {
   return {
     type: actionType.SHOW_ALL_POINTS,
@@ -85,6 +87,15 @@ export function resetHull(name) {
     name,
   };
 }
+
+export function highlightPoint(name) {
+  return {
+    type: actionType.HIGHLIGHT_POINT,
+    name,
+  };
+}
+
+// end sidebar actions
 
 export function clearSelectedHulls() {
   return {
