@@ -26,6 +26,10 @@
   color: #A3A3A7;
 }
 
+#default {
+  background-color: green;
+}
+
 #hullresize {
   font-size: 12px;
   padding-left: 10px;
