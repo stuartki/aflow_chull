@@ -70,23 +70,27 @@ h3{
     transition: all 1s ease-in-out;
 }
 
+.area {
+    transition: all 1s ease-in-out;
+}
+
 .line {
     fill: none;
     /* stroke: #7dc7f4; */
     stroke-width: 3px;
-    /* transition: all 1s ease-in-out; */
+    transition: all 1s ease-in-out;
 }
 
 .tieline {
     stroke: green;
     stroke-width: 5px;
-    /* transition: all 1s ease-in-out; */
+    transition: all 1s ease-in-out;
 }
 
 .hline {
     stroke: red;
     stroke-width: 4px;
-    /* transition: all 1s ease-in-out; */
+    transition: all 1s ease-in-out;
 }
 
 .axis{
@@ -97,7 +101,7 @@ h3{
 }
 
 .point {
-    /* transition: all 1s ease-in-out; */
+    transition: all 1s ease-in-out;
 }
 
 .axis path,
