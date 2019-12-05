@@ -1,13 +1,17 @@
+/* eslint-disable no-mixed-operators */
+/* eslint-disable max-len */
 import React from 'react';
 import PropTypes from 'prop-types';
 
 const propTypes = {
+  defaultBehavior: PropTypes.bool.isRequired,
   cx: PropTypes.number.isRequired,
   xScale: PropTypes.func.isRequired,
   cy: PropTypes.number.isRequired,
   yScale: PropTypes.func.isRequired,
   fill: PropTypes.string.isRequired,
   auid: PropTypes.string.isRequired,
+  compound: PropTypes.string.isRequired,
   vertices: PropTypes.arrayOf(
     PropTypes.shape({
       x: React.PropTypes.number.isRequired,
@@ -25,7 +29,8 @@ class Point extends React.Component {
     super(props);
     this.state = {
       tielineClicked: false,
-      tielineStay: false,
+      tielineStay: false || this.props.defaultBehavior,
+      text: false,
     };
     this.timer = null;
     this.onClick = this.onClick.bind(this);
@@ -40,12 +45,12 @@ class Point extends React.Component {
   }
 
   onMouseOver() {
-    this.setState({ tielineClicked: true });
+    this.setState({ tielineClicked: true, text: true });
   }
 
   onMouseOut() {
     this.timer = setTimeout(() => {
-      this.setState({ tielineClicked: false });
+      this.setState({ tielineClicked: false, text: false });
     }, 1000);
   }
 
@@ -82,13 +87,24 @@ class Point extends React.Component {
       return decompPoints;
     }
 
-    // function hullLine(points) {
-    //   continue;
+    // fixes pesky offset of line to circle center
+    // function offset(points, xScale, yScale) {
+    //   const norm = ((yScale(points[1].y - points[0].y) ** 2)
+    //     + (xScale(points[1].x - points[0].x) ** 2)) ** (0.5);
+    //   const xiVec = 6 * xScale(points[1].x - points[0].x) / norm;
+    //   const yiVec = 6 * yScale(points[1].y - points[0].y) / norm;
+    //   const offsetPoints = [{ x: 0, y: 0 }, { x: 0, y: 0 }];
+    //   offsetPoints[0].x = xScale.invert(xScale(points[0].x) + xiVec);
+    //   offsetPoints[0].y = yScale.invert(yScale(points[0].y) + yiVec);
+    //   offsetPoints[1].x = xScale.invert(xScale(points[1].x) - xiVec);
+    //   offsetPoints[1].y = yScale.invert(yScale(points[1].y) - yiVec);
+    //   return offsetPoints;
     // }
 
     // svg components
     let tieline = null;
     let point = null;
+    let compound = null;
 
     // if it is clicked and not a hull point
     if (this.props.isClicked && this.props.distanceToHull > 0) {
@@ -113,7 +129,17 @@ class Point extends React.Component {
         if (this.state.tielineStay) {
           className = 'tieline shadow';
         }
-
+        compound =
+          (
+            <text
+              x={this.props.cx - 25}
+              y={this.props.cy - 10}
+              fill="#757575"
+              textLength={50}
+            >
+              {this.props.compound}
+            </text>
+          );
         tieline =
         (
           <g>
@@ -124,12 +150,12 @@ class Point extends React.Component {
               strokeLinecap="round"
               strokeDasharray="3, 10"
             />
-            <path
+            {/* <path
               className={className}
-              d={this.props.line(decompPoints)}
+              d={this.props.line(offsetPoints)}
               onClick={this.onLineClick}
               strokeLinecap="round"
-            />
+            /> */}
             <circle
               className="point"
               r="6"
@@ -169,6 +195,7 @@ class Point extends React.Component {
         );
     return (
       <g>
+        {compound}
         {tieline}
         {point}
       </g>
