@@ -40,9 +40,11 @@ class Point extends React.Component {
 */
 
 const propTypes = {
+  defaultBehavior: PropTypes.bool.isRequired,
   data: PropTypes.array.isRequired,
   xScale: PropTypes.func.isRequired,
   yScale: PropTypes.func.isRequired,
+  line: PropTypes.func.isRequired,
   color: PropTypes.string.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
   vertices: PropTypes.arrayOf(
@@ -54,6 +56,7 @@ const propTypes = {
 };
 
 const Points = (props) => {
+  let click = false;
   // svg rendering order dictates the z-index
   // first order rendering
   const data = props.data;
@@ -63,16 +66,18 @@ const Points = (props) => {
   const selectedData = [];
 
   // first order rendering: general points
-  const circles = data.map((d) => {
+  let circles = data.map((d) => {
     let point;
     const fill = props.color;
     if (d.distanceToHull === 0) {
       vertexData.push(d);
     } else if (d.isClicked) {
       selectedData.push(d);
+      click = click || d.isClicked;
     } else {
       point = (
         <Point
+          defaultBehavior={props.defaultBehavior}
           cx={props.xScale(d.composition[1])}
           xScale={props.xScale}
           cy={props.yScale(d.enthalpyFormationAtom)}
@@ -80,6 +85,7 @@ const Points = (props) => {
           distanceToHull={d.distanceToHull}
           fill={fill}
           auid={d.auid}
+          compound={d.compound}
           vertices={props.vertices}
           isClicked={d.isClicked}
           line={props.line}
@@ -89,6 +95,10 @@ const Points = (props) => {
     }
     return (point);
   });
+
+  if (props.defaultBehavior && click) {
+    circles = null;
+  }
 
   // second order rendering: hull points
   const vertexCircles = vertexData.map((d) => {
@@ -104,6 +114,7 @@ const Points = (props) => {
         yScale={props.yScale}
         fill={fill}
         auid={d.auid}
+        compound={d.compound}
         isClicked={d.isClicked}
         line={props.line}
         pointClickHandler={props.pointClickHandler}
@@ -117,6 +128,7 @@ const Points = (props) => {
     const fill = '#CA6F96';
     const point = (
       <Point
+        defaultBehavior={props.defaultBehavior}
         cx={props.xScale(d.composition[1])}
         xScale={props.xScale}
         cy={props.yScale(d.enthalpyFormationAtom)}
@@ -124,6 +136,7 @@ const Points = (props) => {
         distanceToHull={d.distanceToHull}
         fill={fill}
         auid={d.auid}
+        compound={d.compound}
         vertices={props.vertices}
         isClicked={d.isClicked}
         line={props.line}
@@ -135,6 +148,13 @@ const Points = (props) => {
   return (
     <g>
       {circles}
+      {/* hull */}
+      <path
+        className="line shadow"
+        stroke={props.color}
+        d={props.line(props.vertices)}
+        strokeLinecap="round"
+      />
       {vertexCircles}
       {selectedCircles}
     </g>
