@@ -8,6 +8,7 @@ import Grid from './LineChartGrid';
 import Gradient from './LineChartGradient';
 
 const propTypes = {
+  defaultBehavior: PropTypes.bool.isRequired,
   width: PropTypes.number,
   height: PropTypes.number,
   color: PropTypes.string,
@@ -27,7 +28,6 @@ const propTypes = {
   sidebarIsVisible: PropTypes.bool.isRequired,
   showAllPoints: PropTypes.bool.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
-  pointHoverHandler: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
@@ -187,6 +187,7 @@ class LineChart extends React.Component {
     if (this.props.showAllPoints) {
       points = (
         <Points
+          defaultBehavior={this.props.defaultBehavior}
           data={this.props.points}
           xScale={x}
           yScale={y}
@@ -194,7 +195,6 @@ class LineChart extends React.Component {
           line={line}
           vertices={vertices}
           pointClickHandler={this.props.pointClickHandler}
-          pointHoverHandler={this.props.pointHoverHandler}
         />
       );
     }
@@ -232,12 +232,6 @@ class LineChart extends React.Component {
               d={area(vertices)}
               key={1}
               fill={`url(#area-${this.props.chartId})`}
-            />
-            <path
-              className="line shadow"
-              stroke={this.props.color}
-              d={line(vertices)}
-              strokeLinecap="round"
             />
             {points}
           </g>
