@@ -31,6 +31,7 @@ class TernaryHull extends React.Component {
         this.props.defaultColor,
         this.props.pointClickHandler,
       ),
+      defaultBehavior: true,
     };
   }
 
@@ -89,41 +90,66 @@ class TernaryHull extends React.Component {
       //   this.state.THREEscene.plotEntries(this.props.hull.entries);
       // }
     } else {
-      this.state.THREEscene.updatePlottedEntries(this.props.hull.entries);
+      this.state.THREEscene.updatePlottedEntries(this.props.hull.entries, this.state.defaultBehavior);
     }
   }
 
   render() {
+    // bootstrap way of fixing color with try and catch
+    if (this.state.defaultBehavior) {
+      try {
+        document.getElementById('default').style.backgroundColor = 'green';
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        document.getElementById('default').style.backgroundColor = 'red';
+      } catch (error) {
+        console.log(error);
+      }
+    }
     return (
       <div id="container">
         <button
-          // id="reset"
-          className="camera-button"
+          id="default"
+            // eslint-disable-next-line no-unused-vars
           onClick={(e) => {
-            this.state.THREEscene.setCamera('init');
-            // this.state.THREEscene.render();
+            this.setState({ defaultBehavior: !this.state.defaultBehavior });
           }}
         >
-        Reset Camera
+          Default
         </button>
-        <button
-          // id="reset"
-          className="camera-button"
-          onClick={(e) => {
-            this.state.THREEscene.THull.n1EnthalpyGain();
-          }}
-        >
-        N+1 Enthalpy Gain
-        </button>
-        <button
-          // id="reset"
-          className="camera-button"
-          onClick={(e) => {
-            this.state.THREEscene.setCamera(2);
-          }}
-        >
-        2
-        </button>
+        <div id="buttons">
+          <button
+            // id="reset"
+            className="camera-button"
+            onClick={(e) => {
+              this.state.THREEscene.setCamera('init');
+              // this.state.THREEscene.render();
+            }}
+          >
+          Reset Camera
+          </button>
+          <button
+            // id="reset"
+            className="camera-button"
+            onClick={(e) => {
+              this.state.THREEscene.THull.n1EnthalpyGain();
+            }}
+          >
+          N+1 Enthalpy Gain
+          </button>
+          {/* <button
+            // id="reset"
+            className="camera-button"
+            onClick={(e) => {
+              this.state.THREEscene.setCamera(2);
+            }}
+          >
+          2
+          </button> */}
+        </div>
         <div
           id={this.props.container}
           // ref={(c) => {
