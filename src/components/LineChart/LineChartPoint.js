@@ -153,25 +153,27 @@ class Point extends React.Component {
             />
             {/* <path
               className={className}
-              d={this.props.line(offsetPoints)}
+              d={this.props.line(decompPoints)}
               onClick={this.onLineClick}
               strokeLinecap="round"
             /> */}
             <circle
               className="point"
-              r="6"
+              r="7"
               cx={this.props.xScale(decompPoints[0].x)}
               cy={this.props.yScale(decompPoints[0].y)}
               fill="none"
-              stroke="#ff0000"
+              stroke="#687BC9"
+              strokeWidth="3"
             />
             <circle
               className="point"
-              r="6"
+              r="7"
               cx={this.props.xScale(decompPoints[1].x)}
               cy={this.props.yScale(decompPoints[1].y)}
               fill="none"
-              stroke="#ff0000"
+              stroke="#687BC9"
+              strokeWidth="3"
             />
           </g>
         );

@@ -82,7 +82,7 @@ h3{
 }
 
 .tieline {
-    stroke: green;
+    stroke:#687BC9;
     stroke-width: 5px;
     /* transition: all 1s ease-in-out; */
 }
