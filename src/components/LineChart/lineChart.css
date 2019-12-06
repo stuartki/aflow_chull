@@ -84,13 +84,13 @@ h3{
 .tieline {
     stroke: green;
     stroke-width: 5px;
-    transition: all 1s ease-in-out;
+    /* transition: all 1s ease-in-out; */
 }
 
 .hline {
     stroke: red;
     stroke-width: 4px;
-    transition: all 1s ease-in-out;
+    /* transition: all 1s ease-in-out; */
 }
 
 .axis{
@@ -101,7 +101,7 @@ h3{
 }
 
 .point {
-    transition: all 1s ease-in-out;
+    /* transition: all 1s ease-in-out; */
 }
 
 .axis path,
