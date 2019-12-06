@@ -409,8 +409,7 @@ class TernaryHullRender {
         // this.group.add(this.lineGroup);
         this.findFacet(pt);
       } else if (indicator === 3) {
-        // this.THull.stabilityCriterion(intersection);
-        this.THull.n1EnthalpyGain();
+        this.THull.stabilityCriterion(intersection);
       }
     } else {
       this.group.remove(this.lineGroup);

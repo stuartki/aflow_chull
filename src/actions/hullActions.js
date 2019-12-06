@@ -137,38 +137,38 @@ export function getSelectedEntries(auids) {
       const entries = [];
 
 
-      //wws16 start
+      // wws16 start
       let comps = [];
-      //get list of all compositions within the selected points
-      for (let i = 0; i < temp.length; i++){
+      // get list of all compositions within the selected points
+      for (let i = 0; i < temp.length; i++) {
         let cur = temp[i].species.split(',');
         cur.sort();
         if (!(comps.includes(cur))){
           comps.push(cur);
         }
       }
-      //determine which comps are contained within other comps (e.g FeMn in FeMnRh, only need to calculate larger hull)
+      // determine which comps are contained within other comps (e.g FeMn in FeMnRh, only need to calculate larger hull)
       let redindices = [];
-      for (let i = 0; i < comps.length; i++){
-        for (let j = 0; j < comps.length; j++){
-          if(i !== j && comps[i].length < comps[j].length){
+      for (let i = 0; i < comps.length; i++) {
+        for (let j = 0; j < comps.length; j++) {
+          if (i !== j && comps[i].length < comps[j].length) {
             let redundant = true;
-            for(let k = 0; k < comps[i].length; k++){
-              if(!(comps[j].includes(comps[i][k]))) redundant = false;
+            for (let k = 0; k < comps[i].length; k++) {
+              if (!(comps[j].includes(comps[i][k]))) redundant = false;
             }
-            if(redundant){
+            if (redundant) {
               redindices.push(i);
             }
           }
         }
       }
-      //keep only the comps which are not contained within another
+      // keep only the comps which are not contained within another
       let hulls = [];
-      for(let i = 0; i < comps.length; i++){
-        if(!(redindices.includes(i))) hulls.push(comps[i]); //useful now contains lists of elements in each hull...
+      for (let i = 0; i < comps.length; i++) {
+        if (!(redindices.includes(i))) hulls.push(comps[i]); // useful now contains lists of elements in each hull...
       }
       
-      //wws16 test start
+      // wws16 test start
       
 
       let hreqs = [];

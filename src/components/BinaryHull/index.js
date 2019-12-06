@@ -15,7 +15,6 @@ const propTypes = {
   fullscreen: PropTypes.bool,
   resizeHullAxes: PropTypes.func.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
-  pointHoverHandler: PropTypes.func.isRequired,
   sidebarIsVisible: PropTypes.bool,
 };
 
@@ -34,6 +33,7 @@ class BinaryHull extends React.Component {
     this.state = {
       yMin: this.props.hull.yMin,
       yMax: this.props.hull.yMax,
+      defaultBehavior: true,
     };
 
     this.incrementMin = this.incrementMin.bind(this);
@@ -81,8 +81,35 @@ class BinaryHull extends React.Component {
       xLabel = `composition ${this.props.hull.species[1]}`;
       yLabel = 'formation enthalpy (meV)';
     }
+
+    // there is a better solution for this, but it is to catch first time render problem
+    // default does not exist before rendered
+    if (this.state.defaultBehavior) {
+      try {
+        document.getElementById('default').style.backgroundColor = 'green';
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        document.getElementById('default').style.backgroundColor = 'red';
+      } catch (error) {
+        console.log(error);
+      }
+    }
     return (
       <div>
+        <div>
+          <button
+            id="default"
+              // eslint-disable-next-line no-unused-vars
+            onClick={(e) => {
+              this.setState({ defaultBehavior: !this.state.defaultBehavior });
+            }}
+          >
+            Default
+          </button>
+        </div>
         <div className="axis-controls">
           <label htmlFor="yMax"> Y Max </label>
           <input
@@ -107,6 +134,7 @@ class BinaryHull extends React.Component {
           />
         </div>
         <LineChart
+          defaultBehavior={this.state.defaultBehavior}
           color={this.props.hull.color}
           width={this.props.width}
           height={this.props.height}
@@ -115,7 +143,6 @@ class BinaryHull extends React.Component {
           vertices={this.props.hull.vertices}
           points={this.props.hull.entries}
           pointClickHandler={this.props.pointClickHandler}
-          pointHoverHandler={this.props.pointHoverHandler}
           showAllPoints={this.props.hull.showAllPoints}
           yMin={this.props.hull.yMin}
           yMax={this.props.hull.yMax}

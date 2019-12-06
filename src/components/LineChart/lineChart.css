@@ -70,11 +70,15 @@ h3{
     transition: all 1s ease-in-out;
 }
 
+.area {
+    transition: all 1s ease-in-out;
+}
+
 .line {
     fill: none;
     /* stroke: #7dc7f4; */
     stroke-width: 3px;
-    /* transition: all 1s ease-in-out; */
+    transition: all 1s ease-in-out;
 }
 
 .tieline {
