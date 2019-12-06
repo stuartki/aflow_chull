@@ -10,6 +10,7 @@ const propTypes = {
   cy: PropTypes.number.isRequired,
   yScale: PropTypes.func.isRequired,
   fill: PropTypes.string.isRequired,
+  opacity: PropTypes.number.isRequired,
   auid: PropTypes.string.isRequired,
   compound: PropTypes.string.isRequired,
   vertices: PropTypes.arrayOf(
@@ -185,6 +186,7 @@ class Point extends React.Component {
               r="5"
               cx={this.props.cx}
               cy={this.props.cy}
+              opacity={this.props.opacity}
               fill={this.props.fill}
               onClick={this.onClick}
               onMouseOver={this.onMouseOver}
