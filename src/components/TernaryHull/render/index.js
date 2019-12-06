@@ -145,7 +145,7 @@ class TernaryHullRender {
   }
 
   // slightly cleaned so that it only updates colors and sizes
-  updatePlottedEntries(data) {
+  updatePlottedEntries(data, defaultBehavior) {
     const entries = this.TPoints.filterMinMaxGrid(data);
     this.lineGroup.remove(...this.lineGroup.children);
     const colors = new Float32Array(entries.length * 3);

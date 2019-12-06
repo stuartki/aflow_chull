@@ -127,10 +127,10 @@ export default class TernaryHull {
   }
 
   stabilityCriterion(vertex) {
-    const url = 'http://localhost:3000/data';
+    const url = 'http://localhost:4000/data';
 
     axios.get(url).then((res) => {
-      const vertices = res.data.facets_data;
+      const vertices = res.data.vertices;
       const newHullSet = [];
       Object.values(vertices).forEach(d =>
         d.forEach(e => e.vertices_auid.forEach(element => newHullSet.push(element))),
@@ -144,8 +144,6 @@ export default class TernaryHull {
 
   n1EnthalpyGain() {
     if (this.n1EG === undefined) {
-
-    
       const hullData = this.data.vertices;
       let minBHull1;
       let minBHull2;
