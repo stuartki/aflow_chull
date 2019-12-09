@@ -62,6 +62,7 @@ class TernaryHullRender {
     const sphereGeometry = new THREE.SphereBufferGeometry(2, 32, 32);
     const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     this.sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
     this.scene.add(this.sphere);
   }
 
@@ -138,6 +139,7 @@ class TernaryHullRender {
   }
 
   plotEntries() {
+    this.group.remove(this.pointCloud);
     this.pointCloud = this.TPoints.plotEntries();
     this.intersectArray = [];
     this.intersectArray.push(this.pointCloud);
@@ -150,6 +152,8 @@ class TernaryHullRender {
     this.lineGroup.remove(...this.lineGroup.children);
     const colors = new Float32Array(entries.length * 3);
     const sizes = new Float32Array(entries.length);
+    const selectedData = [];
+    let click = false;
 
     const auids = [];
     // const sprite = THREE.ImageUtils.loadTexture('textures/disc.png');
@@ -174,6 +178,8 @@ class TernaryHullRender {
       let size = 40;
       let pointColor;
       if (entries[i].isClicked) {
+        selectedData.push(i);
+        click = true;
         pointColor = new THREE.Color('#CA6F96');
         size = 80;
       } else {
@@ -185,6 +191,51 @@ class TernaryHullRender {
       sizes[i] = size;
       auids[i] = entries[i].auid;
     }
+
+    if (defaultBehavior && click) {
+      const sPositions = new Float32Array(entries.length * 3);
+      const sColors = new Float32Array(entries.length * 3);
+      const sSizes = new Float32Array(entries.length);
+      const sAuids = [];
+      for (let s = 0; s < selectedData.length; s++) {
+        const size = 80;
+        const pointColor = new THREE.Color('#CA6F96');
+
+
+        const spos = this.pointCloud.geometry.attributes.position.array.slice(
+          selectedData[s] * 3, (selectedData[s] * 3) + 3,
+        );
+        for (let j = 0; j < 3; j++) {
+          sPositions[s * 3 + j] = spos[j];
+        }
+        pointColor.toArray(sColors, s * 3);
+        sSizes[s] = size;
+        sAuids.push(entries[selectedData[s]].auid);
+      }
+
+      this.TPoints.selectedPointCloud.geometry.setDrawRange(0, selectedData.length);
+
+      this.TPoints.selectedPointCloud.geometry.attributes.size.set(sSizes);
+      this.TPoints.selectedPointCloud.geometry.attributes.size.needsUpdate = true;
+
+      this.TPoints.selectedPointCloud.geometry.attributes.customColor.set(sColors);
+      this.TPoints.selectedPointCloud.geometry.attributes.customColor.needsUpdate = true;
+
+      this.TPoints.selectedPointCloud.geometry.attributes.position.set(sPositions);
+      this.TPoints.selectedPointCloud.geometry.attributes.position.needsUpdate = true;
+
+      this.TPoints.selectedPointCloud.pointNames = sAuids;
+
+      this.group.remove(this.pointCloud);
+      this.group.add(this.TPoints.selectedPointCloud);
+      this.intersectArray = [];
+      this.intersectArray.push(this.TPoints.selectedPointCloud);
+    } else {
+      this.group.remove(this.TPoints.selectedPointCloud);
+      this.group.add(this.pointCloud);
+      this.intersectArray = [this.pointCloud];
+    }
+
 
     this.pointCloud.geometry.attributes.size.set(sizes);
     this.pointCloud.geometry.attributes.size.needsUpdate = true;
@@ -405,9 +456,9 @@ class TernaryHullRender {
       const indicator = this.pointIndicator(intersection);
       if (indicator === 1) {
         const pt = this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3);
-        // this.distanceToHull(pt);
-        // this.group.add(this.lineGroup);
-        this.findFacet(pt);
+        this.distanceToHull(pt);
+        this.group.add(this.lineGroup);
+        // this.findFacet(pt);
       } else if (indicator === 3) {
         this.THull.stabilityCriterion(intersection);
       }
@@ -453,7 +504,8 @@ class TernaryHullRender {
     // calculate objects intersecting the picking ray
     const intersects = this.raycaster.intersectObjects(this.intersectArray);
     if (intersects.length > 0) {
-      const auid = this.pointCloud.pointNames[intersects[0].index];
+
+      const auid = intersects[0].object.pointNames[intersects[0].index];
       const intersection = (intersects.length) > 0 ? intersects[0] : null;
       // console.log('selecting point: ', auid );
       this.pointClickHandler(auid);
