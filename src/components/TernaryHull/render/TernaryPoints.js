@@ -6,7 +6,6 @@ export default class TernaryPoints {
   constructor(data, TGrid) {
     this.data = data;
     this.TGrid = TGrid;
-    this.pointGroup = new THREE.Group();
   }
 
   plotEntries() {
@@ -21,6 +20,7 @@ export default class TernaryPoints {
     const sizes = new Float32Array(entries.length);
 
     const auids = [];
+
     // const sprite = THREE.ImageUtils.loadTexture('textures/disc.png');
 
     for (let i = 0; i < entries.length; i++) {
@@ -94,7 +94,13 @@ export default class TernaryPoints {
       alphaTest: 0.9,
     });
     this.pointCloud = new THREE.Points(pointsGeometry, pointsMaterial);
+
     this.pointCloud.pointNames = auids;
+
+    this.selectedPointCloud = new THREE.Points(pointsGeometry.clone(), pointsMaterial);
+    this.selectedPointCloud.pointNames = auids;
+
+
     return this.pointCloud;
   }
 
