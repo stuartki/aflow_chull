@@ -10,6 +10,7 @@ export default class TernaryHull {
     this.data = data;
     this.gridHeight = this.TGrid.gridHeight;
     this.n1EG = undefined;
+    this.sc = undefined;
     this.hullGroup = new THREE.Group();
   }
 
@@ -128,17 +129,25 @@ export default class TernaryHull {
 
   stabilityCriterion(vertex) {
     const url = 'http://localhost:4000/data';
-
+    const bthis = this;
     axios.get(url).then((res) => {
-      const vertices = res.data.vertices;
-      const newHullSet = [];
-      Object.values(vertices).forEach(d =>
-        d.forEach(e => e.vertices_auid.forEach(element => newHullSet.push(element))),
-      );
-      const scData = this.data.entries.filter(entry => newHullSet.includes(entry.auid));
-      const scFaces = THREE.ShapeUtils.triangulateShape(scData);
-      const hullData = { vertices: scData, faces: scFaces };
-
+      if (bthis.sc === undefined) {
+        // const vertices = res.data.facets_data;
+        // const newHullSet = [];
+        // Object.values(vertices).forEach(d =>
+        //   d.forEach(e => e.vertices_auid.forEach(element => newHullSet.push(element))),
+        // );
+        // const scData = this.data.entries.filter(entry => newHullSet.includes(entry.auid));
+        // const scFaces = THREE.ShapeUtils.triangulateShape(scData);
+        const vertices = res.data.vertices;
+        const faces = res.data.faces;
+        const hullData = { vertices, faces };
+        bthis.sc = bthis.drawHull(hullData, false);
+        bthis.hullGroup.add(bthis.sc);
+      } else {
+        bthis.hullGroup.remove(bthis.sc);
+        bthis.sc = undefined;
+      }
     });
   }
 
