@@ -14,7 +14,7 @@ export default class TernaryHull {
     this.hullGroup = new THREE.Group();
   }
 
-  colorVertex(vertex, color = '#787CB5', defaultColor = true) {
+  colorVertex(vertex, defaultColor = true, color = '#787CB5') {
     let z;
     let c;
     if (defaultColor) {
@@ -42,7 +42,7 @@ export default class TernaryHull {
     return c;
   }
 
-  drawHull(data = this.data, init = true) {
+  drawHull(data = this.data, defaultColor = true, init = true) {
     const hullData = data;
 
     // ski - I dont believe this is necessary after cleaning at init
@@ -98,9 +98,9 @@ export default class TernaryHull {
 
     for (let i = 0; i < geometry.faces.length; ++i) {
       const face = geometry.faces[i];
-      face.vertexColors[0] = this.colorVertex(geometry.vertices[face.a], this.TGrid.gridHeight);
-      face.vertexColors[1] = this.colorVertex(geometry.vertices[face.b], this.TGrid.gridHeight);
-      face.vertexColors[2] = this.colorVertex(geometry.vertices[face.c], this.TGrid.gridHeight);
+      face.vertexColors[0] = this.colorVertex(geometry.vertices[face.a], defaultColor);
+      face.vertexColors[1] = this.colorVertex(geometry.vertices[face.b], defaultColor);
+      face.vertexColors[2] = this.colorVertex(geometry.vertices[face.c], defaultColor);
     }
 
     const hullMesh = new THREE.Mesh(geometry, material);
@@ -129,9 +129,8 @@ export default class TernaryHull {
 
   stabilityCriterion(vertex) {
     const url = 'http://localhost:4000/data';
-    const bthis = this;
-    axios.get(url).then((res) => {
-      if (bthis.sc === undefined) {
+    axios.get(url).then(function (res) {
+      if (this.sc === undefined) {
         // const vertices = res.data.facets_data;
         // const newHullSet = [];
         // Object.values(vertices).forEach(d =>
@@ -142,13 +141,9 @@ export default class TernaryHull {
         const vertices = res.data.vertices;
         const faces = res.data.faces;
         const hullData = { vertices, faces };
-        bthis.sc = bthis.drawHull(hullData, false);
-        bthis.hullGroup.add(bthis.sc);
-      } else {
-        bthis.hullGroup.remove(bthis.sc);
-        bthis.sc = undefined;
+        this.sc = this.drawHull(hullData, false, false);
       }
-    });
+    }.bind(this));
   }
 
   n1EnthalpyGain() {
