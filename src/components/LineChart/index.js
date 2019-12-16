@@ -188,6 +188,7 @@ class LineChart extends React.Component {
       points = (
         <Points
           defaultBehavior={this.props.defaultBehavior}
+          hullName={this.props.chartId}
           data={this.props.points}
           xScale={x}
           yScale={y}
