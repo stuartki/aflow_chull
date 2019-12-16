@@ -441,8 +441,8 @@ export function fetchHull(name, selectedHulls) {
           const query = `${currentHull.name}_n_${auidCode}`;
           // const query = 'MnPd';
           const ssurl = `http://aflowlib.duke.edu/search/ui/API/chull/v1.2/?ss=${query}`;
-          callList.push(axios.get(ssurl)
-          .then(res => {console.log(res.data.vertices); console.log(auidCode);})
+          callList.push(axios.get(ssurl),
+          // .then(res => {console.log(res.data.vertices); console.log(auidCode);})
           );
         }
       });
