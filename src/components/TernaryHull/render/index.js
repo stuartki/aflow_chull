@@ -403,28 +403,32 @@ class TernaryHullRender {
     }
   }
 
-  pointIndicator(intersection) {
-    function binPoint(entries, i) {
+  pointIndicator(auid) {
+    function isBinPoint(entries, i) {
       const pX = !entries[i].composition[0];
       const pY = !entries[i].composition[2];
       const pZ = !entries[i].composition[1];
 
-      return !(pX || pY || pZ);
+      return (pX || pY || pZ);
     }
 
-    const auid = this.pointCloud.pointNames[intersection.index];
     let index;
     for (let i = 0; i < this.hull.entries.length; i++) {
       if (auid === this.hull.entries[i].auid) {
         index = i;
       }
     }
-    if (this.hull.entries[index].isClicked && binPoint(this.hull.entries, index)) {
+
+    const isVertex = this.hull.entries[index].distanceToHull === 0;
+    const isClicked = this.hull.entries[index].isClicked;
+    if (isClicked && !isBinPoint(this.hull.entries, index) && !isVertex) {
       return 1;
-    } else if (binPoint(this.hull.entries, index)) {
+    } else if (isClicked && isBinPoint(this.hull.entries, index) && isVertex) {
       return 2;
-    } else if (this.hull.entries[index].distanceToHull === 0) {
+    } else if (isClicked && isVertex) {
       return 3;
+    } else if (isClicked) {
+      return 4;
     }
     return -1;
   }
@@ -453,18 +457,29 @@ class TernaryHullRender {
 
     if (intersection !== null) {
       this.sphere.position.copy(intersection.point);
-      const indicator = this.pointIndicator(intersection);
+      const auid = intersection.object.pointNames[intersection.index];
+      const indicator = this.pointIndicator(auid);
       if (indicator === 1) {
-        const pt = this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3);
+        const index = this.pointCloud.pointNames.indexOf(auid);
+        const pt = this.pointCloud.geometry.attributes.position.array.slice(index * 3, index * 3 + 3);
         this.distanceToHull(pt);
         this.group.add(this.lineGroup);
         // this.findFacet(pt);
       } else if (indicator === 3) {
         this.THull.stabilityCriterion(intersection);
+        let count = 0;
+        while (this.THull.sc && count < 10) {
+          setTimeout(() => {}, 100);
+          count += 1;
+        }
+        this.group.add(this.THull.sc);
+        this.THull.hullGroup.remove(this.THull.edges);
       }
     } else {
       this.group.remove(this.lineGroup);
+      this.group.remove(this.THull.sc);
       this.lineGroup.remove(...this.lineGroup.children);
+      this.THull.hullGroup.add(this.THull.edges);
     }
     this.render();
   }
@@ -504,13 +519,13 @@ class TernaryHullRender {
     // calculate objects intersecting the picking ray
     const intersects = this.raycaster.intersectObjects(this.intersectArray);
     if (intersects.length > 0) {
-
       const auid = intersects[0].object.pointNames[intersects[0].index];
       const intersection = (intersects.length) > 0 ? intersects[0] : null;
       // console.log('selecting point: ', auid );
       this.pointClickHandler(auid);
-      if (this.pointIndicator(intersection) === 1) {
-        const pt = this.pointCloud.geometry.attributes.position.array.slice(intersection.index * 3, intersection.index * 3 + 3);
+      if (this.pointIndicator(auid) === 1) {
+        const index = this.pointCloud.pointNames.indexOf(auid);
+        const pt = this.pointCloud.geometry.attributes.position.array.slice(index * 3, index * 3 + 3);
         this.distanceToHull(pt);
         this.group.add(this.lineGroup);
       }
