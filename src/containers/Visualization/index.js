@@ -26,7 +26,6 @@ const propTypes = {
   setLastSelectedHull: PropTypes.func.isRequired,
   resizeHullAxes: PropTypes.func.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
-  pointHoverHandler: PropTypes.func.isRequired,
   sidebarIsVisible: PropTypes.bool,
 };
 
