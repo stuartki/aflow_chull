@@ -3,12 +3,14 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 
 const propTypes = {
+  hullName: PropTypes.string.isRequired,
   cx: PropTypes.number.isRequired,
   xScale: PropTypes.func.isRequired,
   cy: PropTypes.number.isRequired,
   yScale: PropTypes.func.isRequired,
   fill: PropTypes.string.isRequired,
   auid: PropTypes.string.isRequired,
+  compound: PropTypes.string.isRequired,
   isClicked: PropTypes.bool.isRequired,
   line: PropTypes.func.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
@@ -24,6 +26,7 @@ class Vertex extends React.Component {
     this.onMouseOver = this.onMouseOver.bind(this);
     this.onMouseOut = this.onMouseOut.bind(this);
     this.findStabilityCriterion = this.findStabilityCriterion.bind(this);
+    this.findStabilityCriterion(this.props.auid);
   }
 
   onClick() {
@@ -39,7 +42,10 @@ class Vertex extends React.Component {
   }
 
   findStabilityCriterion(auid) {
-    const url = 'http://localhost:4000/data';
+    const auidCode = auid.slice(6);
+    const query = `${this.props.hullName}_n_${auidCode}`;
+    // const url = 'http://localhost:4000/data';
+    const url = `http://aflowlib.duke.edu/search/ui/API/chull/v1.2/?ss=${query}`;
     axios.get(url).then((res) => {
       this.scHullVertices = res.data.vertices.map(d => (
         { auid: d.auid,
@@ -57,7 +63,6 @@ class Vertex extends React.Component {
     const xScale = this.props.xScale;
     const yScale = this.props.yScale;
     if (this.state.sc && this.props.isClicked) {
-      this.findStabilityCriterion(this.props.auid);
       const circles = this.scHullVertices.map(d => (
         <circle
           className="point"
