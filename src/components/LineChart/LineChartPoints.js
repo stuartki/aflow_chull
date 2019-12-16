@@ -41,6 +41,7 @@ class Point extends React.Component {
 
 const propTypes = {
   defaultBehavior: PropTypes.bool.isRequired,
+  hullName: PropTypes.string.isRequired,
   data: PropTypes.array.isRequired,
   xScale: PropTypes.func.isRequired,
   yScale: PropTypes.func.isRequired,
@@ -69,11 +70,11 @@ const Points = (props) => {
   let circles = data.map((d) => {
     let point;
     const fill = props.color;
-    if (d.distanceToHull === 0) {
-      vertexData.push(d);
-    } else if (d.isClicked) {
+    if (d.isClicked) {
       selectedData.push(d);
       click = click || d.isClicked;
+    } else if (d.distanceToHull === 0) {
+      vertexData.push(d);
     } else {
       point = (
         <Point
@@ -108,6 +109,7 @@ const Points = (props) => {
     }
     const point = (
       <Vertex
+        hullName={props.hullName}
         cx={props.xScale(d.composition[1])}
         xScale={props.xScale}
         cy={props.yScale(d.enthalpyFormationAtom)}
@@ -126,23 +128,42 @@ const Points = (props) => {
   // third order rendering: selected points
   const selectedCircles = selectedData.map((d) => {
     const fill = '#CA6F96';
-    const point = (
-      <Point
-        defaultBehavior={props.defaultBehavior}
-        cx={props.xScale(d.composition[1])}
-        xScale={props.xScale}
-        cy={props.yScale(d.enthalpyFormationAtom)}
-        yScale={props.yScale}
-        distanceToHull={d.distanceToHull}
-        fill={fill}
-        auid={d.auid}
-        compound={d.compound}
-        vertices={props.vertices}
-        isClicked={d.isClicked}
-        line={props.line}
-        pointClickHandler={props.pointClickHandler}
-      />
-    );
+    let point;
+    if (d.distanceToHull === 0) {
+      point = (
+        <Vertex
+          hullName={props.hullName}
+          cx={props.xScale(d.composition[1])}
+          xScale={props.xScale}
+          cy={props.yScale(d.enthalpyFormationAtom)}
+          yScale={props.yScale}
+          fill={fill}
+          auid={d.auid}
+          compound={d.compound}
+          isClicked={d.isClicked}
+          line={props.line}
+          pointClickHandler={props.pointClickHandler}
+        />
+      );
+    } else {
+      point = (
+        <Point
+          defaultBehavior={props.defaultBehavior}
+          cx={props.xScale(d.composition[1])}
+          xScale={props.xScale}
+          cy={props.yScale(d.enthalpyFormationAtom)}
+          yScale={props.yScale}
+          distanceToHull={d.distanceToHull}
+          fill={fill}
+          auid={d.auid}
+          compound={d.compound}
+          vertices={props.vertices}
+          isClicked={d.isClicked}
+          line={props.line}
+          pointClickHandler={props.pointClickHandler}
+        />
+      );
+    }
     return (point);
   });
   return (
