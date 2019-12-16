@@ -326,6 +326,7 @@ export function getSelectedEntries(auids) {
 }
 
 export function fetchHull(name, selectedHulls) {
+  let hull;
   return (dispatch) => {
     let selection = name.split(/(?=[A-Z])/);
     selection = selection.sort((a, b) => {
@@ -349,6 +350,7 @@ export function fetchHull(name, selectedHulls) {
     // const url = `http://aflowlib.duke.edu/users/egossett/ahull-cmds/api/hulls/?hull=${selectedHull}`; // AFLOW direct
     // const url = `http://aflowlib.duke.edu/search/ui/API/chull/v1.1/?hull=${selectedHull}`; // AFLOW direct
     const url = 'http://localhost:3000/data';
+    // const url = `http://aflowlib.duke.edu/search/ui/API/chull/v1.2/?hull=${selectedHull}`;
     return axios.get(url).then((res) => {
       const meV = 1000; // scales from eV to meV
       const entries = [];
@@ -397,7 +399,7 @@ export function fetchHull(name, selectedHulls) {
         vertices.sort((a, b) => a.x - b.x);
       }
 
-      let hull = {
+      hull = {
         name: selectedHull,
         species: d.species,
         dim,
@@ -430,7 +432,22 @@ export function fetchHull(name, selectedHulls) {
           showLabels: true,
         };
       }
-
+      return hull;
+    }).then((currentHull) => {
+      const callList = [];
+      currentHull.vertices.forEach((d) => {
+        if (d.auid !== null && d.auid.includes('aflow:')) {
+          const auidCode = d.auid.slice(6);
+          const query = `${currentHull.name}_n_${auidCode}`;
+          // const query = 'MnPd';
+          const ssurl = `http://aflowlib.duke.edu/search/ui/API/chull/v1.2/?ss=${query}`;
+          callList.push(axios.get(ssurl)
+          .then(res => {console.log(res.data.vertices); console.log(auidCode);})
+          );
+        }
+      });
+      return axios.all(callList);
+    }).then((res) => {
       dispatch(addHull(hull));
     });
   };
