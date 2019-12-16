@@ -73,6 +73,8 @@ const Points = (props) => {
     if (d.isClicked) {
       selectedData.push(d);
       click = click || d.isClicked;
+    // } else if (d.distanceToHull === 0) {
+    //   vertexData.push(d);
     } else {
       point = (
         <Point
@@ -98,6 +100,30 @@ const Points = (props) => {
   if (props.defaultBehavior && click) {
     circles = null;
   }
+
+  // second order rendering: hull points
+  const vertexCircles = vertexData.map((d) => {
+    let fill = props.color;
+    if (d.isClicked) {
+      fill = '#CA6F96';
+    }
+    const point = (
+      <Vertex
+        hullName={props.hullName}
+        cx={props.xScale(d.composition[1])}
+        xScale={props.xScale}
+        cy={props.yScale(d.enthalpyFormationAtom)}
+        yScale={props.yScale}
+        fill={fill}
+        auid={d.auid}
+        compound={d.compound}
+        isClicked={d.isClicked}
+        line={props.line}
+        pointClickHandler={props.pointClickHandler}
+      />
+    );
+    return (point);
+  });
 
   // third order rendering: selected points
   const selectedCircles = selectedData.map((d) => {
