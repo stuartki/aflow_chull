@@ -127,74 +127,26 @@ export default class TernaryHull {
     return hullGroup;
   }
 
-  stabilityCriterion(vertex) {
-    const url = 'http://localhost:4000/data';
-    axios.get(url).then(function (res) {
-      if (this.sc === undefined) {
-        // const vertices = res.data.facets_data;
-        // const newHullSet = [];
-        // Object.values(vertices).forEach(d =>
-        //   d.forEach(e => e.vertices_auid.forEach(element => newHullSet.push(element))),
-        // );
-        // const scData = this.data.entries.filter(entry => newHullSet.includes(entry.auid));
-        // const scFaces = THREE.ShapeUtils.triangulateShape(scData);
-        const vertices = res.data.vertices;
-        const faces = res.data.faces;
-        const hullData = { vertices, faces };
-        this.sc = this.drawHull(hullData, false, false);
-      }
-    }.bind(this));
+  stabilityCriterion(vertexAuid) {
+    const f = this.data.vertices.filter(t => t.auid === vertexAuid);
+    const thisSSHullVertices = f.length > 0 ? f[0].ssHullVertices : null;
+    const thisSSHullFaces = f.length > 0 ? f[0].ssHullFaces : null;
+    if (this.sc === undefined) {
+      // const vertices = res.data.facets_data;
+      // const newHullSet = [];
+      // Object.values(vertices).forEach(d =>
+      //   d.forEach(e => e.vertices_auid.forEach(element => newHullSet.push(element))),
+      // );
+      // const scData = this.data.entries.filter(entry => newHullSet.includes(entry.auid));
+      // const scFaces = THREE.ShapeUtils.triangulateShape(scData);
+      const hullData = { vertices: thisSSHullVertices, faces: thisSSHullFaces };
+      this.sc = this.drawHull(hullData, false, false);
+    }
   }
 
   n1EnthalpyGain() {
     if (this.n1EG === undefined) {
-      const hullData = this.data.vertices;
-      let minBHull1;
-      let minBHull2;
-      let minBHull3;
-      let minHull;
-      let minBHull;
-
-      for (let i = 0; i < hullData.length; i++) {
-        if (hullData[i].composition[0] === 0) {
-          if (minBHull1 === undefined) {
-            minBHull1 = hullData[i];
-          } else if (minBHull1.enthalpyFormationAtom > hullData[i].enthalpyFormationAtom) {
-            minBHull1 = hullData[i];
-          }
-        }
-        if (hullData[i].composition[1] === 0) {
-          if (minBHull2 === undefined) {
-            minBHull2 = hullData[i];
-          } else if (minBHull2.enthalpyFormationAtom > hullData[i].enthalpyFormationAtom) {
-            minBHull2 = hullData[i];
-          }
-        }
-        if (hullData[i].composition[2] === 0) {
-          if (minBHull3 === undefined) {
-            minBHull3 = hullData[i];
-          } else if (minBHull3.enthalpyFormationAtom > hullData[i].enthalpyFormationAtom) {
-            minBHull3 = hullData[i];
-          }
-        }
-        if (minHull === undefined) {
-          minHull = hullData[i];
-        } else if (minHull.enthalpyFormationAtom > hullData[i].enthalpyFormationAtom) {
-          minHull = hullData[i];
-        }
-      }
-      const vertices = [minBHull1, minBHull2, minBHull3];
-      this.n1EG = this.drawHull({ vertices: vertices, faces: [[0, 1, 2]] }, false);
-      this.hullGroup.add(this.n1EG);
-      // minBHull = minBHull1;
-      // vertices.forEach((v) => {
-      //   if (minBHull.enthalpyFormationAtom > v.enthalpyFormationAtom) {
-      //     minBHull = v;
-      //   }
-      // });
-      // if (minBHull.enthalpyFormationAtom !== minHull.enthalpyFormationAtom) {
-      //   this.minHull.isClicked = true;
-      // }
+      // hello
     } else {
       this.hullGroup.remove(this.n1EG);
       this.n1EG = undefined;
