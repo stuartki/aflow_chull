@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 
 const propTypes = {
-  hullName: PropTypes.string.isRequired,
+  defaultBehavior: PropTypes.bool.isRequired,
   cx: PropTypes.number.isRequired,
   xScale: PropTypes.func.isRequired,
   cy: PropTypes.number.isRequired,
@@ -21,15 +21,18 @@ class Vertex extends React.Component {
     super(props);
     this.state = {
       sc: false,
+      scStay: false || this.props.defaultBehavior,
     };
     this.onClick = this.onClick.bind(this);
     this.onMouseOver = this.onMouseOver.bind(this);
     this.onMouseOut = this.onMouseOut.bind(this);
+    this.onLineClick = this.onLineClick.bind(this);
     this.findStabilityCriterion = this.findStabilityCriterion.bind(this);
-    this.findStabilityCriterion(this.props.auid);
+    this.findStabilityCriterion();
   }
 
   onClick() {
+    this.setState({ scStay: false });
     this.props.pointClickHandler(this.props.auid);
   }
 
@@ -38,23 +41,32 @@ class Vertex extends React.Component {
   }
 
   onMouseOut() {
-    this.setState({ sc: false });
+    this.timer = setTimeout(() => {
+      this.setState({ sc: false });
+    }, 1000);
   }
 
-  findStabilityCriterion(auid) {
-    const auidCode = auid.slice(6);
-    const query = `${this.props.hullName}_n_${auidCode}`;
-    // const url = 'http://localhost:4000/data';
-    const url = `http://aflowlib.duke.edu/search/ui/API/chull/v1.2/?ss=${query}`;
-    axios.get(url).then((res) => {
-      this.scHullVertices = res.data.vertices.map(d => (
+  onLineClick() {
+    clearTimeout(this.timer);
+    this.setState({ scStay: !this.state.scStay });
+    if (!this.state.scStay) {
+      this.setState({ sc: false });
+    }
+  }
+
+  findStabilityCriterion() {
+    // eslint-disable-next-line react/prop-types
+    if (this.props.ssHullVertices === undefined || this.props.ssHullVertices === null) {
+      this.scHullVertices = [];
+    } else {
+      // eslint-disable-next-line react/prop-types
+      this.scHullVertices = this.props.ssHullVertices.map(d => (
         { auid: d.auid,
           y: d.enthalpyFormationAtom * 1000,
           x: d.composition[1],
         }
       ));
-    });
-    setTimeout(() => console.log(this.scHullVertices), 100);
+    }
   }
 
   render() {
@@ -62,7 +74,7 @@ class Vertex extends React.Component {
     let ssHull = null;
     const xScale = this.props.xScale;
     const yScale = this.props.yScale;
-    if (this.state.sc && this.props.isClicked) {
+    if ((this.state.sc || this.state.scStay) && this.props.isClicked) {
       const circles = this.scHullVertices.map(d => (
         <circle
           className="point"
@@ -79,8 +91,9 @@ class Vertex extends React.Component {
           <g>
             <path
               className="line shadow"
-              stroke="blue"
+              stroke="#687BC9"
               d={this.props.line(this.scHullVertices)}
+              onClick={this.onLineClick}
               strokeLinecap="round"
             />
             {circles}
