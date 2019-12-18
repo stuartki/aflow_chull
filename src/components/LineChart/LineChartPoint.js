@@ -10,9 +10,14 @@ const propTypes = {
   cy: PropTypes.number.isRequired,
   yScale: PropTypes.func.isRequired,
   fill: PropTypes.string.isRequired,
-  opacity: PropTypes.number.isRequired,
   auid: PropTypes.string.isRequired,
   compound: PropTypes.string.isRequired,
+  decompositionPoints: PropTypes.arrayOf(
+    PropTypes.shape({
+      x: React.PropTypes.number.isRequired,
+      y: React.PropTypes.number.isRequired,
+    }),
+  ).isRequired,
   vertices: PropTypes.arrayOf(
     PropTypes.shape({
       x: React.PropTypes.number.isRequired,
@@ -71,23 +76,6 @@ class Point extends React.Component {
       return ((m * curX) + b);
     }
 
-    // find decomposition points
-    // TODO: turn this into getting decomposition reaction
-    function findDecomp(xPos, vertices) {
-      let decompPoints;
-      for (let i = 0; i < vertices.length; i++) {
-        if (xPos < vertices[i].x) {
-          const temp = vertices.slice(i - 1, i + 1);
-          decompPoints = [
-            { x: temp[0].x, y: temp[0].y },
-            { x: temp[1].x, y: temp[1].y },
-          ];
-          break;
-        }
-      }
-      return decompPoints;
-    }
-
     // fixes pesky offset of line to circle center
     // function offset(points, xScale, yScale) {
     //   const norm = ((yScale(points[1].y - points[0].y) ** 2)
@@ -106,6 +94,7 @@ class Point extends React.Component {
     let tieline = null;
     let point = null;
     let compound = null;
+    let decompCircles = null;
 
     // if it is clicked and not a hull point
     if (this.props.isClicked && this.props.distanceToHull > 0) {
@@ -115,7 +104,7 @@ class Point extends React.Component {
 
       // the math part
       // find the decomposition reaction
-      const decompPoints = findDecomp(x, this.props.vertices);
+      const decompPoints = this.props.decompositionPoints;
       const pathToHull = [
         { x, y },
         { x, y: hullDistance(decompPoints, x) },
@@ -151,12 +140,6 @@ class Point extends React.Component {
               strokeLinecap="round"
               strokeDasharray="3, 10"
             />
-            {/* <path
-              className={className}
-              d={this.props.line(decompPoints)}
-              onClick={this.onLineClick}
-              strokeLinecap="round"
-            /> */}
             <circle
               className="point"
               r="7"
@@ -177,6 +160,33 @@ class Point extends React.Component {
             />
           </g>
         );
+        if (this.props.defaultBehavior) {
+          decompCircles =
+          (
+            <g>
+              <path
+                className={className}
+                d={this.props.line(decompPoints)}
+                onClick={this.onLineClick}
+                strokeLinecap="round"
+              />
+              <circle
+                className="point"
+                r="5"
+                cx={this.props.xScale(decompPoints[0].x)}
+                cy={this.props.yScale(decompPoints[0].y)}
+                fill={this.props.fill}
+              />
+              <circle
+                className="point"
+                r="5"
+                cx={this.props.xScale(decompPoints[1].x)}
+                cy={this.props.yScale(decompPoints[1].y)}
+                fill={this.props.fill}
+              />
+            </g>
+          );
+        }
       }
     }
 
@@ -188,7 +198,6 @@ class Point extends React.Component {
               r="5"
               cx={this.props.cx}
               cy={this.props.cy}
-              opacity={this.props.opacity}
               fill={this.props.fill}
               onClick={this.onClick}
               onMouseOver={this.onMouseOver}
@@ -201,6 +210,7 @@ class Point extends React.Component {
       <g>
         {compound}
         {tieline}
+        {decompCircles}
         {point}
       </g>
     );
