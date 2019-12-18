@@ -198,6 +198,8 @@ class TernaryHullRender {
       const sSizes = new Float32Array(entries.length);
       const sAuids = [];
       for (let s = 0; s < selectedData.length; s++) {
+        // const decompositionAuids = entries[selectedData[s]].decompositionAuids;
+        // const decompositionPoints = this.entries.filter(d => decompositionAuids.includes(d.auid));
         const size = 80;
         const pointColor = new THREE.Color('#CA6F96');
 
@@ -211,6 +213,28 @@ class TernaryHullRender {
         pointColor.toArray(sColors, s * 3);
         sSizes[s] = size;
         sAuids.push(entries[selectedData[s]].auid);
+
+        // decompositionPoints.forEach((d) => {
+        //   const pX = d.composition[0] * 100;
+        //   const pY = d.composition[2] * 100;
+        //   const pZ = d.composition[1] * 100;
+        //   const pCoord = this.TGrid.triCoord(pX, pY, pZ);
+
+        //   const datapoint = new THREE.Vector3(
+        //     pCoord[0],
+        //     pCoord[1],
+        //     (d.enthalpyFormationAtom * this.TGrid.gridHeight),
+        //   );
+        //   let dpointColor;
+        //   if (this.defaultColor) {
+        //     dpointColor = new THREE.Color(pX / 100, pY / 100, pZ / 100);
+        //   } else {
+        //     dpointColor = this.colorVertex(datapoint);
+        //   }
+        //   dpointColor.toArray(sColors, s * 3);
+        //   sSizes[s] = size;
+        //   sAuids.push(entries[selectedData[s]].auid);
+        // });
       }
 
       this.TPoints.selectedPointCloud.geometry.setDrawRange(0, selectedData.length);
@@ -269,21 +293,7 @@ class TernaryHullRender {
     this.render();
   }
 
-  findFacet(point) {
-    function inEdge(pt, v1, v2) {
-      const thisPoint = { x: pt[0], y: pt[1] };
-      function distance(one, two) {
-        const a = one.x - two.x;
-        const b = one.y - two.y;
-        // eslint-disable-next-line no-mixed-operators
-        return Math.sqrt(a * a + b * b);
-      }
-      // eslint-disable-next-line no-mixed-operators
-      if (distance(thisPoint, v1) + distance(thisPoint, v2) - distance(v2, v1) < 0.01) {
-        return true;
-      }
-      return false;
-    }
+  findFacet(pointAuid) {
 
     function makeLine(v1, v2) {
       const geometry = new THREE.Geometry();
@@ -299,6 +309,10 @@ class TernaryHullRender {
       const b = endpoints[0].y - (m * endpoints[0].x);
       return ((m * curX) + b);
     }
+
+    const pt = this.hull.entries.filter(d => d.auid === pointAuid)[0];
+
+    const decompPoints = this.hull.entries.filter(d => pt.decompositionAuids.includes(d.auid));
 
     const faces = this.THull.hullMesh.geometry.faces;
     const vertices = this.THull.hullMesh.geometry.vertices;
@@ -464,9 +478,9 @@ class TernaryHullRender {
         const pt = this.pointCloud.geometry.attributes.position.array.slice(index * 3, index * 3 + 3);
         this.distanceToHull(pt);
         this.group.add(this.lineGroup);
-        // this.findFacet(pt);
+        // this.findFacet(auid);
       } else if (indicator === 3) {
-        this.THull.stabilityCriterion(intersection);
+        this.THull.stabilityCriterion(auid);
         let count = 0;
         while (this.THull.sc && count < 10) {
           setTimeout(() => {}, 100);
@@ -478,6 +492,7 @@ class TernaryHullRender {
     } else {
       this.group.remove(this.lineGroup);
       this.group.remove(this.THull.sc);
+      this.THull.sc = undefined;
       this.lineGroup.remove(...this.lineGroup.children);
       this.THull.hullGroup.add(this.THull.edges);
     }
