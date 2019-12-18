@@ -349,8 +349,8 @@ export function fetchHull(name, selectedHulls) {
     // const url = `${URL_ROOT}/api/v2/hulls/${selectedHull}`;
     // const url = `http://aflowlib.duke.edu/users/egossett/ahull-cmds/api/hulls/?hull=${selectedHull}`; // AFLOW direct
     // const url = `http://aflowlib.duke.edu/search/ui/API/chull/v1.1/?hull=${selectedHull}`; // AFLOW direct
-    const url = 'http://localhost:3000/data';
-    // const url = `http://aflowlib.duke.edu/search/ui/API/chull/v1.2/?hull=${selectedHull}`;
+    // const url = 'http://localhost:3000/data';
+    const url = `http://aflowlib.duke.edu/search/ui/API/chull/v1.2/?hull=${selectedHull}`;
     return axios.get(url).then((res) => {
       const meV = 1000; // scales from eV to meV
       const entries = [];
@@ -390,6 +390,7 @@ export function fetchHull(name, selectedHulls) {
           datum.auid = vertex.auid;
           datum.x = vertex.composition[1];
           datum.y = vertex.enthalpyFormationAtom * meV;
+          datum.composition = vertex.composition;
           // datum.isClicked = hullStore.hasPointBeenClicked(vertex.auid);
           datum.isClicked = false;
           datum.tielineClicked = false;
@@ -435,19 +436,39 @@ export function fetchHull(name, selectedHulls) {
       return hull;
     }).then((currentHull) => {
       const callList = [];
+      function nary(vertex, dimension) {
+        let count = 0;
+        vertex.composition.forEach((d) => { if (d > 0) { count += 1; } });
+        if (count === dimension) {
+          return true;
+        } return false;
+      }
       currentHull.vertices.forEach((d) => {
-        if (d.auid !== null && d.auid.includes('aflow:')) {
+        if (d.auid !== null && d.auid.includes('aflow:') && nary(d, hull.dim)) {
           const auidCode = d.auid.slice(6);
           const query = `${currentHull.name}_n_${auidCode}`;
           // const query = 'MnPd';
           const ssurl = `http://aflowlib.duke.edu/search/ui/API/chull/v1.2/?ss=${query}`;
-          callList.push(axios.get(ssurl),
-          // .then(res => {console.log(res.data.vertices); console.log(auidCode);})
-          );
+          callList.push(axios.get(ssurl));
+        } else {
+          callList.push(null);
         }
       });
-      return axios.all(callList);
+      return axios.all(callList).then((res) => {
+        let index = 0;
+
+        res.forEach((d) => {
+          if (d !== null) {
+            if (hull.dim > 2) {
+              hull.vertices[index].ssHullFaces = d.data.faces;
+            }
+            hull.vertices[index].ssHullVertices = d.data.vertices;
+          }
+          index += 1;
+        });
+      });
     }).then((res) => {
+      console.log(res);
       dispatch(addHull(hull));
     });
   };
