@@ -70,6 +70,12 @@ class Vertex extends React.Component {
   }
 
   render() {
+    function hullDistance(endpoints, curX) {
+      const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
+      const b = endpoints[0].y - (m * endpoints[0].x);
+      return ((m * curX) + b);
+    }
+
     let point = null;
     let ssHull = null;
     const xScale = this.props.xScale;
