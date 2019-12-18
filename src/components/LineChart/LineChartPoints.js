@@ -3,6 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Point from './LineChartPoint';
 import Vertex from './LineChartVertex';
+import axios from 'axios';
 
 /*
 const propTypes = {
@@ -71,7 +72,38 @@ const Points = (props) => {
     if (d.isClicked) {
       selectedData.push(d);
       click = click || d.isClicked;
+    } else if (d.distanceToHull === 0) {
+      const co = d.compound;
+      const f = props.vertices.filter(t => t.auid === d.auid);
+      const thisSSHullVertices = f.length > 0 ? f[0].ssHullVertices : null;
+      point = (
+        <Vertex
+          defaultBehavior={props.defaultBehavior}
+          hullName={props.hullName}
+          cx={props.xScale(d.composition[1])}
+          xScale={props.xScale}
+          cy={props.yScale(d.enthalpyFormationAtom)}
+          yScale={props.yScale}
+          fill={fill}
+          auid={d.auid}
+          compound={d.compound}
+          ssHullVertices={thisSSHullVertices}
+          isClicked={d.isClicked}
+          line={props.line}
+          pointClickHandler={props.pointClickHandler}
+        />
+      );
     } else {
+      let decompositionPoints;
+      if (d.decompositionAuids === null) {
+        decompositionPoints = [];
+      } else {
+        decompositionPoints = data.filter(entry => d.decompositionAuids.includes(entry.auid));
+        decompositionPoints = decompositionPoints.map(pt => ({
+          x: pt.composition[1],
+          y: pt.enthalpyFormationAtom,
+        }));
+      }
       point = (
         <Point
           defaultBehavior={props.defaultBehavior}
@@ -83,6 +115,7 @@ const Points = (props) => {
           fill={fill}
           auid={d.auid}
           compound={d.compound}
+          decompositionPoints={decompositionPoints}
           vertices={props.vertices}
           isClicked={d.isClicked}
           line={props.line}
@@ -102,8 +135,11 @@ const Points = (props) => {
     const fill = '#CA6F96';
     let point;
     if (d.distanceToHull === 0) {
+      const f = props.vertices.filter(t => t.auid === d.auid);
+      const thisSSHullVertices = f.length > 0 ? f[0].ssHullVertices : null;
       point = (
         <Vertex
+          defaultBehavior={props.defaultBehavior}
           hullName={props.hullName}
           cx={props.xScale(d.composition[1])}
           xScale={props.xScale}
@@ -112,12 +148,23 @@ const Points = (props) => {
           fill={fill}
           auid={d.auid}
           compound={d.compound}
+          ssHullVertices={thisSSHullVertices}
           isClicked={d.isClicked}
           line={props.line}
           pointClickHandler={props.pointClickHandler}
         />
       );
     } else {
+      let decompositionPoints;
+      if (d.decompositionAuids === null) {
+        decompositionPoints = [];
+      } else {
+        decompositionPoints = data.filter(entry => d.decompositionAuids.includes(entry.auid));
+        decompositionPoints = decompositionPoints.map(pt => ({
+          x: pt.composition[1],
+          y: pt.enthalpyFormationAtom,
+        }));
+      }
       point = (
         <Point
           defaultBehavior={props.defaultBehavior}
@@ -129,6 +176,7 @@ const Points = (props) => {
           fill={fill}
           auid={d.auid}
           compound={d.compound}
+          decompositionPoints={decompositionPoints}
           vertices={props.vertices}
           isClicked={d.isClicked}
           line={props.line}
