@@ -45,7 +45,7 @@ class Searchbox extends React.Component {
 
   onEnter(e) {
     if (e.charCode === 13 && e.target.value !== '') {
-      if (e.target.value.charAt(0) === 'e') {
+      if (e.target.value.charAt(0) === 'c') {
         // eslint-disable-next-line max-len
         const entry = this.props.selectedHulls.map(hull => hull.entries.filter(d => d.compound === e.target.value.slice(1)));
         if (entry.length > 0) {
