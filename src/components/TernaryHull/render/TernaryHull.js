@@ -114,7 +114,7 @@ export default class TernaryHull {
     const edges = new THREE.LineSegments(
       edgesGeometry,
       new THREE.LineBasicMaterial({
-        color: '#787CB5',
+        color: '#000000',
         linewidth: 2,
       }),
     );
@@ -144,11 +144,17 @@ export default class TernaryHull {
     }
   }
 
-  n1EnthalpyGain() {
+  n1EnthalpyGain(vertexAuid) {
     if (this.n1EG === undefined) {
-      // hello
+      const hullData = { vertices: this.data.n1HullVertices, faces: this.data.n1HullFaces };
+      this.n1EG = this.drawHull(hullData, false, false);
+      this.hullGroup.add(this.n1EG);
+      this.hullGroup.remove(this.edges);
+      this.hullGroup.remove(this.hullMesh);
     } else {
       this.hullGroup.remove(this.n1EG);
+      this.hullGroup.add(this.edges);
+      this.hullGroup.add(this.hullMesh);
       this.n1EG = undefined;
     }
   }
