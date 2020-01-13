@@ -194,7 +194,7 @@ class BinaryHull extends React.Component {
               const vertices = this.props.hull.vertices.map(v => v.y);
               const hullyMin = Math.min(...vertices);
               const hullyMax = Math.max(...vertices);
-              const offset = hullyMax - hullyMin;
+              const offset = 10;
               this.props.resizeHullAxes(this.props.hull.name,
                 Math.min(Number(hullyMin) - offset, Number(-100)),
                 Math.max(Number(hullyMax) + offset, Number(100)));
