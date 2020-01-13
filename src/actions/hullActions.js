@@ -468,7 +468,29 @@ export function fetchHull(name, selectedHulls) {
         });
       });
     }).then((res) => {
-      console.log(res);
+      function nary(vertex, dimension) {
+        let count = 0;
+        vertex.composition.forEach((d) => { if (d > 0) { count += 1; } });
+        if (count === dimension) {
+          return true;
+        } return false;
+      }
+
+      const mNeglect = hull.entries.filter(d => nary(d, hull.dim)).map(d => d.auid);
+      let neglectAuids = '';
+      // eslint-disable-next-line no-return-assign
+      mNeglect.forEach(d => neglectAuids += `${d},`);
+      const query = `${hull.name}_m_${neglectAuids}`;
+      const murl = `http://aflowlib.duke.edu/search/ui/API/chull/v1.2/?n1=${query}`;
+      return axios.get(murl);
+    // eslint-disable-next-line newline-per-chained-call
+    }).then((res) => {
+      if (res.status !== 414) {
+        hull.n1HullVertices = res.data.vertices;
+        if (hull.dim > 2) {
+          hull.n1HullFaces = res.data.faces;
+        }
+      }
       dispatch(addHull(hull));
     });
   };
