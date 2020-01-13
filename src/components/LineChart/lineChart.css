@@ -134,6 +134,10 @@ h3{
     opacity: 1;
 }
 
+.attributeName{
+    fill: #B4B4B4;
+}
+
 /* 
 .default-svg{
 
