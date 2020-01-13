@@ -107,6 +107,7 @@ const Points = (props) => {
       point = (
         <Point
           defaultBehavior={props.defaultBehavior}
+          entry={d}
           cx={props.xScale(d.composition[1])}
           xScale={props.xScale}
           cy={props.yScale(d.enthalpyFormationAtom)}
@@ -168,6 +169,7 @@ const Points = (props) => {
       point = (
         <Point
           defaultBehavior={props.defaultBehavior}
+          entry={d}
           cx={props.xScale(d.composition[1])}
           xScale={props.xScale}
           cy={props.yScale(d.enthalpyFormationAtom)}
