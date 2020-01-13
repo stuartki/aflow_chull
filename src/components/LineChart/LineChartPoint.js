@@ -2,6 +2,7 @@
 /* eslint-disable max-len */
 import React from 'react';
 import PropTypes from 'prop-types';
+import InfoCard from './LineChartInfoCard';
 
 const propTypes = {
   defaultBehavior: PropTypes.bool.isRequired,
@@ -76,6 +77,21 @@ class Point extends React.Component {
       return ((m * curX) + b);
     }
 
+    function makeDecompPointCircs(decomposition, fill, r, xScale, yScale) {
+      const decomps = decomposition.map(d => (
+        <circle
+          className="point"
+          r={r}
+          cx={xScale(d.x)}
+          cy={yScale(d.y)}
+          fill={fill}
+          stroke={fill === 'none' ? '#687BC9' : 'none'}
+          strokeWidth={fill === 'none' ? '3' : 'none'}
+        />
+      ));
+      return decomps;
+    }
+
     // fixes pesky offset of line to circle center
     // function offset(points, xScale, yScale) {
     //   const norm = ((yScale(points[1].y - points[0].y) ** 2)
@@ -104,12 +120,22 @@ class Point extends React.Component {
 
       // the math part
       // find the decomposition reaction
-      const decompPoints = this.props.decompositionPoints;
-      const pathToHull = [
-        { x, y },
-        { x, y: hullDistance(decompPoints, x) },
-      ];
+      let decompPoints = this.props.decompositionPoints;
+      let pathToHull;
+      if (decompPoints.length === 0) {
+        decompPoints = this.props.vertices.filter(d => Math.abs(d.x - x) < 0.01);
+        pathToHull = [
+          { x, y },
+          { x, y: decompPoints[0].y },
+        ];
+      } else {
+        pathToHull = [
+          { x, y },
+          { x, y: hullDistance(decompPoints, x) },
+        ];
+      }
 
+      const s = makeDecompPointCircs(decompPoints, 'none', '7', this.props.xScale, this.props.yScale);
       // drawing the points
       if (this.state.tielineClicked || this.state.tielineStay) {
         let className = 'line shadow';
@@ -119,17 +145,18 @@ class Point extends React.Component {
         if (this.state.tielineStay) {
           className = 'tieline shadow';
         }
-        compound =
+        if (this.props.defaultBehavior) {
+          compound =
           (
-            <text
-              x={this.props.cx - 25}
-              y={this.props.cy - 10}
-              fill="#757575"
-              textLength={50}
-            >
-              {this.props.compound}
-            </text>
+            <InfoCard
+              // eslint-disable-next-line react/prop-types
+              data={this.props.entry}
+              x={this.props.cx}
+              y={this.props.cy}
+            />
           );
+        }
+
         tieline =
         (
           <g>
@@ -140,7 +167,8 @@ class Point extends React.Component {
               strokeLinecap="round"
               strokeDasharray="3, 10"
             />
-            <circle
+            {makeDecompPointCircs(decompPoints, 'none', '7', this.props.xScale, this.props.yScale)}
+            {/* <circle
               className="point"
               r="7"
               cx={this.props.xScale(decompPoints[0].x)}
@@ -157,7 +185,7 @@ class Point extends React.Component {
               fill="none"
               stroke="#687BC9"
               strokeWidth="3"
-            />
+            /> */}
           </g>
         );
         if (this.props.defaultBehavior) {
@@ -170,7 +198,8 @@ class Point extends React.Component {
                 onClick={this.onLineClick}
                 strokeLinecap="round"
               />
-              <circle
+              {makeDecompPointCircs(decompPoints, 'red', '5', this.props.xScale, this.props.yScale)}
+              {/* <circle
                 className="point"
                 r="5"
                 cx={this.props.xScale(decompPoints[0].x)}
@@ -183,7 +212,7 @@ class Point extends React.Component {
                 cx={this.props.xScale(decompPoints[1].x)}
                 cy={this.props.yScale(decompPoints[1].y)}
                 fill={this.props.fill}
-              />
+              /> */}
             </g>
           );
         }
