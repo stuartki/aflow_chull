@@ -29,10 +29,12 @@ class TernaryHull extends React.Component {
         this.props.hull,
         this.props.plotEntries,
         this.props.defaultColor,
+        true,
         this.props.pointClickHandler,
       ),
-      defaultBehavior: true,
     };
+    this.defaultBehavior = true;
+    this.onClick = this.onClick.bind(this);
   }
 
   componentDidMount() {
@@ -48,6 +50,7 @@ class TernaryHull extends React.Component {
         nextProps.hull,
         nextProps.plotEntries,
         nextProps.defaultColor,
+        this.defaultBehavior,
         nextProps.pointClickHandler,
       );
       this.state.THREEscene.removeEventListeners();
@@ -90,13 +93,14 @@ class TernaryHull extends React.Component {
       //   this.state.THREEscene.plotEntries(this.props.hull.entries);
       // }
     } else {
-      this.state.THREEscene.updatePlottedEntries(this.props.hull.entries, this.state.defaultBehavior);
+      this.state.THREEscene.updatePlottedEntries(this.props.hull.entries, this.defaultBehavior);
     }
   }
 
-  render() {
-    // bootstrap way of fixing color with try and catch
-    if (this.state.defaultBehavior) {
+  onClick() {
+    this.defaultBehavior = !this.defaultBehavior;
+    this.state.THREEscene.switchDefault();
+    if (this.defaultBehavior) {
       try {
         document.getElementById('default').style.backgroundColor = 'green';
       } catch (error) {
@@ -109,14 +113,15 @@ class TernaryHull extends React.Component {
         console.log(error);
       }
     }
+  }
+
+  render() {
     return (
       <div id="container">
         <button
           id="default"
             // eslint-disable-next-line no-unused-vars
-          onClick={(e) => {
-            this.setState({ defaultBehavior: !this.state.defaultBehavior });
-          }}
+          onClick={this.onClick}
         >
           Default
         </button>
