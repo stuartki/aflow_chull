@@ -11,11 +11,12 @@ import MeshLine from './MeshLine';
 // import OrbitControls from './OrbitControls';
 
 class TernaryHullRender {
-  constructor(hull, showEntries, defaultColor, pointClickHandler) {
+  constructor(hull, showEntries, defaultColor, defaultBehavior, pointClickHandler) {
     this.pointClickHandler = pointClickHandler;
     this.defaultColor = defaultColor;
     this.hull = hull;
     this.showEntries = showEntries;
+    this.defaultBehavior = defaultBehavior;
     if (defaultColor) {
       this.color = '#787CB5';
     } else {
@@ -126,6 +127,10 @@ class TernaryHullRender {
     this.animate();
   }
 
+  switchDefault() {
+    this.defaultBehavior = !this.defaultBehavior;
+  }
+
   setCamera(type) {
     if (type === 'init') {
       this.camera.up = new THREE.Vector3(0, 1, 0);
@@ -197,9 +202,10 @@ class TernaryHullRender {
       const sColors = new Float32Array(entries.length * 3);
       const sSizes = new Float32Array(entries.length);
       const sAuids = [];
+      let count = 0;
       for (let s = 0; s < selectedData.length; s++) {
-        // const decompositionAuids = entries[selectedData[s]].decompositionAuids;
-        // const decompositionPoints = this.entries.filter(d => decompositionAuids.includes(d.auid));
+        const pt = entries[selectedData[s]];
+
         const size = 80;
         const pointColor = new THREE.Color('#CA6F96');
 
@@ -208,36 +214,46 @@ class TernaryHullRender {
           selectedData[s] * 3, (selectedData[s] * 3) + 3,
         );
         for (let j = 0; j < 3; j++) {
-          sPositions[s * 3 + j] = spos[j];
+          sPositions[count * 3 + j] = spos[j];
         }
-        pointColor.toArray(sColors, s * 3);
-        sSizes[s] = size;
+        pointColor.toArray(sColors, count * 3);
+        sSizes[count] = size;
         sAuids.push(entries[selectedData[s]].auid);
+        if (pt.decompositionAuids === null) {
+          // if (pt.distanceToHull)
+        } else {
+          const decompPoints = entries.filter(d => pt.decompositionAuids.includes(d.auid));
+          for (let dind = 0; dind < decompPoints.length; dind++) {
+            count += 1;
+            const d = decompPoints[dind];
+            const pX = d.composition[0] * 100;
+            const pY = d.composition[2] * 100;
+            const pZ = d.composition[1] * 100;
+            const pCoord = this.TGrid.triCoord(pX, pY, pZ);
 
-        // decompositionPoints.forEach((d) => {
-        //   const pX = d.composition[0] * 100;
-        //   const pY = d.composition[2] * 100;
-        //   const pZ = d.composition[1] * 100;
-        //   const pCoord = this.TGrid.triCoord(pX, pY, pZ);
-
-        //   const datapoint = new THREE.Vector3(
-        //     pCoord[0],
-        //     pCoord[1],
-        //     (d.enthalpyFormationAtom * this.TGrid.gridHeight),
-        //   );
-        //   let dpointColor;
-        //   if (this.defaultColor) {
-        //     dpointColor = new THREE.Color(pX / 100, pY / 100, pZ / 100);
-        //   } else {
-        //     dpointColor = this.colorVertex(datapoint);
-        //   }
-        //   dpointColor.toArray(sColors, s * 3);
-        //   sSizes[s] = size;
-        //   sAuids.push(entries[selectedData[s]].auid);
-        // });
+            const datapoint = new THREE.Vector3(
+              pCoord[0],
+              pCoord[1],
+              (d.enthalpyFormationAtom * this.TGrid.gridHeight),
+            );
+            let dpointColor;
+            if (this.defaultColor) {
+              dpointColor = new THREE.Color(pX / 100, pY / 100, pZ / 100);
+            } else {
+              dpointColor = this.colorVertex(datapoint);
+            }
+            datapoint.toArray(sPositions, count * 3);
+            dpointColor.toArray(sColors, count * 3);
+            sSizes[count] = size;
+            sAuids.push(d.auid);
+          }
+        }
+        count += 1;
+        sAuids.push('break');
+        count += 1;
       }
 
-      this.TPoints.selectedPointCloud.geometry.setDrawRange(0, selectedData.length);
+      this.TPoints.selectedPointCloud.geometry.setDrawRange(0, count);
 
       this.TPoints.selectedPointCloud.geometry.attributes.size.set(sSizes);
       this.TPoints.selectedPointCloud.geometry.attributes.size.needsUpdate = true;
@@ -293,72 +309,67 @@ class TernaryHullRender {
     this.render();
   }
 
-  findFacet(pointAuid) {
+  // findFacet(pointAuid) {
+  //   function makeLine(v1, v2) {
+  //     const geometry = new THREE.Geometry();
+  //     geometry.vertices.push(
+  //       v1, v2,
+  //     );
+  //     const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
+  //     return new THREE.Line(geometry, material);
+  //   }
 
-    function makeLine(v1, v2) {
-      const geometry = new THREE.Geometry();
-      geometry.vertices.push(
-        v1, v2,
-      );
-      const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
-      return new THREE.Line(geometry, material);
-    }
+  //   function hullDistance(endpoints, curX) {
+  //     const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
+  //     const b = endpoints[0].y - (m * endpoints[0].x);
+  //     return ((m * curX) + b);
+  //   }
 
-    function hullDistance(endpoints, curX) {
-      const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
-      const b = endpoints[0].y - (m * endpoints[0].x);
-      return ((m * curX) + b);
-    }
+  //   const faces = this.THull.hullMesh.geometry.faces;
+  //   const vertices = this.THull.hullMesh.geometry.vertices;
+  //   let vertex1;
+  //   let vertex2;
+  //   let vertex3;
+  //   let newLine = null;
+  //   const thisPoint = { x: point[0], y: point[1], z: point[2] };
+  //   for (let i = 0; i < faces.length; i++) {
+  //     vertex1 = vertices[faces[i].a];
+  //     vertex2 = vertices[faces[i].b];
+  //     vertex3 = vertices[faces[i].c];
+  //     if (inEdge(point, vertex1, vertex2)) {
+  //       this.group.add(makeLine(vertex1, vertex2));
+  //       newLine = makeLine(thisPoint,
+  //         {
+  //           x: thisPoint.x,
+  //           y: hullDistance([vertex1, vertex2], thisPoint.x),
+  //         },
+  //       );
+  //       this.group.add(newLine);
+  //     }
+  //     if (inEdge(point, vertex2, vertex3)) {
+  //       this.group.add(makeLine(vertex2, vertex3));
+  //       newLine = makeLine(thisPoint,
+  //         {
+  //           x: thisPoint.x,
+  //           y: hullDistance([vertex2, vertex3], thisPoint.x),
+  //         },
+  //       );
+  //       this.group.add(newLine);
+  //     }
+  //     if (inEdge(point, vertex3, vertex1)) {
+  //       this.group.add(makeLine(vertex3, vertex1));
+  //       newLine = makeLine(thisPoint,
+  //         {
+  //           x: thisPoint.x,
+  //           y: hullDistance([vertex3, vertex1], thisPoint.x),
+  //         },
+  //       );
+  //       this.group.add(newLine);
+  //     }
+  //   }
+  // }
 
-    const pt = this.hull.entries.filter(d => d.auid === pointAuid)[0];
-
-    const decompPoints = this.hull.entries.filter(d => pt.decompositionAuids.includes(d.auid));
-
-    const faces = this.THull.hullMesh.geometry.faces;
-    const vertices = this.THull.hullMesh.geometry.vertices;
-    let vertex1;
-    let vertex2;
-    let vertex3;
-    let newLine = null;
-    const thisPoint = { x: point[0], y: point[1], z: point[2] };
-    for (let i = 0; i < faces.length; i++) {
-      vertex1 = vertices[faces[i].a];
-      vertex2 = vertices[faces[i].b];
-      vertex3 = vertices[faces[i].c];
-      if (inEdge(point, vertex1, vertex2)) {
-        this.group.add(makeLine(vertex1, vertex2));
-        newLine = makeLine(thisPoint,
-          {
-            x: thisPoint.x,
-            y: hullDistance([vertex1, vertex2], thisPoint.x),
-          },
-        );
-        this.group.add(newLine);
-      }
-      if (inEdge(point, vertex2, vertex3)) {
-        this.group.add(makeLine(vertex2, vertex3));
-        newLine = makeLine(thisPoint,
-          {
-            x: thisPoint.x,
-            y: hullDistance([vertex2, vertex3], thisPoint.x),
-          },
-        );
-        this.group.add(newLine);
-      }
-      if (inEdge(point, vertex3, vertex1)) {
-        this.group.add(makeLine(vertex3, vertex1));
-        newLine = makeLine(thisPoint,
-          {
-            x: thisPoint.x,
-            y: hullDistance([vertex3, vertex1], thisPoint.x),
-          },
-        );
-        this.group.add(newLine);
-      }
-    }
-  }
-
-  distanceToHull(point) {
+  distanceToHull(point, auid) {
     function inTriangle(pt, vertices) {
       function sgn(p1, p2, p3) {
         // eslint-disable-next-line no-mixed-operators
@@ -383,7 +394,7 @@ class TernaryHullRender {
       geometry.computeLineDistances();
       const material = new THREE.LineDashedMaterial(
         {
-          color: 0xff0000,
+          color: 0x687BC9,
           linewidth: 100,
         });
       return new THREE.Line(geometry, material);
@@ -404,15 +415,27 @@ class TernaryHullRender {
     let vertex1;
     let vertex2;
     let vertex3;
+    let count = 1;
+    const selectedData = [];
+    const index = this.TPoints.selectedPointCloud.pointNames.indexOf(auid);
+    while (this.TPoints.selectedPointCloud.pointNames[index + count] !== 'break') {
+      // eslint-disable-next-line max-len
+      selectedData.push(this.TPoints.selectedPointCloud.geometry.attributes.position.array.slice((index + count) * 3, (index + count) * 3 + 3));
+      count += 1;
+    }
 
-    const thisPoint = { x: point[0], y: point[1], z: point[2] };
+    function makePoint(pt) {
+      return new THREE.Vector3(pt[0], pt[1], pt[2]);
+    }
+    const thisPoint = makePoint(point);
     for (let i = 0; i < faces.length; i++) {
       vertex1 = vertices[faces[i].a];
       vertex2 = vertices[faces[i].b];
       vertex3 = vertices[faces[i].c];
       if (inTriangle(thisPoint, [vertex1, vertex2, vertex3])) {
-        const p = new THREE.Vector3(thisPoint.x, thisPoint.y, thisPoint.z);
-        this.lineGroup.add(makeLine(p, hullPoint(faces[i].normal, vertex1, p)));
+        const p = hullPoint(faces[i].normal, vertex1, makePoint(point));
+        this.lineGroup.add(makeLine(makePoint(point), p));
+        selectedData.forEach(d => this.lineGroup.add(makeLine(makePoint(d), p)));
       }
     }
   }
@@ -473,28 +496,24 @@ class TernaryHullRender {
       this.sphere.position.copy(intersection.point);
       const auid = intersection.object.pointNames[intersection.index];
       const indicator = this.pointIndicator(auid);
-      if (indicator === 1) {
+      if (indicator === 1 && !this.defaultBehavior) {
         const index = this.pointCloud.pointNames.indexOf(auid);
         const pt = this.pointCloud.geometry.attributes.position.array.slice(index * 3, index * 3 + 3);
-        this.distanceToHull(pt);
+        this.distanceToHull(pt, index);
         this.group.add(this.lineGroup);
-        // this.findFacet(auid);
-      } else if (indicator === 3) {
+      } else if (indicator === 3 && !this.defaultBehavior) {
         this.THull.stabilityCriterion(auid);
-        let count = 0;
-        while (this.THull.sc && count < 10) {
-          setTimeout(() => {}, 100);
-          count += 1;
-        }
         this.group.add(this.THull.sc);
+        this.THull.hullGroup.remove(this.THull.hullMesh);
         this.THull.hullGroup.remove(this.THull.edges);
       }
-    } else {
+    } else if (!this.defaultBehavior) {
       this.group.remove(this.lineGroup);
       this.group.remove(this.THull.sc);
       this.THull.sc = undefined;
       this.lineGroup.remove(...this.lineGroup.children);
       this.THull.hullGroup.add(this.THull.edges);
+      this.THull.hullGroup.add(this.THull.hullMesh);
     }
     this.render();
   }
@@ -538,11 +557,24 @@ class TernaryHullRender {
       const intersection = (intersects.length) > 0 ? intersects[0] : null;
       // console.log('selecting point: ', auid );
       this.pointClickHandler(auid);
+      const indicator = this.pointIndicator(auid);
       if (this.pointIndicator(auid) === 1) {
         const index = this.pointCloud.pointNames.indexOf(auid);
         const pt = this.pointCloud.geometry.attributes.position.array.slice(index * 3, index * 3 + 3);
-        this.distanceToHull(pt);
+        this.distanceToHull(pt, auid);
         this.group.add(this.lineGroup);
+      } else if (indicator === 3) {
+        this.THull.stabilityCriterion(auid);
+        this.group.add(this.THull.sc);
+        this.THull.hullGroup.remove(this.THull.hullMesh);
+        this.THull.hullGroup.remove(this.THull.edges);
+      } else {
+        this.group.remove(this.lineGroup);
+        this.group.remove(this.THull.sc);
+        this.THull.sc = undefined;
+        this.lineGroup.remove(...this.lineGroup.children);
+        this.THull.hullGroup.add(this.THull.edges);
+        this.THull.hullGroup.add(this.THull.hullMesh);
       }
 
       // this.pointCloud.geometry.attributes.size.array[intersects[0].index] = 80;
