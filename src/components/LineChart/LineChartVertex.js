@@ -32,8 +32,8 @@ class Vertex extends React.Component {
   }
 
   onClick() {
-    this.setState({ scStay: false });
     this.props.pointClickHandler(this.props.auid);
+    this.setState({ scStay: false });
   }
 
   onMouseOver() {
@@ -70,7 +70,13 @@ class Vertex extends React.Component {
   }
 
   render() {
-    function hullDistance(endpoints, curX) {
+    function ssHullDistance(vertices, curX) {
+      let endpoints;
+      for (let i = 0; i < vertices.length; i++) {
+        if (vertices[i].x > curX && vertices[i - 1].x < curX) {
+          endpoints = vertices.slice(i - 1, i + 1);
+        }
+      }
       const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
       const b = endpoints[0].y - (m * endpoints[0].x);
       return ((m * curX) + b);
@@ -78,20 +84,40 @@ class Vertex extends React.Component {
 
     let point = null;
     let ssHull = null;
+    let filledCircles;
     const xScale = this.props.xScale;
     const yScale = this.props.yScale;
+
     if ((this.state.sc || this.state.scStay) && this.props.isClicked) {
+      const x = this.props.xScale.invert(this.props.cx);
+      const y = this.props.yScale.invert(this.props.cy);
+
+      const pathToHull = [
+        { x, y },
+        { x, y: ssHullDistance(this.scHullVertices, x) },
+      ];
       const circles = this.scHullVertices.map(d => (
         <circle
           className="point"
-          r="5"
+          r="7"
           cx={xScale(d.x)}
           cy={yScale(d.y)}
           fill="none"
-          strokeWidth="2px"
-          stroke="#ff0000"
+          strokeWidth="3px"
+          stroke="#687BC9"
         />
       ));
+      if (this.props.defaultBehavior) {
+        filledCircles = this.scHullVertices.map(d => (
+          <circle
+            className="point"
+            r="5"
+            cx={xScale(d.x)}
+            cy={yScale(d.y)}
+            fill={this.props.fill}
+          />
+        ));
+      }
       ssHull =
         (
           <g>
@@ -101,8 +127,17 @@ class Vertex extends React.Component {
               d={this.props.line(this.scHullVertices)}
               onClick={this.onLineClick}
               strokeLinecap="round"
+              strokeDasharray="3, 10"
+            />
+            <path
+              className="line shadow"
+              stroke="#687BC9"
+              d={this.props.line(pathToHull)}
+              onClick={this.onLineClick}
+              strokeLinecap="round"
             />
             {circles}
+            {filledCircles}
           </g>
         );
     }
