@@ -369,7 +369,7 @@ class TernaryHullRender {
   //   }
   // }
 
-  distanceToHull(point, auid) {
+  distanceToHull(point, auid, hullMesh) {
     function inTriangle(pt, vertices) {
       function sgn(p1, p2, p3) {
         // eslint-disable-next-line no-mixed-operators
@@ -408,9 +408,9 @@ class TernaryHullRender {
       return new THREE.Vector3(curPoint.x, curPoint.y, curPoint.z - b / normal.z);
     }
 
-    this.THull.hullMesh.geometry.computeFaceNormals();
-    const faces = this.THull.hullMesh.geometry.faces;
-    const vertices = this.THull.hullMesh.geometry.vertices;
+    hullMesh.geometry.computeFaceNormals();
+    const faces = hullMesh.geometry.faces;
+    const vertices = hullMesh.geometry.vertices;
 
     let vertex1;
     let vertex2;
@@ -496,14 +496,16 @@ class TernaryHullRender {
       this.sphere.position.copy(intersection.point);
       const auid = intersection.object.pointNames[intersection.index];
       const indicator = this.pointIndicator(auid);
+      const index = this.pointCloud.pointNames.indexOf(auid);
+      const pt = this.pointCloud.geometry.attributes.position.array.slice(index * 3, index * 3 + 3);
       if (indicator === 1 && !this.defaultBehavior) {
-        const index = this.pointCloud.pointNames.indexOf(auid);
-        const pt = this.pointCloud.geometry.attributes.position.array.slice(index * 3, index * 3 + 3);
-        this.distanceToHull(pt, index);
+        this.distanceToHull(pt, index, this.THull.hullMesh);
         this.group.add(this.lineGroup);
       } else if (indicator === 3 && !this.defaultBehavior) {
         this.THull.stabilityCriterion(auid);
         this.group.add(this.THull.sc);
+        this.distanceToHull(pt, index, this.THull.sc);
+        this.group.add(this.lineGroup);
         this.THull.hullGroup.remove(this.THull.hullMesh);
         this.THull.hullGroup.remove(this.THull.edges);
       }
@@ -558,14 +560,16 @@ class TernaryHullRender {
       // console.log('selecting point: ', auid );
       this.pointClickHandler(auid);
       const indicator = this.pointIndicator(auid);
+      const index = this.pointCloud.pointNames.indexOf(auid);
+      const pt = this.pointCloud.geometry.attributes.position.array.slice(index * 3, index * 3 + 3);
       if (this.pointIndicator(auid) === 1) {
-        const index = this.pointCloud.pointNames.indexOf(auid);
-        const pt = this.pointCloud.geometry.attributes.position.array.slice(index * 3, index * 3 + 3);
-        this.distanceToHull(pt, auid);
+        this.distanceToHull(pt, auid, this.THull.hullMesh);
         this.group.add(this.lineGroup);
       } else if (indicator === 3) {
         this.THull.stabilityCriterion(auid);
         this.group.add(this.THull.sc);
+        this.distanceToHull(pt, index, this.THull.sc.children[0]);
+        this.group.add(this.lineGroup);
         this.THull.hullGroup.remove(this.THull.hullMesh);
         this.THull.hullGroup.remove(this.THull.edges);
       } else {
