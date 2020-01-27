@@ -10,6 +10,8 @@ const propTypes = {
   xScale: PropTypes.func.isRequired,
   cy: PropTypes.number.isRequired,
   yScale: PropTypes.func.isRequired,
+  yMin: PropTypes.number.isRequired,
+  yMax: PropTypes.number.isRequired,
   fill: PropTypes.string.isRequired,
   auid: PropTypes.string.isRequired,
   compound: PropTypes.string.isRequired,
@@ -56,13 +58,13 @@ class Point extends React.Component {
   }
 
   onMouseOut() {
-    this.timer = setTimeout(() => {
-      this.setState({ tielineClicked: false, text: false });
-    }, 1000);
+    // this.timer = setTimeout(() => {
+    this.setState({ tielineClicked: false, text: false });
+    // }, 1000);
   }
 
   onLineClick() {
-    clearTimeout(this.timer);
+    // clearTimeout(this.timer);
     this.setState({ tielineStay: !this.state.tielineStay });
     if (!this.state.tielineStay) {
       this.setState({ tielineClicked: false });
@@ -151,8 +153,12 @@ class Point extends React.Component {
             <InfoCard
               // eslint-disable-next-line react/prop-types
               data={this.props.entry}
-              x={this.props.cx}
-              y={this.props.cy}
+              x={x}
+              y={y}
+              xScale={this.props.xScale}
+              yScale={this.props.yScale}
+              yMin={this.props.yMin}
+              yMax={this.props.yMax}
             />
           );
         }
@@ -197,6 +203,7 @@ class Point extends React.Component {
                 d={this.props.line(decompPoints)}
                 onClick={this.onLineClick}
                 strokeLinecap="round"
+                strokeDasharray="3, 10"
               />
               {makeDecompPointCircs(decompPoints, 'red', '5', this.props.xScale, this.props.yScale)}
               {/* <circle
