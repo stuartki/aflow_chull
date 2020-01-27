@@ -32,8 +32,8 @@ class Vertex extends React.Component {
   }
 
   onClick() {
-    this.props.pointClickHandler(this.props.auid);
     this.setState({ scStay: false });
+    this.props.pointClickHandler(this.props.auid);
   }
 
   onMouseOver() {
@@ -41,13 +41,13 @@ class Vertex extends React.Component {
   }
 
   onMouseOut() {
-    this.timer = setTimeout(() => {
-      this.setState({ sc: false });
-    }, 1000);
+    // this.timer = setTimeout(() => {
+    this.setState({ sc: false });
+    // }, 1000);
   }
 
   onLineClick() {
-    clearTimeout(this.timer);
+    // clearTimeout(this.timer);
     this.setState({ scStay: !this.state.scStay });
     if (!this.state.scStay) {
       this.setState({ sc: false });
