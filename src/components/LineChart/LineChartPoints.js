@@ -49,6 +49,8 @@ const propTypes = {
   line: PropTypes.func.isRequired,
   color: PropTypes.string.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
+  yMin: PropTypes.number.isRequired,
+  yMax: PropTypes.number.isRequired,
   vertices: PropTypes.arrayOf(
     PropTypes.shape({
       x: React.PropTypes.number.isRequired,
@@ -112,6 +114,8 @@ const Points = (props) => {
           xScale={props.xScale}
           cy={props.yScale(d.enthalpyFormationAtom)}
           yScale={props.yScale}
+          yMin={props.yMin}
+          yMax={props.yMax}
           distanceToHull={d.distanceToHull}
           fill={fill}
           auid={d.auid}
@@ -174,6 +178,8 @@ const Points = (props) => {
           xScale={props.xScale}
           cy={props.yScale(d.enthalpyFormationAtom)}
           yScale={props.yScale}
+          yMin={props.yMin}
+          yMax={props.yMax}
           distanceToHull={d.distanceToHull}
           fill={fill}
           auid={d.auid}
