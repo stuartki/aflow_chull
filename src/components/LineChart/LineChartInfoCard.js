@@ -8,6 +8,10 @@ const propTypes = {
   data: PropTypes.object.isRequired,
   x: PropTypes.number.isRequired,
   y: PropTypes.number.isRequired,
+  xScale: PropTypes.func.isRequired,
+  yScale: PropTypes.func.isRequired,
+  yMin: PropTypes.number.isRequired,
+  yMax: PropTypes.number.isRequired,
 };
 
 
@@ -15,21 +19,40 @@ class InfoCard extends React.Component {
 
   constructor(props) {
     super(props);
-    this.x = this.props.x;
-    this.y = this.props.y;
-    this.width = 200;
-    this.titleHeight = 50;
-    this.bodyHeight = 80;
-    this.offset = this.width / 10;
   }
 
   render() {
+    this.x = this.props.xScale(this.props.x);
+    this.y = this.props.yScale(this.props.y);
+    this.width = this.props.xScale(0.25);
+    // scales from top, so it is strangely more intuitive to scale with max - offset
+    const scale = (this.props.yMax - this.props.yMin) / (2 * 10);
+    this.titleHeight = this.props.yScale(this.props.yMax - 2 * scale);
+    this.bodyHeight = this.props.yScale(this.props.yMax - 3 * scale);
+    this.offset = this.width / 10;
+
     const xStart = this.x - (this.width + this.offset);
     const yStart = this.y - (this.titleHeight / 4);
     const xMid = this.x - (this.width + this.offset) + this.width / 2;
     const yTop = this.y - (this.titleHeight / 4);
 
     const centeringBody = 4;
+
+    let data1;
+    let data1Title;
+    let data2;
+    let data2Title;
+    if (this.props.data.distanceToHull === 0) {
+      data1 = this.props.data.stabilityCriterion.toFixed(3);
+      data1Title = 'Stability Criterion';
+      data2 = this.props.data.n1EnthalpyGain.toFixed(3);
+      data2Title = 'N+1 Enthalpy Gain';
+    } else {
+      data1 = this.props.data.enthalpyFormationAtom.toFixed(3);
+      data1Title = 'Formation Enthalpy';
+      data2 = (this.props.data.distanceToHull * 1000).toFixed(3);
+      data2Title = 'Distance To Hull';
+    }
     return (
       <g width={this.width} height={this.titleHeight + this.bodyHeight}>
         <rect
@@ -67,8 +90,9 @@ class InfoCard extends React.Component {
             textAnchor="middle"
             alignmentBaseline="hanging"
             fontSize={(this.bodyHeight / 2) - (this.bodyHeight / centeringBody)}
+            textLength={`${this.width / 2 - (this.offset)}`}
           >
-            {this.props.data.enthalpyFormationAtom.toFixed(3)}
+            {data1}
           </tspan>
           <tspan
             className="attributeName"
@@ -77,8 +101,9 @@ class InfoCard extends React.Component {
             textAnchor="middle"
             alignmentBaseline="hanging"
             fontSize={((this.bodyHeight / 2) - (this.bodyHeight / centeringBody)) / 2}
+            textLength={`${this.width / 2 - (this.offset / 2)}`}
           >
-            Formation Enthalpy
+            {data1Title}
           </tspan>
           <tspan
             className="attributeName"
@@ -87,6 +112,7 @@ class InfoCard extends React.Component {
             textAnchor="middle"
             alignmentBaseline="hanging"
             fontSize={((this.bodyHeight / 2) - (this.bodyHeight / centeringBody)) / 2}
+            textLength={`${this.width / 2 - (this.offset)}`}
           >
             (meV/atom)
           </tspan>
@@ -100,8 +126,9 @@ class InfoCard extends React.Component {
             textAnchor="middle"
             alignmentBaseline="hanging"
             fontSize={(this.bodyHeight / 2) - (this.bodyHeight / centeringBody)}
+            textLength={`${this.width / 2 - (this.offset)}`}
           >
-            {(this.props.data.distanceToHull * 1000).toFixed(3)}
+            {data2}
           </tspan>
           <tspan
             className="attributeName"
@@ -110,8 +137,9 @@ class InfoCard extends React.Component {
             textAnchor="middle"
             alignmentBaseline="hanging"
             fontSize={((this.bodyHeight / 2) - (this.bodyHeight / centeringBody)) / 2}
+            textLength={`${this.width / 2 - (this.offset / 2)}`}
           >
-            Distance To Hull
+            {data2Title}
           </tspan>
           <tspan
             className="attributeName"
@@ -120,6 +148,7 @@ class InfoCard extends React.Component {
             textAnchor="middle"
             alignmentBaseline="hanging"
             fontSize={((this.bodyHeight / 2) - (this.bodyHeight / centeringBody)) / 2}
+            textLength={`${this.width / 2 - (this.offset)}`}
           >
             (meV/atom)
           </tspan>
