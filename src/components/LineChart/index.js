@@ -192,6 +192,8 @@ class LineChart extends React.Component {
           data={this.props.points}
           xScale={x}
           yScale={y}
+          yMin={this.props.yMin}
+          yMax={this.props.yMax}
           color={this.props.color}
           line={line}
           vertices={vertices}
