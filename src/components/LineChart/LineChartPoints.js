@@ -86,6 +86,8 @@ const Points = (props) => {
           xScale={props.xScale}
           cy={props.yScale(d.enthalpyFormationAtom)}
           yScale={props.yScale}
+          yMin={props.yMin}
+          yMax={props.yMax}
           fill={fill}
           auid={d.auid}
           compound={d.compound}
@@ -150,6 +152,8 @@ const Points = (props) => {
           xScale={props.xScale}
           cy={props.yScale(d.enthalpyFormationAtom)}
           yScale={props.yScale}
+          yMin={props.yMin}
+          yMax={props.yMax}
           fill={fill}
           auid={d.auid}
           compound={d.compound}
