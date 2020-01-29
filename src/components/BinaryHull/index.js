@@ -185,7 +185,7 @@ class BinaryHull extends React.Component {
               });
             }}
           >
-            Reset
+            View Reset
           </button>
           <button
             id="hullresize"
@@ -204,7 +204,7 @@ class BinaryHull extends React.Component {
               // });
             }}
           >
-            Resize Hull
+            View Hull
           </button>
         </div>
       </div>
