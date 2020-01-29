@@ -31,10 +31,15 @@ class InfoCard extends React.Component {
     this.bodyHeight = this.props.yScale(this.props.yMax - 3 * scale);
     this.offset = this.width / 10;
 
-    const xStart = this.x - (this.width + this.offset);
-    const yStart = this.y - (this.titleHeight / 4);
-    const xMid = this.x - (this.width + this.offset) + this.width / 2;
-    const yTop = this.y - (this.titleHeight / 4);
+    let boost = 0;
+    if (this.props.data.distanceToHull * 1000 < (5 * scale)) {
+      boost = this.titleHeight + this.bodyHeight - this.props.yScale(this.props.yMax - (this.props.data.distanceToHull * 1000 / 2));
+    }
+
+    const switchSide = (this.props.x > 0.5);
+    const xStart = switchSide ? this.x - (this.width + this.offset) : this.x + this.offset;
+    const yStart = this.y - (this.titleHeight / 4) - boost;
+    const xMid = switchSide ? this.x - (this.width + this.offset) + this.width / 2 : this.x + this.width/2 + this.offset;
 
     const centeringBody = 4;
 
@@ -80,7 +85,7 @@ class InfoCard extends React.Component {
           height={this.bodyHeight}
           fill="#FFFAFA"
         />
-        <line x1={xMid} y1={yTop + this.titleHeight} x2={xMid} y2={yTop + this.titleHeight + this.bodyHeight} stroke="black" />
+        <line x1={xMid} y1={yStart + this.titleHeight} x2={xMid} y2={yStart + this.titleHeight + this.bodyHeight} stroke="black" />
         <text
           fontFamily="Roboto"
         >
@@ -96,7 +101,7 @@ class InfoCard extends React.Component {
           </tspan>
           <tspan
             className="attributeName"
-            x={this.x - (this.width + this.offset) + this.width / 4}
+            x={xStart + this.width / 4}
             dy={(this.bodyHeight / 2) - (this.bodyHeight / centeringBody)}
             textAnchor="middle"
             alignmentBaseline="hanging"
@@ -107,7 +112,7 @@ class InfoCard extends React.Component {
           </tspan>
           <tspan
             className="attributeName"
-            x={this.x - (this.width + this.offset) + this.width / 4}
+            x={xStart + this.width / 4}
             dy={((this.bodyHeight / 2) - (this.bodyHeight / centeringBody)) / 2}
             textAnchor="middle"
             alignmentBaseline="hanging"
@@ -121,7 +126,7 @@ class InfoCard extends React.Component {
           fontFamily="Roboto"
         >
           <tspan
-            x={this.x - (this.width + this.offset) + 3 * this.width / 4}
+            x={xStart + 3 * this.width / 4}
             y={yStart + (this.titleHeight) + (this.bodyHeight / centeringBody)}
             textAnchor="middle"
             alignmentBaseline="hanging"
@@ -132,7 +137,7 @@ class InfoCard extends React.Component {
           </tspan>
           <tspan
             className="attributeName"
-            x={this.x - (this.width + this.offset) + 3 * this.width / 4}
+            x={xStart + 3 * this.width / 4}
             dy={(this.bodyHeight / 2) - (this.bodyHeight / centeringBody)}
             textAnchor="middle"
             alignmentBaseline="hanging"
@@ -143,7 +148,7 @@ class InfoCard extends React.Component {
           </tspan>
           <tspan
             className="attributeName"
-            x={this.x - (this.width + this.offset) + 3 * this.width / 4}
+            x={xStart + 3 * this.width / 4}
             dy={((this.bodyHeight / 2) - (this.bodyHeight / centeringBody)) / 2}
             textAnchor="middle"
             alignmentBaseline="hanging"
