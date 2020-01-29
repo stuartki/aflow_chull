@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import InfoCard from './LineChartInfoCard';
 
 const propTypes = {
   defaultBehavior: PropTypes.bool.isRequired,
@@ -8,6 +9,8 @@ const propTypes = {
   xScale: PropTypes.func.isRequired,
   cy: PropTypes.number.isRequired,
   yScale: PropTypes.func.isRequired,
+  yMin: PropTypes.number.isRequired,
+  yMax: PropTypes.number.isRequired,
   fill: PropTypes.string.isRequired,
   auid: PropTypes.string.isRequired,
   compound: PropTypes.string.isRequired,
@@ -84,6 +87,7 @@ class Vertex extends React.Component {
 
     let point = null;
     let ssHull = null;
+    let compound = null;
     let filledCircles;
     const xScale = this.props.xScale;
     const yScale = this.props.yScale;
@@ -118,6 +122,23 @@ class Vertex extends React.Component {
           />
         ));
       }
+
+      if (this.props.defaultBehavior) {
+        compound =
+        (
+          <InfoCard
+            // eslint-disable-next-line react/prop-types
+            data={this.props.entry}
+            x={x}
+            y={y}
+            xScale={this.props.xScale}
+            yScale={this.props.yScale}
+            yMin={this.props.yMin}
+            yMax={this.props.yMax}
+          />
+        );
+      }
+
       ssHull =
         (
           <g>
@@ -159,6 +180,7 @@ class Vertex extends React.Component {
         );
     return (
       <g>
+        {compound}
         {ssHull}
         {point}
       </g>
