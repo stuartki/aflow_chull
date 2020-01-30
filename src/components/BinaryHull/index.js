@@ -206,6 +206,17 @@ class BinaryHull extends React.Component {
           >
             View Hull
           </button>
+          <button
+            id="tutorial"
+            // eslint-disable-next-line no-unused-vars
+            onClick={(e) => {
+              const nodes = document.getElementById(this.props.hull.name).childNodes;
+              console.log(nodes);
+              nodes[1].style.opacity = 0.5;
+            }}
+          >
+            Tutorial
+          </button>
         </div>
       </div>
     );
