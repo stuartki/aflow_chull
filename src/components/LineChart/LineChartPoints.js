@@ -81,6 +81,7 @@ const Points = (props) => {
       point = (
         <Vertex
           defaultBehavior={props.defaultBehavior}
+          entry={d}
           hullName={props.hullName}
           cx={props.xScale(d.composition[1])}
           xScale={props.xScale}
@@ -151,6 +152,7 @@ const Points = (props) => {
       point = (
         <Vertex
           defaultBehavior={props.defaultBehavior}
+          entry={d}
           hullName={props.hullName}
           cx={props.xScale(d.composition[1])}
           xScale={props.xScale}
