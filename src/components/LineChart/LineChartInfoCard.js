@@ -31,9 +31,9 @@ class InfoCard extends React.Component {
     this.bodyHeight = this.props.yScale(this.props.yMax - 3 * scale);
     this.offset = this.width / 10;
 
-    let boost = 0;
+    let boost = (this.props.data.distanceToHull) ? 0 : this.props.yScale(this.props.yMax - scale);
     if (this.props.data.distanceToHull * 1000 < (5 * scale)) {
-      boost = this.titleHeight + this.bodyHeight - this.props.yScale(this.props.yMax - (this.props.data.distanceToHull * 1000 / 2));
+      boost = boost + this.titleHeight + this.bodyHeight - this.props.yScale(this.props.yMax - (this.props.data.distanceToHull * 1000 / 2));
     }
 
     const switchSide = (this.props.x > 0.5);
@@ -50,7 +50,7 @@ class InfoCard extends React.Component {
     if (this.props.data.distanceToHull === 0) {
       data1 = this.props.data.stabilityCriterion.toFixed(3);
       data1Title = 'Stability Criterion';
-      data2 = this.props.data.n1EnthalpyGain.toFixed(3);
+      data2 = this.props.data.nPlus1EnthalpyGain.toFixed(3);
       data2Title = 'N+1 Enthalpy Gain';
     } else {
       data1 = this.props.data.enthalpyFormationAtom.toFixed(3);
