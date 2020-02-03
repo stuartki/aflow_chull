@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import './binaryHull.css';
 import LineChart from '../LineChart';
+import Tutorial2D from '../Tutorial/Tutorial2D';
 // import * as hullActions from '../../actions/hullActions.js';
 // import { resizeHullAxes } from '../../actions/hullActions.js';
 
@@ -34,6 +35,7 @@ class BinaryHull extends React.Component {
       yMin: this.props.hull.yMin,
       yMax: this.props.hull.yMax,
       defaultBehavior: true,
+      tutorialMode: false,
     };
 
     this.incrementMin = this.incrementMin.bind(this);
@@ -97,6 +99,14 @@ class BinaryHull extends React.Component {
         console.log(error);
       }
     }
+    const parentNode = document.getElementById(this.props.hull.name);
+    const nodes = parentNode ? parentNode.childNodes : null;
+    if (this.state.tutorialMode && nodes !== null) {
+      nodes[1].style.opacity = 0.5;
+    } else if (nodes !== null) {
+      nodes[1].style.opacity = 1;
+    }
+
     return (
       <div>
         <div>
@@ -210,14 +220,23 @@ class BinaryHull extends React.Component {
             id="tutorial"
             // eslint-disable-next-line no-unused-vars
             onClick={(e) => {
-              const nodes = document.getElementById(this.props.hull.name).childNodes;
-              console.log(nodes);
-              nodes[1].style.opacity = 0.5;
+              this.setState({
+                tutorialMode: !this.state.tutorialMode,
+              });
             }}
           >
             Tutorial
           </button>
         </div>
+        {this.state.tutorialMode ?
+          <Tutorial2D
+            tutorialMode={this.state.tutorialMode}
+            parentNode={this.props.hull.name}
+            nodes={nodes}
+            width={this.props.width}
+            height={this.props.height}
+          />
+          : null}
       </div>
     );
   }
