@@ -63,6 +63,12 @@ class Point extends React.Component {
     // }, 1000);
   }
 
+  onContextMenu() {
+    // this.timer = setTimeout(() => {
+    this.setState({ tielineClicked: false, text: false });
+    // }, 1000);
+  }
+
   onLineClick() {
     // clearTimeout(this.timer);
     this.setState({ tielineStay: !this.state.tielineStay });
