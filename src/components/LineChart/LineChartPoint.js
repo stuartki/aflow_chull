@@ -88,6 +88,7 @@ class Point extends React.Component {
     function makeDecompPointCircs(decomposition, fill, r, xScale, yScale) {
       const decomps = decomposition.map(d => (
         <circle
+          key={`${d.x.toString()}`}
           className="point"
           r={r}
           cx={xScale(d.x)}

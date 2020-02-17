@@ -80,6 +80,7 @@ const Points = (props) => {
       const thisSSHullVertices = f.length > 0 ? f[0].ssHullVertices : null;
       point = (
         <Vertex
+          key={d.auid}
           defaultBehavior={props.defaultBehavior}
           entry={d}
           hullName={props.hullName}
@@ -111,6 +112,7 @@ const Points = (props) => {
       }
       point = (
         <Point
+          key={d.auid}
           defaultBehavior={props.defaultBehavior}
           entry={d}
           cx={props.xScale(d.composition[1])}
@@ -151,6 +153,7 @@ const Points = (props) => {
       const thisSSHullVertices = f.length > 0 ? f[0].ssHullVertices : null;
       point = (
         <Vertex
+          key={d.auid}
           defaultBehavior={props.defaultBehavior}
           entry={d}
           hullName={props.hullName}
@@ -182,6 +185,7 @@ const Points = (props) => {
       }
       point = (
         <Point
+          key={d.auid}
           defaultBehavior={props.defaultBehavior}
           entry={d}
           cx={props.xScale(d.composition[1])}
