@@ -1,14 +1,14 @@
 import * as THREE from 'three';
 import axios from 'axios';
 
-import TrackballControls from './TrackballControls';
+// import TrackballControls from './TrackballControls';
 import TernaryGrid from './TernaryGrid';
 import TernaryAxis from './TernaryAxis';
 import TernaryHull from './TernaryHull';
 import TernaryPoints from './TernaryPoints';
 
 import MeshLine from './MeshLine';
-// import OrbitControls from './OrbitControls';
+import OrbitControls from './OrbitControls';
 
 class TernaryHullRender {
   constructor(hull, showEntries, defaultColor, defaultBehavior, pointClickHandler) {
@@ -133,9 +133,9 @@ class TernaryHullRender {
 
   setCamera(type) {
     if (type === 'init') {
-      this.camera.up = new THREE.Vector3(0, 1, 0);
-      this.camera.position.set(this.TGrid.triCenter[0], this.TGrid.triCenter[1], 1000);
-      this.controls = new TrackballControls(this.camera, this.container);
+      this.camera.up = new THREE.Vector3(0, 0, 1);
+      this.camera.position.set(this.TGrid.triCenter[0], - (5 * this.TGrid.triCenter[1]), 0);
+      this.controls = new OrbitControls(this.camera, this.container);
       this.controls.rotateSpeed = 1.0;
       // this.camera.lookAt(new THREE.Vector3(this.TGrid.triCenter[0], this.TGrid.triCenter[1], 0));
       this.controls.target = new THREE.Vector3(this.TGrid.triCenter[0], this.TGrid.triCenter[1], 0);
@@ -477,6 +477,7 @@ class TernaryHullRender {
     // eslint-disable-next-line no-unused-vars
     const top = window.pageYOffset || document.documentElement.scrollTop;
     const left = window.pageXOffset || document.documentElement.scrollLeft;
+
     this.mouse.x = (
       // eslint-disable-next-line no-mixed-operators
       (event.clientX - this.renderer.domElement.offsetLeft - viewport.offsetLeft + left) /

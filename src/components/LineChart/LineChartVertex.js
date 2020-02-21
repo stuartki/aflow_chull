@@ -102,6 +102,7 @@ class Vertex extends React.Component {
       ];
       const circles = this.scHullVertices.map(d => (
         <circle
+          key={`${d.x.toString()}`}
           className="point"
           r="7"
           cx={xScale(d.x)}
@@ -114,6 +115,7 @@ class Vertex extends React.Component {
       if (this.props.defaultBehavior) {
         filledCircles = this.scHullVertices.map(d => (
           <circle
+            key={`${d.x.toString()}`}
             className="point"
             r="5"
             cx={xScale(d.x)}

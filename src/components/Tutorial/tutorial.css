@@ -1,0 +1,41 @@
+#intro {
+  position: absolute;
+  width: 100px;
+  top: 50%;
+  left: 50%;
+  margin-left: -50px;
+  text-align: center;
+}
+
+#clickIntro{
+  position: absolute;
+  width: 100px;
+  top: 60%;
+  left: 60%;
+  text-align: center;
+  font-size: 10px;
+}
+
+#tut {
+  position: absolute;
+  width: 100px;
+  top: 100%;
+  left: 50%;
+  margin-left: -50px;
+  text-align: center;
+}
+
+#next {
+  position: relative;
+  left: 50px;
+  padding: 10px 15px;
+  font-size: 10px;
+}
+
+#previous {
+  position: relative;
+  top: -36px;
+  left: -50px;
+  padding: 10px 15px;
+  font-size: 10px;
+}
