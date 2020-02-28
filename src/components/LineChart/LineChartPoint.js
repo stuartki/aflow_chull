@@ -98,20 +98,6 @@ class Point extends React.Component {
       return decomps;
     }
 
-    // fixes pesky offset of line to circle center
-    // function offset(points, xScale, yScale) {
-    //   const norm = ((yScale(points[1].y - points[0].y) ** 2)
-    //     + (xScale(points[1].x - points[0].x) ** 2)) ** (0.5);
-    //   const xiVec = 6 * xScale(points[1].x - points[0].x) / norm;
-    //   const yiVec = 6 * yScale(points[1].y - points[0].y) / norm;
-    //   const offsetPoints = [{ x: 0, y: 0 }, { x: 0, y: 0 }];
-    //   offsetPoints[0].x = xScale.invert(xScale(points[0].x) + xiVec);
-    //   offsetPoints[0].y = yScale.invert(yScale(points[0].y) + yiVec);
-    //   offsetPoints[1].x = xScale.invert(xScale(points[1].x) - xiVec);
-    //   offsetPoints[1].y = yScale.invert(yScale(points[1].y) - yiVec);
-    //   return offsetPoints;
-    // }
-
     // svg components
     let tieline = null;
     let point = null;
