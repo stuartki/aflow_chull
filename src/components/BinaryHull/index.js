@@ -216,7 +216,7 @@ class BinaryHull extends React.Component {
           >
             View Hull
           </button>
-          <button
+          {/* <button
             id="tutorial"
             // eslint-disable-next-line no-unused-vars
             onClick={(e) => {
@@ -226,7 +226,7 @@ class BinaryHull extends React.Component {
             }}
           >
             Tutorial
-          </button>
+          </button> */}
         </div>
         {this.state.tutorialMode ?
           <Tutorial2D
