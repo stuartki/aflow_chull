@@ -137,11 +137,16 @@ const Points = (props) => {
   });
 
   if (props.defaultBehavior && click) {
-    circles = null;
-    // const x = document.getElementsByClassName('point');
-    // for (let i = 0; i < x.length; i ++) {
-    //   x[i].style.opacity = 0.5;
-    // }
+    // circles = null;
+    const x = document.getElementsByClassName('point');
+    for (let i = 0; i < x.length; i++) {
+      x[i].style.opacity = 0.4;
+    }
+  } else {
+    const x = document.getElementsByClassName('point');
+    for (let i = 0; i < x.length; i++) {
+      x[i].style.opacity = 1;
+    }
   }
 
   // third order rendering: selected points

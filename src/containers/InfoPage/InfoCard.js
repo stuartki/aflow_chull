@@ -190,7 +190,7 @@ class InfoCard extends React.Component {
               <div className="col-md-12">
                 <div className="info-card-action-col">
                   <a
-                    href={`http://aflow.org/material.php?id=${this.props.data.auid}`}
+                    href={`http://aflow.org/material/?id=${this.props.data.auid}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="info-card-action-link"

@@ -72,6 +72,7 @@ class InfoCard extends React.Component {
           y={yStart + (this.titleHeight / 2)}
           alignmentBaseline="middle"
           fontFamily="Roboto"
+          fontSize={((this.titleHeight / 2) - (this.titleHeight / centeringBody))}
           textLength={`${this.width - (this.offset / 2)}`}
           fill="white"
         >

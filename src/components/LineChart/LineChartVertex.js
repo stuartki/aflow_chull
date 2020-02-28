@@ -44,13 +44,10 @@ class Vertex extends React.Component {
   }
 
   onMouseOut() {
-    // this.timer = setTimeout(() => {
     this.setState({ sc: false });
-    // }, 1000);
   }
 
   onLineClick() {
-    // clearTimeout(this.timer);
     this.setState({ scStay: !this.state.scStay });
     if (!this.state.scStay) {
       this.setState({ sc: false });
@@ -58,6 +55,7 @@ class Vertex extends React.Component {
   }
 
   findStabilityCriterion() {
+    // catch if no stability criterion
     // eslint-disable-next-line react/prop-types
     if (this.props.ssHullVertices === undefined || this.props.ssHullVertices === null) {
       this.scHullVertices = [];
@@ -75,20 +73,30 @@ class Vertex extends React.Component {
   render() {
     function ssHullDistance(vertices, curX) {
       let endpoints;
-      for (let i = 0; i < vertices.length; i++) {
+      if (vertices[0].x === curX) {
+        endpoints = vertices[0];
+      }
+      for (let i = 1; i < vertices.length; i++) {
         if (vertices[i].x > curX && vertices[i - 1].x < curX) {
           endpoints = vertices.slice(i - 1, i + 1);
         }
+        if (vertices[i] === curX) {
+          endpoints = vertices[i];
+        }
       }
-      const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
-      const b = endpoints[0].y - (m * endpoints[0].x);
-      return ((m * curX) + b);
+      if (endpoints.length > 1) {
+        const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
+        const b = endpoints[0].y - (m * endpoints[0].x);
+        return ((m * curX) + b);
+      }
+      return (endpoints.y);
     }
 
     let point = null;
     let ssHull = null;
     let compound = null;
     let filledCircles;
+
     const xScale = this.props.xScale;
     const yScale = this.props.yScale;
 
@@ -100,6 +108,8 @@ class Vertex extends React.Component {
         { x, y },
         { x, y: ssHullDistance(this.scHullVertices, x) },
       ];
+
+      // make new hull circles
       const circles = this.scHullVertices.map(d => (
         <circle
           key={`${d.x.toString()}`}
