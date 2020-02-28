@@ -109,7 +109,7 @@ class Searchbox extends React.Component {
         <input
           autoComplete="off"
           className="hull-input inline"
-          placeholder="Add a Hull..."
+          placeholder="Search"
           value={this.props.selectedElements}
           onChange={this.handleChange}
           onKeyPress={this.onEnter}
