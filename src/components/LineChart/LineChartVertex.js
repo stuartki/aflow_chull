@@ -190,9 +190,9 @@ class Vertex extends React.Component {
         );
     return (
       <g>
-        {compound}
         {ssHull}
         {point}
+        {compound}
       </g>
     );
   }
