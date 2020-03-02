@@ -124,15 +124,18 @@ class Visualization extends React.Component {
     this.cancelReq = null;
     // console.log(this.props.params.hullName);
     axios
-      .get(`http://aflowlib.duke.edu/API/chull/apool/?hull=${hull}`, {
+      // .get(`http://aflowlib.duke.edu/API/chull/apool/?hull=${hull}`, {
+      .get(`http://aflowlib.duke.edu/search/ui/API/chull/v1.2/?pprint=${hull}`, {
         cancelToken: new axios.CancelToken((c) => {
           // An executor function receives a cancel function as a parameter
           this.cancelReq = c;
         }),
       })
       .then((res) => {
+        let returnString = '';
+        res.data.forEach(d => returnString += (d + '\n'));
         this.setState({
-          apool: res.data,
+          apool: returnString,
           apoolLoading: false,
         });
       });
