@@ -31,7 +31,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	// How far you can dolly in and out ( PerspectiveCamera only )
 	this.minDistance = 0;
-	this.maxDistance = Infinity;
+	this.maxDistance = 1500;
 
 	// How far you can zoom in and out ( OrthographicCamera only )
 	this.minZoom = 0;
@@ -55,17 +55,17 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// This option actually enables dollying in and out; left as "zoom" for backwards compatibility.
 	// Set to false to disable zooming
 	this.enableZoom = true;
-	this.zoomSpeed = 1.0;
+	this.zoomSpeed = 0.5;
 
 	// Set to false to disable rotating
 	this.enableRotate = true;
-	this.rotateSpeed = 1.0;
+	this.rotateSpeed = 0.0;
 
 	// Set to false to disable panning
 	this.enablePan = true;
 	this.panSpeed = 1.0;
 	this.screenSpacePanning = false; // if true, pan in screen-space
-	this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
+	this.keyPanSpeed = 30.0;	// pixels moved per arrow key push
 
 	// Set to true to automatically rotate around the target
 	// If auto-rotate is enabled, you must call controls.update() in your animation loop
@@ -364,7 +364,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				v.setFromMatrixColumn( objectMatrix, 0 );
 				v.crossVectors( scope.object.up, v );
-
+ 
 			}
 
 			v.multiplyScalar( distance );
@@ -484,7 +484,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		rotateEnd.set( event.clientX, event.clientY );
 
-		rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
+		// const rotateSpeed = scope.rotateSpeed;
+		const rotateSpeed = 0.3;
+		rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( rotateSpeed );
 
 		var element = scope.domElement;
 
@@ -563,22 +565,26 @@ THREE.OrbitControls = function ( object, domElement ) {
 		switch ( event.keyCode ) {
 
 			case scope.keys.UP:
-				pan( 0, scope.keyPanSpeed );
+				// pan( 0, scope.keyPanSpeed );
+				rotateUp(scope.keyPanSpeed * Math.PI / 180 / 10);
 				needsUpdate = true;
 				break;
 
 			case scope.keys.BOTTOM:
-				pan( 0, - scope.keyPanSpeed );
+				// pan( 0, - scope.keyPanSpeed );
+				rotateUp(-scope.keyPanSpeed * Math.PI / 180 / 10);
 				needsUpdate = true;
 				break;
 
 			case scope.keys.LEFT:
-				pan( scope.keyPanSpeed, 0 );
+				// pan( scope.keyPanSpeed, 0 );
+				rotateLeft(scope.keyPanSpeed * Math.PI / 180 / 10);
 				needsUpdate = true;
 				break;
 
 			case scope.keys.RIGHT:
-				pan( - scope.keyPanSpeed, 0 );
+				// pan( - scope.keyPanSpeed, 0 );
+				rotateLeft(-scope.keyPanSpeed * Math.PI / 180 / 10);
 				needsUpdate = true;
 				break;
 

@@ -58,13 +58,16 @@ class Point extends React.Component {
   }
 
   onMouseOut() {
+    this.setState({ tielineClicked: false, text: false });
+  }
+
+  onContextMenu() {
     // this.timer = setTimeout(() => {
     this.setState({ tielineClicked: false, text: false });
     // }, 1000);
   }
 
   onLineClick() {
-    // clearTimeout(this.timer);
     this.setState({ tielineStay: !this.state.tielineStay });
     if (!this.state.tielineStay) {
       this.setState({ tielineClicked: false });
@@ -72,7 +75,7 @@ class Point extends React.Component {
   }
 
   render() {
-    // find hull distance in scale of graph
+    // find hull distance in the scale of graph
     function hullDistance(endpoints, curX) {
       const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
       const b = endpoints[0].y - (m * endpoints[0].x);
@@ -82,6 +85,7 @@ class Point extends React.Component {
     function makeDecompPointCircs(decomposition, fill, r, xScale, yScale) {
       const decomps = decomposition.map(d => (
         <circle
+          key={`${d.x.toString()}`}
           className="point"
           r={r}
           cx={xScale(d.x)}
@@ -94,20 +98,6 @@ class Point extends React.Component {
       return decomps;
     }
 
-    // fixes pesky offset of line to circle center
-    // function offset(points, xScale, yScale) {
-    //   const norm = ((yScale(points[1].y - points[0].y) ** 2)
-    //     + (xScale(points[1].x - points[0].x) ** 2)) ** (0.5);
-    //   const xiVec = 6 * xScale(points[1].x - points[0].x) / norm;
-    //   const yiVec = 6 * yScale(points[1].y - points[0].y) / norm;
-    //   const offsetPoints = [{ x: 0, y: 0 }, { x: 0, y: 0 }];
-    //   offsetPoints[0].x = xScale.invert(xScale(points[0].x) + xiVec);
-    //   offsetPoints[0].y = yScale.invert(yScale(points[0].y) + yiVec);
-    //   offsetPoints[1].x = xScale.invert(xScale(points[1].x) - xiVec);
-    //   offsetPoints[1].y = yScale.invert(yScale(points[1].y) - yiVec);
-    //   return offsetPoints;
-    // }
-
     // svg components
     let tieline = null;
     let point = null;
@@ -115,7 +105,7 @@ class Point extends React.Component {
     let decompCircles = null;
 
     // if it is clicked and not a hull point
-    if (this.props.isClicked && this.props.distanceToHull > 0) {
+    if (this.props.isClicked) {
       // invert x back to local stoichiometric/enthalpy x/y coordinates
       const x = this.props.xScale.invert(this.props.cx);
       const y = this.props.yScale.invert(this.props.cy);
@@ -124,6 +114,7 @@ class Point extends React.Component {
       // find the decomposition reaction
       let decompPoints = this.props.decompositionPoints;
       let pathToHull;
+      // condition to find vertex on hull for no decomposition points
       if (decompPoints.length === 0) {
         decompPoints = this.props.vertices.filter(d => Math.abs(d.x - x) < 0.01);
         pathToHull = [
@@ -163,6 +154,7 @@ class Point extends React.Component {
           );
         }
 
+        // distance to hull drawing
         tieline =
         (
           <g>
@@ -174,26 +166,10 @@ class Point extends React.Component {
               strokeDasharray="3, 10"
             />
             {makeDecompPointCircs(decompPoints, 'none', '7', this.props.xScale, this.props.yScale)}
-            {/* <circle
-              className="point"
-              r="7"
-              cx={this.props.xScale(decompPoints[0].x)}
-              cy={this.props.yScale(decompPoints[0].y)}
-              fill="none"
-              stroke="#687BC9"
-              strokeWidth="3"
-            />
-            <circle
-              className="point"
-              r="7"
-              cx={this.props.xScale(decompPoints[1].x)}
-              cy={this.props.yScale(decompPoints[1].y)}
-              fill="none"
-              stroke="#687BC9"
-              strokeWidth="3"
-            /> */}
           </g>
         );
+
+        // decomposition line between decomposition points drawing
         if (this.props.defaultBehavior) {
           decompCircles =
           (
@@ -206,20 +182,6 @@ class Point extends React.Component {
                 strokeDasharray="3, 10"
               />
               {makeDecompPointCircs(decompPoints, 'red', '5', this.props.xScale, this.props.yScale)}
-              {/* <circle
-                className="point"
-                r="5"
-                cx={this.props.xScale(decompPoints[0].x)}
-                cy={this.props.yScale(decompPoints[0].y)}
-                fill={this.props.fill}
-              />
-              <circle
-                className="point"
-                r="5"
-                cx={this.props.xScale(decompPoints[1].x)}
-                cy={this.props.yScale(decompPoints[1].y)}
-                fill={this.props.fill}
-              /> */}
             </g>
           );
         }
