@@ -1,2 +1,9 @@
 node_modules
 .DS_Store
+.vscode/
+aflow_MnPdPt_hull.json
+aflow_MnPdPt_hull_web.json
+apool_txt_editor.py
+dist/data/
+log.log
+php/
