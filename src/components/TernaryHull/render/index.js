@@ -45,7 +45,8 @@ class TernaryHullRender {
 
     this.mouse = new THREE.Vector2();
     this.raycaster = new THREE.Raycaster();
-    this.raycaster.params.Points.threshold = 15;
+    this.raycaster.params.Points.threshold = 7;
+
     // this.container;
     // this.width;
     // this.height;
@@ -58,13 +59,31 @@ class TernaryHullRender {
     // );
     // this.controls;
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    // this.renderer.setPixelRatio(window.devicePixelRatio);
 
     // pointer
     const sphereGeometry = new THREE.SphereBufferGeometry(2, 32, 32);
     const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     this.sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 
+    function makeLine(v1, v2) {
+      const geometry = new THREE.Geometry();
+      geometry.vertices.push(
+        v1, v2,
+      );
+      geometry.computeLineDistances();
+      const material = new THREE.LineDashedMaterial(
+        {
+          color: 0x687BC9,
+          linewidth: 100,
+        });
+      return new THREE.Line(geometry, material);
+    }
+
+    this.ray = makeLine(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0));
+
     this.scene.add(this.sphere);
+    this.scene.add(this.ray);
   }
 
   init(containerID) {
@@ -420,6 +439,10 @@ class TernaryHullRender {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const intersections = this.raycaster.intersectObjects(this.intersectArray);
     const intersection = (intersections.length) > 0 ? intersections[0] : null;
+
+    this.ray.geometry.vertices[0] = new THREE.Vector3(this.TGrid.triCenter[0], - (5 * this.TGrid.triCenter[1]), 0);
+    this.ray.geometry.vertices[1] = this.raycaster.ray.direction.multiplyScalar(1000).add(this.raycaster.ray.origin);
+    this.ray.geometry.verticesNeedUpdate = true;
 
     if (intersection !== null) {
       this.sphere.position.copy(intersection.point);
