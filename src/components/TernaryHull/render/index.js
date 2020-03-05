@@ -80,10 +80,10 @@ class TernaryHullRender {
       return new THREE.Line(geometry, material);
     }
 
-    this.ray = makeLine(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0));
+    // this.ray = makeLine(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0));
+    // this.scene.add(this.ray);
 
     this.scene.add(this.sphere);
-    this.scene.add(this.ray);
   }
 
   init(containerID) {
@@ -432,7 +432,7 @@ class TernaryHullRender {
     // eslint-disable-next-line no-mixed-operators
     ) * 2 - 1; // NOTE: the +5 is a hack to get raycaster centered on point in nwjs
     this.mouse.y = -(
-      (event.clientY - this.renderer.domElement.offsetTop - viewport.offsetTop + top) /
+      (event.clientY - this.renderer.domElement.offsetTop - viewport.offsetTop + viewport.scrollTop) /
     // eslint-disable-next-line no-mixed-operators
     this.renderer.domElement.height) * 2 + 1;
 
@@ -440,9 +440,9 @@ class TernaryHullRender {
     const intersections = this.raycaster.intersectObjects(this.intersectArray);
     const intersection = (intersections.length) > 0 ? intersections[0] : null;
 
-    this.ray.geometry.vertices[0] = new THREE.Vector3(this.TGrid.triCenter[0], - (5 * this.TGrid.triCenter[1]), 0);
-    this.ray.geometry.vertices[1] = this.raycaster.ray.direction.multiplyScalar(1000).add(this.raycaster.ray.origin);
-    this.ray.geometry.verticesNeedUpdate = true;
+    // this.ray.geometry.vertices[0] = new THREE.Vector3(this.TGrid.triCenter[0], - (5 * this.TGrid.triCenter[1]), 0);
+    // this.ray.geometry.vertices[1] = this.raycaster.ray.direction.multiplyScalar(1000).add(this.raycaster.ray.origin);
+    // this.ray.geometry.verticesNeedUpdate = true;
 
     if (intersection !== null) {
       this.sphere.position.copy(intersection.point);
@@ -619,7 +619,7 @@ class TernaryHullRender {
 
       this.camera.position.set(
         newPos.x,
-        newPos.y,
+        newPos.y, 
         newPos.z
       );
     }
