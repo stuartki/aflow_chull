@@ -12,11 +12,51 @@
 
 #default{
   position: absolute;
+  right: 40px;
+}
+
+/* Style the button that is used to open and close the collapsible content */
+.collapsible {
+  height: 5%;
+  width: 20%;
+  position: absolute;
+  right: 40px;
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 5px 5px;
+  text-align: center;
+  font-size: 15px;
+  z-index: 3;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.active, .collapsible:hover {
+  background-color: #ccc;
+}
+
+.content{
+  background-color: gray;
+  height: 30%;
+  width: 20%;
+  right: 40px;
+  position: absolute;
+  /* max-height: 0; */
+  display: none;
+  overflow: hidden;
+  z-index: 1;
+  /* transition: max-height 0.2s ease-out; */
 }
 
 #buttons{
-  height: 25px;
-  position: absolute;
-  right: 40px;
-  background-color: black;
+  height: 10px;
+  margin-top: 40px;
+  width: 100%;
+  z-index: 2;
 }
+
+#buttons>button, #default{
+  display: block;
+  margin: 1px;
+}
+
