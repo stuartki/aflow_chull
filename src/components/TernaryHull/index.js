@@ -35,6 +35,7 @@ class TernaryHull extends React.Component {
     };
     this.defaultBehavior = true;
     this.onClick = this.onClick.bind(this);
+    this.onCollapseClick = this.onCollapseClick.bind(this);
   }
 
   componentDidMount() {
@@ -115,45 +116,51 @@ class TernaryHull extends React.Component {
     }
   }
 
+  onCollapseClick() {
+    const content = document.getElementsByClassName('content')[0];
+    if (content.style.display === 'block') {
+      content.style.display = 'none';
+    } else {
+      content.style.display = 'block';
+    }
+  }
+
   render() {
     return (
       <div id="container">
         <button
           id="default"
-            // eslint-disable-next-line no-unused-vars
           onClick={this.onClick}
         >
           Default
         </button>
-        <div id="buttons">
-          <button
-            // id="reset"
-            className="camera-button"
-            onClick={(e) => {
-              this.state.THREEscene.setCamera('init');
-              // this.state.THREEscene.render();
-            }}
-          >
-          Reset Camera
-          </button>
-          <button
-            // id="reset"
-            className="camera-button"
-            onClick={(e) => {
-              this.state.THREEscene.THull.n1EnthalpyGain();
-            }}
-          >
-          N+1 Enthalpy Gain
-          </button>
-          {/* <button
-            // id="reset"
-            className="camera-button"
-            onClick={(e) => {
-              this.state.THREEscene.setCamera(2);
-            }}
-          >
-          2
-          </button> */}
+        <button
+          type="button"
+          className="collapsible"
+          onClick={this.onCollapseClick}
+        >
+          Open Collapsible
+        </button>
+        <div className="content">
+          <div id="buttons">
+            <button
+              className="camera-button"
+              onClick={(e) => {
+                this.state.THREEscene.setCamera('init');
+              }}
+            >
+              Reset Camera
+            </button>
+            <button
+              // id="reset"
+              className="camera-button"
+              onClick={(e) => {
+                this.state.THREEscene.THull.n1EnthalpyGain();
+              }}
+            >
+            N+1 Enthalpy Gain
+            </button>
+          </div>
         </div>
         <div
           id={this.props.container}
