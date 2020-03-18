@@ -80,7 +80,7 @@ class BinaryHull extends React.Component {
     let xLabel = '';
     let yLabel = '';
     if (this.props.showAxisLabels) {
-      xLabel = `composition ${this.props.hull.species[1]}`;
+      xLabel = `atomic % ${this.props.hull.species[1]}`;
       yLabel = 'formation enthalpy (meV)';
     }
 
