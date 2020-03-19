@@ -101,7 +101,7 @@ const Points = (props) => {
       );
     } else {
       let decompositionPoints;
-      if (d.decompositionAuids === null) {
+      if (d.decompositionAuids === null || d.decompositionAuids === undefined) {
         decompositionPoints = [];
       } else {
         decompositionPoints = data.filter(entry => d.decompositionAuids.includes(entry.auid));
@@ -179,7 +179,7 @@ const Points = (props) => {
       );
     } else {
       let decompositionPoints;
-      if (d.decompositionAuids === null) {
+      if (d.decompositionAuids === null || d.decompositionAuids === undefined) {
         decompositionPoints = [];
       } else {
         decompositionPoints = data.filter(entry => d.decompositionAuids.includes(entry.auid));
