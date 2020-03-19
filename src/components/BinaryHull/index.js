@@ -83,16 +83,18 @@ class BinaryHull extends React.Component {
       xLabel = `atomic % ${this.props.hull.species[1]}`;
       yLabel = 'formation enthalpy (meV)';
     }
-
+    let defaultText;
     // there is a better solution for this, but it is to catch first time render problem
     // default does not exist before rendered
     if (this.state.defaultBehavior) {
+      defaultText = 'DEFAULT';
       try {
         document.getElementById('default').style.backgroundColor = 'green';
       } catch (error) {
         console.log(error);
       }
     } else {
+      defaultText = 'NON-DEFAULT';
       try {
         document.getElementById('default').style.backgroundColor = 'red';
       } catch (error) {
@@ -117,7 +119,7 @@ class BinaryHull extends React.Component {
               this.setState({ defaultBehavior: !this.state.defaultBehavior });
             }}
           >
-            Default
+            {defaultText}
           </button>
         </div>
         <div className="axis-controls">
