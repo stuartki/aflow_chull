@@ -104,12 +104,15 @@ class TernaryHull extends React.Component {
     if (this.defaultBehavior) {
       try {
         document.getElementById('default').style.backgroundColor = 'green';
+        document.getElementById('default').textContent = 'DEFAULT';
       } catch (error) {
         console.log(error);
       }
     } else {
+      this.defaultText = 'NON-DEFAULT';
       try {
         document.getElementById('default').style.backgroundColor = 'red';
+        document.getElementById('default').textContent = 'NON-DEFAULT';
       } catch (error) {
         console.log(error);
       }
@@ -132,7 +135,7 @@ class TernaryHull extends React.Component {
           id="default"
           onClick={this.onClick}
         >
-          Default
+          DEFAULT
         </button>
         <button
           type="button"

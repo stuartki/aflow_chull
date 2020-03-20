@@ -103,13 +103,11 @@ class Point extends React.Component {
     let point = null;
     let compound = null;
     let decompCircles = null;
-
+    // invert x back to local stoichiometric/enthalpy x/y coordinates
+    const x = this.props.xScale.invert(this.props.cx);
+    const y = this.props.yScale.invert(this.props.cy);
     // if it is clicked and not a hull point
     if (this.props.isClicked) {
-      // invert x back to local stoichiometric/enthalpy x/y coordinates
-      const x = this.props.xScale.invert(this.props.cx);
-      const y = this.props.yScale.invert(this.props.cy);
-
       // the math part
       // find the decomposition reaction
       let decompPoints = this.props.decompositionPoints;
@@ -187,23 +185,24 @@ class Point extends React.Component {
         }
       }
     }
-
-    point =
-        (
-          <g>
-            <circle
-              className="point"
-              r="5"
-              cx={this.props.cx}
-              cy={this.props.cy}
-              fill={this.props.fill}
-              onClick={this.onClick}
-              onMouseOver={this.onMouseOver}
-              onMouseOut={this.onMouseOut}
-              strokeWidth="2px"
-            />
-          </g>
-        );
+    if (y > this.props.yMin && this.props.yMax > y) {
+      point =
+          (
+            <g>
+              <circle
+                className="point"
+                r="5"
+                cx={this.props.cx}
+                cy={this.props.cy}
+                fill={this.props.fill}
+                onClick={this.onClick}
+                onMouseOver={this.onMouseOver}
+                onMouseOut={this.onMouseOut}
+                strokeWidth="2px"
+              />
+            </g>
+          );
+    }
     return (
       <g>
         {compound}

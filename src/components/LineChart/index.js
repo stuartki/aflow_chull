@@ -130,7 +130,7 @@ class LineChart extends React.Component {
     if (!this.props.sidebarIsVisible) {
       // this.updateSize();
     }
-    const margin = { top: 20, right: 50, bottom: 30, left: 70 };
+    const margin = { top: 30, right: 50, bottom: 30, left: 70 };
     const w = this.state.width - (margin.left + margin.right);
     const h = this.state.height - (margin.top + margin.bottom);
 
@@ -145,6 +145,7 @@ class LineChart extends React.Component {
       .scaleLinear()
       .domain([this.props.yMin, this.props.yMax])
       .range([h, 0]);
+      // .clamp(true);
 
     const yAxis = d3.axisLeft(y);
 
@@ -158,6 +159,9 @@ class LineChart extends React.Component {
 
     const line = d3
       .line()
+      .defined(d =>
+        d.y > this.props.yMin && d.y < this.props.yMax,
+      )
       .x(d => x(d.x))
       .y(d => y(d.y));
 
@@ -210,7 +214,12 @@ class LineChart extends React.Component {
         }}
       >
         <svg id={this.props.chartId} width={this.state.width} height={svgHeight}>
-          <Gradient className="gradient" color1={this.props.color} color2="#fff" id={`area-${this.props.chartId}`} />
+          <Gradient
+            className="gradient"
+            color1={this.props.color}
+            color2="#fff"
+            id={`area-${this.props.chartId}`}
+          />
           <g transform={transform}>
             <Grid height={h} grid={yGrid} gridType="y" />
             <Axis height={h} axis={yAxis} axisType="y" />
@@ -230,12 +239,13 @@ class LineChart extends React.Component {
             >
               {this.props.xAxisLabel}
             </text>
-            <path
+            {/* <path
               className="area"
               d={area(vertices)}
               key={1}
               fill={`url(#area-${this.props.chartId})`}
-            />
+            /> */}
+            <rect width={w} height={h} fill={`url(#area-${this.props.chartId})`} />
             {points}
           </g>
         </svg>
