@@ -16,6 +16,7 @@ import {
   resizeHullAxes,
   pointClickHandler,
   pointHoverHandler,
+  resetHull,
 } from '../../actions/hullActions';
 
 const propTypes = {
@@ -26,6 +27,7 @@ const propTypes = {
   setLastSelectedHull: PropTypes.func.isRequired,
   resizeHullAxes: PropTypes.func.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
+  resetHull: PropTypes.func.isRequired,
   sidebarIsVisible: PropTypes.bool,
 };
 
@@ -317,6 +319,7 @@ class Visualization extends React.Component {
                 container={'threeScene'}
                 plotEntries
                 pointClickHandler={this.props.pointClickHandler}
+                resetHull={this.props.resetHull}
                 sidebarIsVisible={this.props.sidebarIsVisible}
               />
             </div>
@@ -435,6 +438,7 @@ function mapDispatchToProps(dispatch) {
     setLastSelectedHull: hull => dispatch(setSelectedHull(hull)),
     pointClickHandler: auid => dispatch(pointClickHandler(auid)),
     pointHoverHandler: auid => dispatch(pointHoverHandler(auid)),
+    resetHull: name => dispatch(resetHull(name)),
     resizeHullAxes: (name, yMin, yMax) => {
       dispatch(resizeHullAxes(name, yMin, yMax));
     },
