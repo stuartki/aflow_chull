@@ -6,6 +6,7 @@ import TernaryHullRender from './render';
 // import { pointClickHandler } from '../../actions/hullActions.js';
 
 import './ternaryHull.css';
+import { $CombinedState } from 'redux';
 
 const propTypes = {
   hull: PropTypes.object.isRequired,
@@ -14,6 +15,7 @@ const propTypes = {
   defaultColor: PropTypes.bool,
   pointClickHandler: PropTypes.func.isRequired,
   sidebarIsVisible: PropTypes.bool,
+  resetHull: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
@@ -28,6 +30,7 @@ class TernaryHull extends React.Component {
       THREEscene: new TernaryHullRender(
         this.props.hull,
         this.props.plotEntries,
+        true,
         this.props.defaultColor,
         true,
         this.props.pointClickHandler,
@@ -50,6 +53,7 @@ class TernaryHull extends React.Component {
       const hull = new TernaryHullRender(
         nextProps.hull,
         nextProps.plotEntries,
+        this.showPointer,
         nextProps.defaultColor,
         this.defaultBehavior,
         nextProps.pointClickHandler,
@@ -103,16 +107,16 @@ class TernaryHull extends React.Component {
     this.state.THREEscene.switchDefault();
     if (this.defaultBehavior) {
       try {
-        document.getElementById('default').style.backgroundColor = 'green';
-        document.getElementById('default').textContent = 'DEFAULT';
+        document.getElementsByClassName('default')[0].style.backgroundColor = 'green';
+        document.getElementsByClassName('default')[0].textContent = 'DEFAULT';
       } catch (error) {
         console.log(error);
       }
     } else {
       this.defaultText = 'NON-DEFAULT';
       try {
-        document.getElementById('default').style.backgroundColor = 'red';
-        document.getElementById('default').textContent = 'NON-DEFAULT';
+        document.getElementsByClassName('default')[0].style.backgroundColor = 'red';
+        document.getElementsByClassName('default')[0].textContent = 'NON-DEFAULT';
       } catch (error) {
         console.log(error);
       }
@@ -132,20 +136,20 @@ class TernaryHull extends React.Component {
     return (
       <div id="container">
         <button
-          id="default"
-          onClick={this.onClick}
-        >
-          DEFAULT
-        </button>
-        <button
           type="button"
           className="collapsible"
           onClick={this.onCollapseClick}
         >
-          Open Collapsible
+          Options
         </button>
         <div className="content">
           <div id="buttons">
+            <button
+              className="camera-button default"
+              onClick={this.onClick}
+            >
+              DEFAULT
+            </button>
             <button
               className="camera-button"
               onClick={(e) => {
@@ -153,6 +157,23 @@ class TernaryHull extends React.Component {
               }}
             >
               Reset Camera
+            </button>
+            <button
+              className="camera-button"
+              onClick={(e) => {
+                this.props.resetHull(this.props.hull.name);
+              }}
+            >
+              Reset Points
+            </button>
+
+            <button
+              className="camera-button"
+              onClick={(e) => {
+                this.state.THREEscene.switchPointer();
+              }}
+            >
+              Show Pointer
             </button>
             <button
               // id="reset"
