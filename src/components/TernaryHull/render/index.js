@@ -11,11 +11,12 @@ import MeshLine from './MeshLine';
 import OrbitControls from './OrbitControls';
 
 class TernaryHullRender {
-  constructor(hull, showEntries, defaultColor, defaultBehavior, pointClickHandler) {
+  constructor(hull, showEntries, showPointer, defaultColor, defaultBehavior, pointClickHandler) {
     this.pointClickHandler = pointClickHandler;
     this.defaultColor = defaultColor;
     this.hull = hull;
     this.showEntries = showEntries;
+    this.showPointer = showPointer;
     this.defaultBehavior = defaultBehavior;
     if (defaultColor) {
       this.color = '#787CB5';
@@ -62,9 +63,6 @@ class TernaryHullRender {
     // this.renderer.setPixelRatio(window.devicePixelRatio);
 
     // pointer
-    const sphereGeometry = new THREE.SphereBufferGeometry(2, 32, 32);
-    const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    this.sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 
     function makeLine(v1, v2) {
       const geometry = new THREE.Geometry();
@@ -83,7 +81,12 @@ class TernaryHullRender {
     // this.ray = makeLine(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0));
     // this.scene.add(this.ray);
 
-    this.scene.add(this.sphere);
+    if (showPointer) {
+      const sphereGeometry = new THREE.SphereBufferGeometry(2, 32, 32);
+      const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+      this.sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+      this.scene.add(this.sphere);
+    }
   }
 
   init(containerID) {
@@ -150,10 +153,19 @@ class TernaryHullRender {
     this.defaultBehavior = !this.defaultBehavior;
   }
 
+  switchPointer() {
+    this.showPointer = !this.showPointer;
+    if (!this.showPointer) {
+      this.scene.remove(this.sphere);
+    } else {
+      this.scene.add(this.sphere);
+    }
+  }
+
   setCamera(type) {
     if (type === 'init') {
       this.camera.up = new THREE.Vector3(0, 0, 1);
-      this.camera.position.set(this.TGrid.triCenter[0], - (5 * this.TGrid.triCenter[1]), 0);
+      this.camera.position.set(this.TGrid.triCenter[0], - (4.5 * this.TGrid.triCenter[1]), 0);
       this.controls = new OrbitControls(this.camera, this.container);
       this.controls.rotateSpeed = 1.0;
       // this.camera.lookAt(new THREE.Vector3(this.TGrid.triCenter[0], this.TGrid.triCenter[1], 0));
@@ -445,7 +457,9 @@ class TernaryHullRender {
     // this.ray.geometry.verticesNeedUpdate = true;
 
     if (intersection !== null) {
-      this.sphere.position.copy(intersection.point);
+      if (this.showPointer) {
+        this.sphere.position.copy(intersection.point);
+      }
       const auid = intersection.object.pointNames[intersection.index];
       const indicator = this.pointIndicator(auid);
       const index = this.pointCloud.pointNames.indexOf(auid);
