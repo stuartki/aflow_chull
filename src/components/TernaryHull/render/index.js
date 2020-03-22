@@ -64,19 +64,19 @@ class TernaryHullRender {
 
     // pointer
 
-    function makeLine(v1, v2) {
-      const geometry = new THREE.Geometry();
-      geometry.vertices.push(
-        v1, v2,
-      );
-      geometry.computeLineDistances();
-      const material = new THREE.LineDashedMaterial(
-        {
-          color: 0x687BC9,
-          linewidth: 100,
-        });
-      return new THREE.Line(geometry, material);
-    }
+    // function makeLine(v1, v2) {
+    //   const geometry = new THREE.Geometry();
+    //   geometry.vertices.push(
+    //     v1, v2,
+    //   );
+    //   geometry.computeLineDistances();
+    //   const material = new THREE.LineDashedMaterial(
+    //     {
+    //       color: 0x687BC9,
+    //       linewidth: 100,
+    //     });
+    //   return new THREE.Line(geometry, material);
+    // }
 
     // this.ray = makeLine(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0));
     // this.scene.add(this.ray);
@@ -282,9 +282,11 @@ class TernaryHullRender {
       this.TPoints.selectedPointCloud.pointNames = sAuids;
 
       if (defaultBehavior) {
+        this.raycaster.params.Points.threshold = 10;
         this.group.remove(this.pointCloud);
         this.intersectArray = [];
       } else {
+        this.raycaster.params.Points.threshold = 7;
         this.intersectArray = [this.pointCloud];
       }
       this.group.add(this.TPoints.selectedPointCloud);
