@@ -10,19 +10,14 @@
   background-color: #FFF;
 }
 
-.default{
-  color: white;
-  background-color: green;
-}
-
 /* Style the button that is used to open and close the collapsible content */
 .collapsible {
   height: 35px;
   width: 20%;
   position: absolute;
   right: 40px;
-  background-color: #eee;
-  color: #444;
+  background-color: #425ABB;
+  color: white;
   cursor: pointer;
   padding: 5px 5px;
   text-align: center;
@@ -32,11 +27,11 @@
 
 /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
 .active, .collapsible:hover {
-  background-color: #ccc;
+  background-color: gray;
 }
 
 .content{
-  background-color: gray;
+  background-color: #284858;
   height: 30%;
   width: 20%;
   right: 40px;
@@ -53,13 +48,35 @@
   margin-top: 40px;
   width: 100%;
   z-index: 2;
+  color: #FFF;
+  /* background-color: #687BC9; */
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
 }
 
 .camera-button{
-  font-size: 10px;
-  height: 20px;
+  /* background-color: #687BC9; */
+  font-size: 16px;
+  height: 30px;
   width: 95%;
   margin: auto;
   display: block;
+  /* border-left:1px solid #5F74C9;
+  border-right:1px solid #5F74C9; */
+  background-color: #687BC9;
+  /* padding: 10px; */
+  text-align:center;
 }
 
+.camera-button:hover{
+  background-color: #5F74C9;
+  color: #fff;
+  cursor: hand;
+  cursor: pointer;
+}
+
+.default{
+  color: white;
+  background-color: green;
+  font-weight: bold;
+}
