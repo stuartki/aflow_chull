@@ -8,7 +8,7 @@ export default class TernaryPoints {
     this.TGrid = TGrid;
   }
 
-  plotEntries() {
+  plotEntries(showThree = false) {
     // clear points
     const entries = this.filterMinMaxGrid(this.data);
 
@@ -28,6 +28,12 @@ export default class TernaryPoints {
       const pY = entries[i].composition[2] * 100;
       const pZ = entries[i].composition[1] * 100;
       const pCoord = this.TGrid.triCoord(pX, pY, pZ);
+
+      if (showThree) {
+        if (pX === 0 || pY === 0 || pZ === 0) {
+          continue;
+        }
+      }
 
       const datapoint = new THREE.Vector3(
         pCoord[0],
