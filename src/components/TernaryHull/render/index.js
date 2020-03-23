@@ -142,7 +142,7 @@ class TernaryHullRender {
     );
 
     this.container.addEventListener(
-      'mousedown',
+      'mouseup',
       this.onClick.bind(this),
       false,
     );
@@ -451,8 +451,8 @@ class TernaryHullRender {
     const isClicked = this.hull.entries[index].isClicked;
     if (isClicked && !isBinPoint(this.hull.entries, index) && !isVertex) {
       return 1;
-    } else if (isClicked && isBinPoint(this.hull.entries, index) && isVertex) {
-      return 2;
+    } else if (isClicked && isBinPoint(this.hull.entries, index) && !isVertex) {
+      return 1;
     } else if (isClicked && isVertex) {
       return 3;
     } else if (isClicked) {
@@ -738,7 +738,7 @@ class TernaryHullRender {
       false,
     );
     this.container.removeEventListener(
-      'mousedown',
+      'mouseup',
       this.onClick.bind(this),
       false,
     );
