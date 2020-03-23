@@ -34,7 +34,6 @@ class BinaryHull extends React.Component {
     this.state = {
       yMin: this.props.hull.yMin,
       yMax: this.props.hull.yMax,
-      defaultBehavior: true,
       tutorialMode: false,
     };
 
@@ -42,6 +41,9 @@ class BinaryHull extends React.Component {
     this.incrementMax = this.incrementMax.bind(this);
     this.decrementMin = this.decrementMin.bind(this);
     this.decrementMax = this.decrementMax.bind(this);
+
+    this.onClick = this.onClick.bind(this);
+    this.defaultBehavior = true;
   }
 
   incrementMin() {
@@ -76,6 +78,34 @@ class BinaryHull extends React.Component {
     this.props.resizeHullAxes(this.props.hull.name, this.state.yMin, this.state.yMax);
   }
 
+  onClick() {
+    this.defaultBehavior = !this.defaultBehavior;
+    if (this.defaultBehavior) {
+      try {
+        document.getElementsByClassName('default')[0].style.backgroundColor = 'green';
+        document.getElementsByClassName('default')[0].textContent = 'DEFAULT';
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        document.getElementsByClassName('default')[0].style.backgroundColor = 'red';
+        document.getElementsByClassName('default')[0].textContent = 'NON-DEFAULT';
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }
+
+  onCollapseClick() {
+    const content = document.getElementsByClassName('content')[0];
+    if (content.style.display === 'block') {
+      content.style.display = 'none';
+    } else {
+      content.style.display = 'block';
+    }
+  }
+
   render() {
     let xLabel = '';
     let yLabel = '';
@@ -83,24 +113,7 @@ class BinaryHull extends React.Component {
       xLabel = `atomic % ${this.props.hull.species[1]}`;
       yLabel = 'formation enthalpy (meV)';
     }
-    let defaultText;
-    // there is a better solution for this, but it is to catch first time render problem
-    // default does not exist before rendered
-    if (this.state.defaultBehavior) {
-      defaultText = 'DEFAULT';
-      try {
-        document.getElementById('default').style.backgroundColor = 'green';
-      } catch (error) {
-        console.log(error);
-      }
-    } else {
-      defaultText = 'NON-DEFAULT';
-      try {
-        document.getElementById('default').style.backgroundColor = 'red';
-      } catch (error) {
-        console.log(error);
-      }
-    }
+
     const parentNode = document.getElementById(this.props.hull.name);
     const nodes = parentNode ? parentNode.childNodes : null;
     if (this.state.tutorialMode && nodes !== null) {
@@ -110,17 +123,49 @@ class BinaryHull extends React.Component {
     }
 
     return (
-      <div>
-        <div>
-          <button
-            id="default"
-              // eslint-disable-next-line no-unused-vars
-            onClick={(e) => {
-              this.setState({ defaultBehavior: !this.state.defaultBehavior });
-            }}
-          >
-            {defaultText}
-          </button>
+      <div id="container">
+        <button
+          type="button"
+          className="collapsible"
+          onClick={this.onCollapseClick}
+        >
+          Options
+        </button>
+        <div className="content">
+          <div id="buttons">
+            <button
+              className="camera-button default"
+              onClick={this.onClick}
+            >
+              DEFAULT
+            </button>
+            <button
+              className="camera-button"
+              onClick={(e) => {
+                this.props.resizeHullAxes(this.props.hull.name, Number(-1000), Number(1000));
+                this.setState({
+                  yMax: Number(1000),
+                  yMin: Number(-1000),
+                });
+              }}
+            >
+              Reset Camera
+            </button>
+            <button
+              className="camera-button"
+              onClick={(e) => {
+                const vertices = this.props.hull.vertices.map(v => v.y);
+                const hullyMin = Math.min(...vertices);
+                const hullyMax = Math.max(...vertices);
+                const offset = 10;
+                this.props.resizeHullAxes(this.props.hull.name,
+                  Math.min(Number(hullyMin) - offset, Number(-100)),
+                  Math.max(Number(hullyMax) + offset, Number(100)));
+              }}
+            >
+              View Hull
+            </button>
+          </div>
         </div>
         <div className="axis-controls">
           <label htmlFor="yMax"> Y Max </label>
@@ -146,7 +191,7 @@ class BinaryHull extends React.Component {
           />
         </div>
         <LineChart
-          defaultBehavior={this.state.defaultBehavior}
+          defaultBehavior={this.defaultBehavior}
           color={this.props.hull.color}
           width={this.props.width}
           height={this.props.height}
@@ -186,7 +231,7 @@ class BinaryHull extends React.Component {
           />
         </div>
         <div>
-          <button
+          {/* <button
             id="reset"
             // eslint-disable-next-line no-unused-vars
             onClick={(e) => {
@@ -213,7 +258,7 @@ class BinaryHull extends React.Component {
             }}
           >
             View Hull
-          </button>
+          </button> */}
           {/* <button
             id="tutorial"
             // eslint-disable-next-line no-unused-vars
