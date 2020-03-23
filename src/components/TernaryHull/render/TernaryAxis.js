@@ -10,7 +10,7 @@ export default class TernaryAxis {
     this.axisTicks = new THREE.Group();
     this.axisLabels = new THREE.Group();
     this.elements = new THREE.Group();
-    this.axisName = this.createText2D('formation enthalpy (meV)', '#000000');
+    this.axisName = this.createText2D('formation enthalpy (meV / atom)', '#000000');
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -31,31 +31,39 @@ export default class TernaryAxis {
       return canvas;
     }
     const canvas = createTextCanvas(text, color, font, size);
-    const plane = new THREE.PlaneGeometry(
-        canvas.width,
-        canvas.height,
-        segW,
-        segH,
-      );
+    // const plane = new THREE.PlaneGeometry(
+    //     canvas.width,
+    //     canvas.height,
+    //     segW,
+    //     segH,
+    //   );
     const tex = new THREE.Texture(canvas);
     tex.needsUpdate = true;
-    const planeMat = new THREE.MeshBasicMaterial({
+    const spriteMat = new THREE.SpriteMaterial({
       map: tex,
       color: 0xffffff,
       transparent: true,
-      side: THREE.DoubleSide,
     });
-    const mesh = new THREE.Mesh(plane, planeMat);
-    mesh.scale.set(0.5, 0.5, 0.5);
-    mesh.doubleSided = true;
-    return mesh;
+    if (text === 'formation enthalpy (meV / atom)') {
+      spriteMat.rotation = Math.PI / 2;
+    }
+    // const mesh = new THREE.Mesh(plane, planeMat);
+    // mesh.scale.set(0.5, 0.5, 0.5);
+    // mesh.doubleSided = true;
+    // return mesh;
+    const sprite = new THREE.Sprite(spriteMat);
+    sprite.scale.set(30, 30, 30);
+    if (text === 'formation enthalpy (meV / atom)') {
+      sprite.scale.set(200, 20, 1);
+    }
+    return sprite;
   }
   // offset is displacement of element to side
   // offset = 0 would be overlapping
   drawThreeElements(species, offset = 30, colors = ['#FF0000', '#0000FF', '#00FF00']) {
     const triSide = this.gridHeight * 2;
     const triPositions = [
-      [-offset, offset, 0],
+      [-offset, -offset, 0],
       [triSide / 2, (offset * Math.sqrt(2)) + (triSide * (Math.sqrt(3) / 2)), 0],
       [triSide + offset, -offset, 0],
     ];
@@ -87,10 +95,10 @@ export default class TernaryAxis {
     const textPosX = 150;
     const textPosY = 75;
       // sprite position in relative to the axis
-    const spritePosX = -25;
+    const spritePosX = -40;
     const spritePosY = 5;
 
-    for (let i = this.axisMin; i <= -0.1; i += 0.1) {
+    for (let i = this.axisMin; i <= -0.1; i += 0.2) {
       const tickGeometry = new THREE.Geometry();
 
         // add a tick on both sides of axes
@@ -129,7 +137,7 @@ export default class TernaryAxis {
       labelTexture.needsUpdate = true;
       const labelMaterial = new THREE.SpriteMaterial({ map: labelTexture });
       const labelSprite = new THREE.Sprite(labelMaterial);
-      labelSprite.scale.set(200, 100, 1.0);
+      labelSprite.scale.set(300, 150, 1.0);
       labelSprite.position.set(
           spritePosX,
           spritePosY,
@@ -139,7 +147,7 @@ export default class TernaryAxis {
     }
 
       // hm, they switched the for loop definiiton
-    for (let i = 0; i <= this.axisMax * 10; i++) {
+    for (let i = 0; i <= this.axisMax * 10; i+=2) {
       const tickGeometry = new THREE.Geometry();
       tickGeometry.vertices.push(
           new THREE.Vector3(
@@ -176,7 +184,7 @@ export default class TernaryAxis {
         map: labelTexture,
       });
       const labelSprite = new THREE.Sprite(labelMaterial);
-      labelSprite.scale.set(200, 100, 1.0);
+      labelSprite.scale.set(300, 150, 1.0);
       labelSprite.position.set(
           spritePosX,
           spritePosY,
@@ -186,34 +194,34 @@ export default class TernaryAxis {
     }
 
       // Axis Name Label
-    const labelCanvas = document.createElement('canvas');
-    const labelContext = labelCanvas.getContext('2d');
+    // const labelCanvas = document.createElement('canvas');
+    // const labelContext = labelCanvas.getContext('2d');
 
-    labelContext.font = '16px Arial';
-    labelContext.clearRect(0, 0, labelCanvas.width, labelCanvas.height);
-    labelContext.fillStyle = '#000000';
-    labelContext.fillText(
-        'formation enthalpy (meV)',
-        textPosX - 50,
-        textPosY,
-      );
+    // labelContext.font = '16px Arial';
+    // labelContext.clearRect(0, 0, labelCanvas.width, labelCanvas.height);
+    // labelContext.fillStyle = '#000000';
+    // labelContext.fillText(
+    //     'formation enthalpy (meV)',
+    //     textPosX - 50,
+    //     textPosY,
+    //   );
 
-    const labelTexture = new THREE.Texture(labelCanvas);
-    labelTexture.needsUpdate = true;
-    const labelMaterial = new THREE.SpriteMaterial({
-      map: labelTexture,
-    });
-    const labelSprite = new THREE.Sprite(labelMaterial);
-    labelSprite.scale.set(200, 100, 1.0);
-    labelSprite.position.set(spritePosX - 10, spritePosY, 0);
+    // const labelTexture = new THREE.Texture(labelCanvas);
+    // labelTexture.needsUpdate = true;
+    // const labelMaterial = new THREE.SpriteMaterial({
+    //   map: labelTexture,
+    // });
+    // const labelSprite = new THREE.Sprite(labelMaterial);
+    // labelSprite.scale.set(200, 100, 1.0);
+    // labelSprite.position.set(spritePosX - 10, spritePosY, 0);
 
 
     this.axisGroup.add(this.axisTicks);
     this.axisGroup.add(this.axisLabels);
 
-    this.axisName.position.set(-50, 0, 0);
-    this.axisName.rotation.x = -(Math.PI) / 2;
-    this.axisName.rotation.z = (Math.PI) / 2;
+    this.axisName.position.set(-50, 0, 150);
+    // this.axisName.rotation.x = -(Math.PI) / 2;
+    // this.axisName.rotation.z = (Math.PI) / 2;
 
     this.axisGroup.add(this.axisName);
 
