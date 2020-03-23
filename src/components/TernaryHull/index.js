@@ -37,6 +37,7 @@ class TernaryHull extends React.Component {
       ),
     };
     this.defaultBehavior = true;
+    this.showThree = false;
     this.onClick = this.onClick.bind(this);
     this.onCollapseClick = this.onCollapseClick.bind(this);
   }
@@ -166,7 +167,15 @@ class TernaryHull extends React.Component {
             >
               Reset Points
             </button>
-
+            <button
+              className="camera-button"
+              onClick={(e) => {
+                this.showThree = !this.showThree;
+                this.state.THREEscene.plotEntries(this.showThree);
+              }}
+            >
+              Show Three
+            </button>
             <button
               className="camera-button"
               onClick={(e) => {
