@@ -165,7 +165,7 @@ class TernaryHullRender {
   setCamera(type) {
     if (type === 'init') {
       this.camera.up = new THREE.Vector3(0, 0, 1);
-      this.camera.position.set(this.TGrid.triCenter[0], - (4.5 * this.TGrid.triCenter[1]), 0);
+      this.camera.position.set(this.TGrid.triCenter[0], -(4.5 * this.TGrid.triCenter[1]), 0);
       this.controls = new OrbitControls(this.camera, this.container);
       this.controls.rotateSpeed = 1.0;
       // this.camera.lookAt(new THREE.Vector3(this.TGrid.triCenter[0], this.TGrid.triCenter[1], 0));
@@ -174,9 +174,9 @@ class TernaryHullRender {
     }
   }
 
-  plotEntries() {
+  plotEntries(showThree = false) {
     this.group.remove(this.pointCloud);
-    this.pointCloud = this.TPoints.plotEntries();
+    this.pointCloud = this.TPoints.plotEntries(showThree);
     this.intersectArray = [];
     this.intersectArray.push(this.pointCloud);
     this.group.add(this.pointCloud);
@@ -282,7 +282,7 @@ class TernaryHullRender {
       this.TPoints.selectedPointCloud.pointNames = sAuids;
 
       if (defaultBehavior) {
-        this.raycaster.params.Points.threshold = 10;
+        this.raycaster.params.Points.threshold = 12;
         this.group.remove(this.pointCloud);
         this.intersectArray = [];
       } else {
@@ -348,17 +348,47 @@ class TernaryHullRender {
     }
 
     function makeLine(v1, v2) {
-      const geometry = new THREE.Geometry();
-      geometry.vertices.push(
-        v1, v2,
-      );
-      geometry.computeLineDistances();
-      const material = new THREE.LineDashedMaterial(
-        {
-          color: 0x687BC9,
-          linewidth: 100,
-        });
-      return new THREE.Line(geometry, material);
+      // const geometry = new THREE.Geometry();
+      // const geometry = new THREE.CylinderGeometry(5, 5, 20, 32);
+      // geometry.vertices.push(
+      //   v1, v2,
+      // );
+      // geometry.computeLineDistances();
+      // const material = new THREE.LineDashedMaterial(
+      //   {
+      //     color: 0x687BC9,
+      //     linewidth: 100,
+      //   });
+      // const material = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
+
+      /* edge from X to Y */
+      const direction = new THREE.Vector3().subVectors(v2, v1);
+      const orientation = new THREE.Matrix4();
+      /* THREE.Object3D().up (=Y) default orientation for all objects */
+      orientation.lookAt(v1, v2, new THREE.Object3D().up);
+      /* rotation around axis X by -90 degrees
+      * matches the default orientation Y
+      * with the orientation of looking Z */
+      const m = new THREE.Matrix4();
+      m.set(1, 0, 0, 0,
+            0, 0, 1, 0,
+            0, -1, 0, 0,
+            0, 0, 0, 1);
+      orientation.multiply(m);
+
+      /* cylinder: radiusAtTop, radiusAtBottom,
+          height, radiusSegments, heightSegments */
+      const edgeGeometry = new THREE.CylinderGeometry(2, 2, direction.length(), 8, 1);
+      const edge = new THREE.Mesh(edgeGeometry,
+              new THREE.MeshBasicMaterial({ color: '#687BC9' }));
+
+      edge.applyMatrix(orientation);
+      const pos = new THREE.Vector3().addVectors(v1, direction.multiplyScalar(0.5));
+      edge.position.x = pos.x;
+      edge.position.y = pos.y;
+      edge.position.z = pos.z;
+      return edge;
+      // return new THREE.Line(geometry, material);
     }
 
     function hullPoint(normal, v1, curPoint) {
@@ -635,7 +665,7 @@ class TernaryHullRender {
 
       this.camera.position.set(
         newPos.x,
-        newPos.y, 
+        newPos.y,
         newPos.z
       );
     }
