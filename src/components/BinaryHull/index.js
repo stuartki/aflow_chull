@@ -210,10 +210,6 @@ class BinaryHull extends React.Component {
               this.props.resizeHullAxes(this.props.hull.name,
                 Math.min(Number(hullyMin) - offset, Number(-100)),
                 Math.max(Number(hullyMax) + offset, Number(100)));
-              // this.setState({
-              //   yMax: Math.max(Number(hullyMax) + offset, Number(100)),
-              //   yMin: Math.min(Number(hullyMin) - offset, Number(-100)),
-              // });
             }}
           >
             View Hull
