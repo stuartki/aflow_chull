@@ -358,6 +358,7 @@ export function fetchHull(name, selectedHulls) {
       const vertices = [];
       // const faces = [];
       const d = res.data;
+      console.log(d);
       for (let i = 0; i < d.points.length; i++) {
         const entry = d.points[i];
         if (dim === 2) {
@@ -446,7 +447,7 @@ export function fetchHull(name, selectedHulls) {
       currentHull.vertices.forEach((d) => {
         if (d.auid !== null && d.auid.includes('aflow:') && nary(d, hull.dim)) {
           const auidCode = d.auid.slice(6);
-          const query = `${currentHull.name}_n_${auidCode}`;
+          const query = `${currentHull.name}_sc_${auidCode}`;
           // const query = 'MnPd';
           const ssurl = `http://aflowlib.duke.edu/search/ui/API/chull/v1.2/?ss=${query}`;
           callList.push(axios.get(ssurl));
