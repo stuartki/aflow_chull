@@ -174,7 +174,7 @@ class TernaryHull extends React.Component {
                 this.state.THREEscene.plotEntries(this.showThree);
               }}
             >
-              Show Three
+              Show 3D Points
             </button>
             <button
               className="camera-button"
