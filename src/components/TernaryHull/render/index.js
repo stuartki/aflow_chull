@@ -234,34 +234,36 @@ class TernaryHullRender {
         pointColor.toArray(sColors, count * 3);
         sSizes[count] = size;
         sAuids.push(entries[selectedData[s]].auid);
+        let decompPoints;
         if (pt.decompositionAuids === null) {
-          // if (pt.distanceToHull)
+          decompPoints = entries.filter(d => pt.composition[0] === d.composition[0] && pt.composition[1] === d.composition[1] && pt.composition[2] === d.composition[2]);
+          decompPoints = [decompPoints.sort(function(a, b){return a-b})[0]];
         } else {
-          const decompPoints = entries.filter(d => pt.decompositionAuids.includes(d.auid));
-          for (let dind = 0; dind < decompPoints.length; dind++) {
-            count += 1;
-            const d = decompPoints[dind];
-            const pX = d.composition[0] * 100;
-            const pY = d.composition[2] * 100;
-            const pZ = d.composition[1] * 100;
-            const pCoord = this.TGrid.triCoord(pX, pY, pZ);
+          decompPoints = entries.filter(d => pt.decompositionAuids.includes(d.auid));
+        }
+        for (let dind = 0; dind < decompPoints.length; dind++) {
+          count += 1;
+          const d = decompPoints[dind];
+          const pX = d.composition[0] * 100;
+          const pY = d.composition[2] * 100;
+          const pZ = d.composition[1] * 100;
+          const pCoord = this.TGrid.triCoord(pX, pY, pZ);
 
-            const datapoint = new THREE.Vector3(
-              pCoord[0],
-              pCoord[1],
-              (d.enthalpyFormationAtom * this.TGrid.gridHeight),
-            );
-            let dpointColor;
-            if (this.defaultColor) {
-              dpointColor = new THREE.Color(pX / 100, pY / 100, pZ / 100);
-            } else {
-              dpointColor = this.colorVertex(datapoint);
-            }
-            datapoint.toArray(sPositions, count * 3);
-            dpointColor.toArray(sColors, count * 3);
-            sSizes[count] = size;
-            sAuids.push(d.auid);
+          const datapoint = new THREE.Vector3(
+            pCoord[0],
+            pCoord[1],
+            (d.enthalpyFormationAtom * this.TGrid.gridHeight),
+          );
+          let dpointColor;
+          if (this.defaultColor) {
+            dpointColor = new THREE.Color(pX / 100, pY / 100, pZ / 100);
+          } else {
+            dpointColor = this.colorVertex(datapoint);
           }
+          datapoint.toArray(sPositions, count * 3);
+          dpointColor.toArray(sColors, count * 3);
+          sSizes[count] = size;
+          sAuids.push(d.auid);
         }
         count += 1;
         sAuids.push('break');
@@ -292,6 +294,7 @@ class TernaryHullRender {
       this.group.add(this.TPoints.selectedPointCloud);
       this.intersectArray.push(this.TPoints.selectedPointCloud);
     } else {
+      this.raycaster.params.Points.threshold = 7;
       this.group.remove(this.TPoints.selectedPointCloud);
       this.group.add(this.pointCloud);
       this.intersectArray = [this.pointCloud];
@@ -348,19 +351,6 @@ class TernaryHullRender {
     }
 
     function makeLine(v1, v2) {
-      // const geometry = new THREE.Geometry();
-      // const geometry = new THREE.CylinderGeometry(5, 5, 20, 32);
-      // geometry.vertices.push(
-      //   v1, v2,
-      // );
-      // geometry.computeLineDistances();
-      // const material = new THREE.LineDashedMaterial(
-      //   {
-      //     color: 0x687BC9,
-      //     linewidth: 100,
-      //   });
-      // const material = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
-
       /* edge from X to Y */
       const direction = new THREE.Vector3().subVectors(v2, v1);
       const orientation = new THREE.Matrix4();
@@ -380,7 +370,7 @@ class TernaryHullRender {
           height, radiusSegments, heightSegments */
       const edgeGeometry = new THREE.CylinderGeometry(2, 2, direction.length(), 8, 1);
       const edge = new THREE.Mesh(edgeGeometry,
-              new THREE.MeshBasicMaterial({ color: '#687BC9' }));
+              new THREE.MeshBasicMaterial({ color: 'red' }));
 
       edge.applyMatrix(orientation);
       const pos = new THREE.Vector3().addVectors(v1, direction.multiplyScalar(0.5));
