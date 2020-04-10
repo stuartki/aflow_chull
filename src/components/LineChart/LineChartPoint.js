@@ -86,7 +86,7 @@ class Point extends React.Component {
       const decomps = decomposition.map(d => (
         <circle
           key={`${d.x.toString()}`}
-          className="point"
+          className="hull point"
           r={r}
           cx={xScale(d.x)}
           cy={yScale(d.y)}
@@ -113,8 +113,12 @@ class Point extends React.Component {
       let decompPoints = this.props.decompositionPoints;
       let pathToHull;
       // condition to find vertex on hull for no decomposition points
-      if (decompPoints.length === 0) {
-        decompPoints = this.props.vertices.filter(d => Math.abs(d.x - x) < 0.01);
+      if (decompPoints.length === 1) {
+        // decompPoints = this.props.vertices.filter(d => Math.abs(d.x - x) < 0.01);
+        // // if it is not a hull point
+        // if (decompPoints.length === 0) {
+        //   decompPoints = this.props.entries
+        // }
         pathToHull = [
           { x, y },
           { x, y: decompPoints[0].y },
@@ -129,12 +133,12 @@ class Point extends React.Component {
       const s = makeDecompPointCircs(decompPoints, 'none', '7', this.props.xScale, this.props.yScale);
       // drawing the points
       if (this.state.tielineClicked || this.state.tielineStay) {
-        let className = 'line shadow';
+        let className = 'hull line shadow';
         if (this.state.tielineClicked) {
-          className = 'hline shadow';
+          className = 'hull hline shadow';
         }
         if (this.state.tielineStay) {
-          className = 'tieline shadow';
+          className = 'hull tieline shadow';
         }
         if (this.props.defaultBehavior) {
           compound =
