@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Point from './LineChartPoint';
 import Vertex from './LineChartVertex';
 import axios from 'axios';
+import { packSiblings } from 'd3';
 
 /*
 const propTypes = {
@@ -68,7 +69,7 @@ const Points = (props) => {
   const selectedData = [];
 
   // first order rendering: general points
-  let circles = data.map((d) => {
+  const circles = data.map((d) => {
     let point;
     const fill = props.color;
     if (d.isClicked) {
@@ -110,6 +111,24 @@ const Points = (props) => {
           y: pt.enthalpyFormationAtom,
         }));
       }
+      if (decompositionPoints.length === 0) {
+        decompositionPoints = props.vertices.filter(v => Math.abs(v.x - d.x) < 0.01);
+        // if it is not a hull point
+        if (decompositionPoints.length === 0) {
+          decompositionPoints = props.data.filter(e => d.compound === e.compound);
+          let minIndex = 0;
+          for (let dp = 0; dp < decompositionPoints.length; dp ++) {
+            if (decompositionPoints[dp].enthalpyFormationAtom < decompositionPoints[minIndex].enthalpyFormationAtom) {
+              minIndex = dp;
+            }
+          }
+          decompositionPoints = [decompositionPoints[minIndex]];
+          decompositionPoints = decompositionPoints.map(pt => ({
+            x: pt.composition[1],
+            y: pt.enthalpyFormationAtom,
+          }));
+        }
+      }
       point = (
         <Point
           key={d.auid}
@@ -136,18 +155,26 @@ const Points = (props) => {
     return (point);
   });
 
-  if (props.defaultBehavior && click) {
-    // circles = null;
-    const x = document.getElementsByClassName('point');
-    for (let i = 0; i < x.length; i++) {
-      x[i].style.opacity = 0.4;
-    }
-  } else {
-    const x = document.getElementsByClassName('point');
-    for (let i = 0; i < x.length; i++) {
-      x[i].style.opacity = 1;
-    }
-  }
+  // if (props.defaultBehavior && click) {
+  //   // circles = null;
+  //   const x = document.getElementsByClassName('point');
+  //   for (let i = 0; i < x.length; i++) {
+  //     if (x[i].attributes[4].value === '#CA6F96') {
+  //       continue;
+  //     }
+  //     x[i].style.opacity = 0.4;
+  //   }
+  //   const extra = document.getElementsByClassName('hull');
+  //   const lenExtra = extra.length;
+  //   for (let l = 0; l < lenExtra; l++) {
+  //     extra[0].parentNode.removeChild(extra[0]);
+  //   }
+  // } else {
+  //   const x = document.getElementsByClassName('point');
+  //   for (let i = 0; i < x.length; i++) {
+  //     x[i].style.opacity = 1;
+  //   }
+  // }
 
   // third order rendering: selected points
   const selectedCircles = selectedData.map((d) => {
@@ -188,6 +215,24 @@ const Points = (props) => {
           y: pt.enthalpyFormationAtom,
         }));
       }
+      if (decompositionPoints.length === 0) {
+        decompositionPoints = props.vertices.filter(v => Math.abs(v.x - d.x) < 0.01);
+        // if it is not a hull point
+        if (decompositionPoints.length === 0) {
+          decompositionPoints = props.data.filter(e => d.compound === e.compound);
+          let minIndex = 0;
+          for (let dp = 0; dp < decompositionPoints.length; dp ++) {
+            if (decompositionPoints[dp].enthalpyFormationAtom < decompositionPoints[minIndex].enthalpyFormationAtom) {
+              minIndex = dp;
+            }
+          }
+          decompositionPoints = [decompositionPoints[minIndex]];
+          decompositionPoints = decompositionPoints.map(pt => ({
+            x: pt.composition[1],
+            y: pt.enthalpyFormationAtom,
+          }));
+        }
+      }
       point = (
         <Point
           key={d.auid}
@@ -213,6 +258,27 @@ const Points = (props) => {
     }
     return (point);
   });
+
+  if (props.defaultBehavior && click) {
+    // circles = null;
+    const x = document.getElementsByClassName('point');
+    for (let i = 0; i < x.length; i++) {
+      if (x[i].attributes[4].value === '#CA6F96') {
+        continue;
+      }
+      x[i].style.opacity = 0.4;
+    }
+    const extra = document.getElementsByClassName('hull');
+    const lenExtra = extra.length;
+    for (let l = 0; l < lenExtra; l++) {
+      extra[0].parentNode.removeChild(extra[0]);
+    }
+  } else {
+    const x = document.getElementsByClassName('point');
+    for (let i = 0; i < x.length; i++) {
+      x[i].style.opacity = 1;
+    }
+  }
   return (
     <g>
       {circles}
