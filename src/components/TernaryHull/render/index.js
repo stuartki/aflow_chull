@@ -237,7 +237,7 @@ class TernaryHullRender {
         let decompPoints;
         if (pt.decompositionAuids === null) {
           decompPoints = entries.filter(d => pt.composition[0] === d.composition[0] && pt.composition[1] === d.composition[1] && pt.composition[2] === d.composition[2]);
-          decompPoints = [decompPoints.sort(function(a, b){return a-b})[0]];
+          decompPoints = [decompPoints.sort(function(a, b) { return a.distanceToHull - b.distanceToHull; })[0]];
         } else {
           decompPoints = entries.filter(d => pt.decompositionAuids.includes(d.auid));
         }
