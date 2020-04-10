@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router';
 // import * as hullActions from '../../actions/hullActions.js';
 // import { removeEntry, pointClickHandler } from '../../actions/hullActions.js';
 
@@ -59,7 +60,7 @@ class InfoCard extends React.Component {
       data2Title = 'Distance To Hull';
     }
     return (
-      <g width={this.width} height={this.titleHeight + this.bodyHeight}>
+      <g className="hull infocard" width={this.width} height={this.titleHeight + this.bodyHeight}>
         <rect
           x={xStart}
           y={yStart}
@@ -76,7 +77,9 @@ class InfoCard extends React.Component {
           textLength={`${this.width - (this.offset / 2)}`}
           fill="white"
         >
-          {`${this.props.data.compound} [${this.props.data.auid}]`}
+          <Link to={`info#${this.props.id}`} onMouseOver={this.onMouseOver}>
+            {`${this.props.data.compound} [${this.props.data.auid}]`}
+          </Link>
         </text>
         {/* body rectangle */}
         <rect
