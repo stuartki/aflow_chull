@@ -7,7 +7,6 @@ import TernaryAxis from './TernaryAxis';
 import TernaryHull from './TernaryHull';
 import TernaryPoints from './TernaryPoints';
 
-import MeshLine from './MeshLine';
 import OrbitControls from './OrbitControls';
 
 class TernaryHullRender {
