@@ -214,10 +214,13 @@ class InfoCard extends React.Component {
             </div>
           </div>
           <div className="s-info-card-title">
-            <Link to={`info#${auid}`}>
-              <p>{compound}</p>
-              <p>{auid}</p>
-            </Link>
+            <a
+              href={`http://aflow.org/material/?id=${auid}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <p>{`MORE INFO: ${auid}`}</p>
+            </a>
           </div>
         </div>
       </div>
