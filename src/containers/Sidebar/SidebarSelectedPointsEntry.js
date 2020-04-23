@@ -20,12 +20,12 @@ class SelectedPointsEntry extends React.Component {
   constructor(props) {
     super(props);
     this.removeOnClick = this.removeOnClick.bind(this);
-    this.onMouseOver = this.onMouseOver.bind(this);
+    // this.onMouseOver = this.onMouseOver.bind(this);
   }
 
-  onMouseOver() {
-    this.props.highlightPoint(this.props.id);
-  }
+  // onMouseOver() {
+  //   this.props.highlightPoint(this.props.id);
+  // }
 
   removeOnClick() {
     // While the remove entry action could be called, the selected points will
@@ -41,7 +41,7 @@ class SelectedPointsEntry extends React.Component {
     return (
       <div className="info-element">
         <div className="info-element-inner">
-          <Link to={`info#${this.props.id}`} onMouseOver={this.onMouseOver}>
+          <Link to={`info#${this.props.id}`}>
             {this.props.compound}
           </Link>
           <span onClick={this.removeOnClick} className="pull-right">
