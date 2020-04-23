@@ -121,6 +121,47 @@ export function removeEntry(auid) {
 //              Thunks
 // **************************************
 
+export function getEntries(auids) {
+  return (dispatch) => {
+    const getEntry = url => axios.get(url);
+    const requests = [];
+    for (let i = 0; i < auids.length; i++) {
+      // const url = `http://aflowhull.materials.duke.edu/entries/${auids[i]}/?format=json`;
+      // const url = `${URL_ROOT}/api/v2/entry/${auids[i]}`;
+      const url = `http://aflowlib.duke.edu/search/API/?auid(%27${auids[i]}%27),compound,composition,enthalpy_formation_atom,species,stoichiometry,lattice_system_relax,density,spacegroup_relax,energy_atom,prototype`;
+      requests.push(getEntry(url));
+    }
+    return axios.all(requests).then((results) => {
+      // const temp = results.map(r => r.data);
+      const temp = results.map(r => r.data[0]);
+      const entries = [];
+      for (let i = 0; i < temp.length; i++) {
+        const entry = { //data section in InfoCard.js
+          auid: temp[i].auid,
+          aurl: temp[i].aurl.replace('aflowlib.duke.edu:', 'http://aflowlib.duke.edu/'),
+          // catalog: temp[i].catalog,
+          energy_atom: Number(temp[i].energy_atom),
+          compound: temp[i].compound,
+          composition: temp[i].composition.split(',').map(d => Number(d)),
+          enthalpy: Number(temp[i].enthalpy_formation_atom) * 1000,
+          species: temp[i].species.split(','),
+          stoichiometry: temp[i].stoichiometry.split(',').map(d => Number(d)),
+          spacegroup: Number(temp[i].spacegroup_relax),
+          lattice: temp[i].lattice_system_relax,
+          density: Number(temp[i].density),
+          prototype: temp[i].prototype,
+          // np1enthalpygain: np1, // wws16
+          // stabilitycriterion: sc,
+          // distancetohull: Number(hdata[tindex].points[tindex2].distanceToHull).toFixed(3),
+          // grstate: gstate,
+        };
+        entries.push(entry);
+      }
+      dispatch(addEntries(entries));
+    });
+  };
+}
+
 export function getSelectedEntries(auids) {
   return (dispatch) => {
     const getEntry = url => axios.get(url);
@@ -358,7 +399,6 @@ export function fetchHull(name, selectedHulls) {
       const vertices = [];
       // const faces = [];
       const d = res.data;
-      console.log(d);
       for (let i = 0; i < d.points.length; i++) {
         const entry = d.points[i];
         if (dim === 2) {
