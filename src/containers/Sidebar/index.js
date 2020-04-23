@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import Searchbox from './SidebarSearchbox';
 import HullOptions from './SidebarHullOptions';
 import SelectedPoints from './SidebarSelectedPoints';
+import InfoCard from './SidebarInfoCard';
 
 import { addElements, fetchAvailableElements } from '../../actions/periodicTableActions';
 import {
@@ -17,6 +18,7 @@ import {
   showAllPoints,
   resetHull,
   toggleLabels,
+  getSelectedEntries,
 } from '../../actions/hullActions';
 import './sidebar.css';
 
@@ -38,6 +40,8 @@ const propTypes = {
   selectedElements: PropTypes.string.isRequired,
   selectedHulls: PropTypes.array.isRequired,
   selectedEntriesAuids: PropTypes.array.isRequired,
+  selectedEntries: PropTypes.array.isRequired,
+  fetchSelectedEntries: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
@@ -48,49 +52,69 @@ const contextTypes = {
   router: PropTypes.object,
 };
 
-const Sidebar = function render(props) {
-  let hullOptions = null;
-  if (props.pathname.match(/^\/hull\/\w+\/?$/) && props.pathname !== '/hull/noSelection') {
-    hullOptions = (
-      <HullOptions
-        selectedHull={props.selectedHull}
-        toggleHullPoints={props.toggleHullPoints}
-        showAllPoints={props.showAllPoints}
-        toggleLabels={props.toggleLabels}
-        resetHull={props.resetHull}
-      />
+class Sidebar extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    if (this.props.selectedEntriesAuids.length !== this.props.selectedEntries.length) {
+      this.props.fetchSelectedEntries(this.props.selectedEntriesAuids.map(d => d.auid));
+    }
+
+    let hullOptions = null;
+    if (this.props.pathname.match(/^\/hull\/\w+\/?$/) && this.props.pathname !== '/hull/noSelection') {
+      hullOptions = (
+        <HullOptions
+          selectedHull={this.props.selectedHull}
+          toggleHullPoints={this.props.toggleHullPoints}
+          showAllPoints={this.props.showAllPoints}
+          toggleLabels={this.props.toggleLabels}
+          resetHull={this.props.resetHull}
+        />
+      );
+    }
+    let className = 'sidebar';
+    if (this.props.isVisible) {
+      if (window.innerWidth <= 768) {
+        className += ' sidebar-show';
+      }
+    } else {
+      className += ' sidebar-hide';
+    }
+    const infoCard =
+      // this.props.selectedEntries.length === this.props.selectedEntriesAuids.length ?
+      (<InfoCard
+        fetchSelectedEntries={getSelectedEntries}
+        selectedEntriesAuids={this.props.selectedEntriesAuids}
+        selectedEntries={this.props.selectedEntries}
+        selectedHull={this.props.selectedHull}
+      />);
+
+    return (
+      <div className={className}>
+        <div className="sidebar-body">
+          <Searchbox
+            pathname={this.props.pathname}
+            selectedElements={this.props.selectedElements}
+            addElements={this.props.addElements}
+            addHull={this.props.addHull}
+            selectedHulls={this.props.selectedHulls}
+            pointClickHandler={this.props.pointClickHandler}
+          />
+          <SelectedPoints
+            selectedEntriesAuids={this.props.selectedEntriesAuids}
+            // removeEntry={this.props.removeEntry}
+            pointClickHandler={this.props.pointClickHandler}
+            highlightPoint={this.props.highlightPoint}
+          />
+          {infoCard}
+          {hullOptions}
+        </div>
+      </div>
     );
   }
-  let className = 'sidebar';
-  if (props.isVisible) {
-    if (window.innerWidth <= 768) {
-      className += ' sidebar-show';
-    }
-  } else {
-    className += ' sidebar-hide';
-  }
-  return (
-    <div className={className}>
-      <div className="sidebar-body">
-        <Searchbox
-          pathname={props.pathname}
-          selectedElements={props.selectedElements}
-          addElements={props.addElements}
-          addHull={props.addHull}
-          selectedHulls={props.selectedHulls}
-          pointClickHandler={props.pointClickHandler}
-        />
-        <SelectedPoints
-          selectedEntriesAuids={props.selectedEntriesAuids}
-          // removeEntry={props.removeEntry}
-          pointClickHandler={props.pointClickHandler}
-          highlightPoint={props.highlightPoint}
-        />
-        {hullOptions}
-      </div>
-    </div>
-  );
-};
+}
 
 Sidebar.propTypes = propTypes;
 Sidebar.defaultProps = defaultProps;
@@ -124,6 +148,10 @@ function mapDispatchToProps(dispatch) {
     showAllPoints: name => dispatch(showAllPoints(name)),
     toggleLabels: name => dispatch(toggleLabels(name)),
     resetHull: name => dispatch(resetHull(name)),
+
+    fetchSelectedEntries: (auids) => {
+      dispatch(getSelectedEntries(auids));
+    },
   };
 }
 
