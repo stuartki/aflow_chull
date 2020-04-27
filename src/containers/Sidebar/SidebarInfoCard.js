@@ -215,7 +215,7 @@ class InfoCard extends React.Component {
           </div>
           <div className="s-info-card-title">
             <a
-              href={`http://aflow.org/material/?id=${auid}`}
+              href={`./material/?id=${auid}`}
               target="_blank"
               rel="noopener noreferrer"
             >
