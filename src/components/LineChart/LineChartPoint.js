@@ -209,7 +209,7 @@ class Point extends React.Component {
     }
     return (
       <g>
-        {compound}
+        {/* {compound} */}
         {tieline}
         {decompCircles}
         {point}
