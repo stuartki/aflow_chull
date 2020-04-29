@@ -37,15 +37,18 @@ class Point extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      // triggered when mouseover
       tielineClicked: false,
+      // triggered when clicked (will stay true if state is defaultBehavior)
       tielineStay: false || this.props.defaultBehavior,
+      // for LineChartInfoCard
       text: false,
     };
     this.timer = null;
     this.onClick = this.onClick.bind(this);
     this.onMouseOver = this.onMouseOver.bind(this);
     this.onMouseOut = this.onMouseOut.bind(this);
-    this.onLineClick = this.onLineClick.bind(this);
+    // this.onLineClick = this.onLineClick.bind(this);
   }
 
   onClick() {
@@ -61,27 +64,31 @@ class Point extends React.Component {
     this.setState({ tielineClicked: false, text: false });
   }
 
-  onContextMenu() {
-    // this.timer = setTimeout(() => {
-    this.setState({ tielineClicked: false, text: false });
-    // }, 1000);
-  }
+  // onContextMenu() {
+  //   // this.timer = setTimeout(() => {
+  //   this.setState({ tielineClicked: false, text: false });
+  //   // }, 1000);
+  // }
 
-  onLineClick() {
-    this.setState({ tielineStay: !this.state.tielineStay });
-    if (!this.state.tielineStay) {
-      this.setState({ tielineClicked: false });
-    }
-  }
+  // OLD -> allows triggering tielineStay by clicking line...does not work because of
+  // breaking state changes
+  // onLineClick() {
+  //   this.setState({ tielineStay: !this.state.tielineStay });
+  //   if (!this.state.tielineStay) {
+  //     this.setState({ tielineClicked: false });
+  //   }
+  // }
 
   render() {
-    // find hull distance in the scale of graph
+    // find distance to hull of curPoint -> curX in the scale of graph
+    // endpoints are decomposition points on hull
     function hullDistance(endpoints, curX) {
       const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
       const b = endpoints[0].y - (m * endpoints[0].x);
       return ((m * curX) + b);
     }
 
+    // quick function to make svg circles with decomposition points
     function makeDecompPointCircs(decomposition, fill, r, xScale, yScale) {
       const decomps = decomposition.map(d => (
         <circle
@@ -101,6 +108,7 @@ class Point extends React.Component {
     // svg components
     let tieline = null;
     let point = null;
+    // OLD
     let compound = null;
     let decompCircles = null;
     // invert x back to local stoichiometric/enthalpy x/y coordinates
@@ -108,17 +116,12 @@ class Point extends React.Component {
     const y = this.props.yScale.invert(this.props.cy);
     // if it is clicked and not a hull point
     if (this.props.isClicked) {
-      // the math part
-      // find the decomposition reaction
+      // find the decomposition points
       let decompPoints = this.props.decompositionPoints;
       let pathToHull;
       // condition to find vertex on hull for no decomposition points
+      // logic for single decomposition points are in LineChartPoints
       if (decompPoints.length === 1) {
-        // decompPoints = this.props.vertices.filter(d => Math.abs(d.x - x) < 0.01);
-        // // if it is not a hull point
-        // if (decompPoints.length === 0) {
-        //   decompPoints = this.props.entries
-        // }
         pathToHull = [
           { x, y },
           { x, y: decompPoints[0].y },
@@ -130,9 +133,9 @@ class Point extends React.Component {
         ];
       }
 
-      const s = makeDecompPointCircs(decompPoints, 'none', '7', this.props.xScale, this.props.yScale);
       // drawing the points
       if (this.state.tielineClicked || this.state.tielineStay) {
+        // deciding css class depending on selection type, default behavior
         let className = 'hull line shadow';
         if (this.state.tielineClicked) {
           className = 'hull hline shadow';
@@ -140,6 +143,8 @@ class Point extends React.Component {
         if (this.state.tielineStay) {
           className = 'hull tieline shadow';
         }
+
+        // draws LineChartInfoCard
         if (this.props.defaultBehavior) {
           compound =
           (
@@ -156,14 +161,14 @@ class Point extends React.Component {
           );
         }
 
-        // distance to hull drawing
+        //  drawing distance to hull
         tieline =
         (
           <g>
             <path
               className={className}
               d={this.props.line(pathToHull)}
-              onClick={this.onLineClick}
+              // onClick={this.onLineClick}
               strokeLinecap="round"
               strokeDasharray="3, 10"
             />
@@ -172,6 +177,7 @@ class Point extends React.Component {
         );
 
         // decomposition line between decomposition points drawing
+        // fill in decomposition circles 
         if (this.props.defaultBehavior) {
           decompCircles =
           (
@@ -189,6 +195,9 @@ class Point extends React.Component {
         }
       }
     }
+
+    // added boundary conditions
+    // drawing the point
     if (y > this.props.yMin && this.props.yMax > y) {
       point =
           (

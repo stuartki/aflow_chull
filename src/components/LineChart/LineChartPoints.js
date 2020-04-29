@@ -61,11 +61,13 @@ const propTypes = {
 };
 
 const Points = (props) => {
+  // click is a variable that indicates whether any element is clicked
   let click = false;
+
   // svg rendering order dictates the z-index
   // first order rendering
   const data = props.data;
-  // third order rendering
+  // second order rendering
   const selectedData = [];
 
   // first order rendering: general points
@@ -73,12 +75,15 @@ const Points = (props) => {
     let point;
     const fill = props.color;
     if (d.isClicked) {
+      // push selected points to second order rendering
       selectedData.push(d);
       click = click || d.isClicked;
     } else if (d.distanceToHull === 0) {
-      const co = d.compound;
-      const f = props.vertices.filter(t => t.auid === d.auid);
-      const thisSSHullVertices = f.length > 0 ? f[0].ssHullVertices : null;
+      // if vertex, create Vertex component
+
+      // getting ssHullVertices for stability criterion hull
+      const vertex = props.vertices.filter(t => t.auid === d.auid);
+      const thisSSHullVertices = vertex.length > 0 ? vertex[0].ssHullVertices : null;
       point = (
         <Vertex
           key={d.auid}
@@ -205,10 +210,14 @@ const Points = (props) => {
         />
       );
     } else {
+      // handling decomposition points
       let decompositionPoints;
+
+      // if no decomposition points are retrieved from AFLOW, still initialize an array
       if (d.decompositionAuids === null || d.decompositionAuids === undefined) {
         decompositionPoints = [];
       } else {
+        // retrieve decomposition point data from entries
         decompositionPoints = data.filter(entry => d.decompositionAuids.includes(entry.auid));
         decompositionPoints = decompositionPoints.map(pt => ({
           x: pt.composition[1],
@@ -216,12 +225,14 @@ const Points = (props) => {
         }));
       }
       if (decompositionPoints.length === 0) {
+        // first case, find vertex of point directly underneath -> spacegroup decomposition
         decompositionPoints = props.vertices.filter(v => Math.abs(v.x - d.x) < 0.01);
-        // if it is not a hull point
+        // if there is no hull points underneath point, find minimum decomposition point
+        // that is the same compound as point
         if (decompositionPoints.length === 0) {
           decompositionPoints = props.data.filter(e => d.compound === e.compound);
           let minIndex = 0;
-          for (let dp = 0; dp < decompositionPoints.length; dp ++) {
+          for (let dp = 0; dp < decompositionPoints.length; dp++) {
             if (decompositionPoints[dp].enthalpyFormationAtom < decompositionPoints[minIndex].enthalpyFormationAtom) {
               minIndex = dp;
             }
@@ -233,6 +244,7 @@ const Points = (props) => {
           }));
         }
       }
+      // if not vertex, the entry is a point
       point = (
         <Point
           key={d.auid}
@@ -259,6 +271,7 @@ const Points = (props) => {
     return (point);
   });
 
+  // Points also handles fading of points and deletion of previous LineChartInfoCards
   if (props.defaultBehavior && click) {
     // circles = null;
     const x = document.getElementsByClassName('point');
@@ -279,6 +292,7 @@ const Points = (props) => {
       x[i].style.opacity = 1;
     }
   }
+
   return (
     <g>
       {circles}
