@@ -9,6 +9,7 @@ import TernaryPoints from './TernaryPoints';
 
 import OrbitControls from './OrbitControls';
 
+// 3D class
 class TernaryHullRender {
   constructor(hull, showEntries, showPointer, defaultColor, defaultBehavior, pointClickHandler) {
     this.pointClickHandler = pointClickHandler;
@@ -61,8 +62,6 @@ class TernaryHullRender {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     // this.renderer.setPixelRatio(window.devicePixelRatio);
 
-    // pointer
-
     // function makeLine(v1, v2) {
     //   const geometry = new THREE.Geometry();
     //   geometry.vertices.push(
@@ -77,9 +76,13 @@ class TernaryHullRender {
     //   return new THREE.Line(geometry, material);
     // }
 
+    // ray, for debugging
+
     // this.ray = makeLine(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0));
     // this.scene.add(this.ray);
 
+
+    // pointer
     if (showPointer) {
       const sphereGeometry = new THREE.SphereBufferGeometry(2, 32, 32);
       const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
@@ -89,6 +92,7 @@ class TernaryHullRender {
   }
 
   init(containerID) {
+    // remove any existing objects
     this.group.remove(this.group.children);
 
     this.container = document.getElementById(containerID);
@@ -132,6 +136,7 @@ class TernaryHullRender {
     // eslint-disable-next-line max-len
     // window.addEventListener('keydown', this.onKeyDown.bind(this), false); // part of work in progress
 
+    // add listeners
     window.addEventListener('resize', this.onWindowResize.bind(this), false);
 
     this.container.addEventListener(
@@ -148,10 +153,12 @@ class TernaryHullRender {
     this.animate();
   }
 
+  // in-class method to switch class variable defaultBehavior
   switchDefault() {
     this.defaultBehavior = !this.defaultBehavior;
   }
 
+  // in-class method to switch class variable showPointer
   switchPointer() {
     this.showPointer = !this.showPointer;
     if (!this.showPointer) {
@@ -161,6 +168,7 @@ class TernaryHullRender {
     }
   }
 
+  // create different camera views
   setCamera(type) {
     if (type === 'init') {
       this.camera.up = new THREE.Vector3(0, 0, 1);
@@ -173,6 +181,7 @@ class TernaryHullRender {
     }
   }
 
+  // plotEntries removes previous data as this is the workhorse to plot new initial data
   plotEntries(showThree = false) {
     this.group.remove(this.pointCloud);
     this.pointCloud = this.TPoints.plotEntries(showThree);
@@ -182,17 +191,20 @@ class TernaryHullRender {
   }
 
   // slightly cleaned so that it only updates colors and sizes
+  // solely updates to selectedPointCloud, preserves this.pointCloud original data
   updatePlottedEntries(data, defaultBehavior) {
     const entries = this.TPoints.filterMinMaxGrid(data);
     this.lineGroup.remove(...this.lineGroup.children);
     const colors = new Float32Array(entries.length * 3);
     const sizes = new Float32Array(entries.length);
+
     const selectedData = [];
     let click = false;
 
     const auids = [];
     // const sprite = THREE.ImageUtils.loadTexture('textures/disc.png');
 
+    // loops through and finds all clicked entriese
     for (let i = 0; i < entries.length; i++) {
       let size = 40;
       let pointColor;
@@ -233,6 +245,8 @@ class TernaryHullRender {
         pointColor.toArray(sColors, count * 3);
         sSizes[count] = size;
         sAuids.push(entries[selectedData[s]].auid);
+
+        // handles null decomposition points by finding minimum same compound
         let decompPoints;
         if (pt.decompositionAuids === null) {
           decompPoints = entries.filter(d => pt.composition[0] === d.composition[0] && pt.composition[1] === d.composition[1] && pt.composition[2] === d.composition[2]);
@@ -240,6 +254,8 @@ class TernaryHullRender {
         } else {
           decompPoints = entries.filter(d => pt.decompositionAuids.includes(d.auid));
         }
+        
+        // aadds decomposition points to selectedPointCloud
         for (let dind = 0; dind < decompPoints.length; dind++) {
           count += 1;
           const d = decompPoints[dind];
@@ -264,7 +280,9 @@ class TernaryHullRender {
           sSizes[count] = size;
           sAuids.push(d.auid);
         }
+        // count handles movement of indices in buffer attributes
         count += 1;
+        // break indicates end of set of decomposition points
         sAuids.push('break');
         count += 1;
       }
@@ -283,6 +301,7 @@ class TernaryHullRender {
       this.TPoints.selectedPointCloud.pointNames = sAuids;
 
       if (defaultBehavior) {
+        // rescales points threshold
         this.raycaster.params.Points.threshold = 12;
         this.group.remove(this.pointCloud);
         this.intersectArray = [];
@@ -332,6 +351,7 @@ class TernaryHullRender {
     this.render();
   }
 
+  // workhorse method to draw distance to hull
   distanceToHull(point, auid, hullMesh) {
     function inTriangle(pt, vertices) {
       function sgn(p1, p2, p3) {

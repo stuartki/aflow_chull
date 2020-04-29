@@ -23,6 +23,7 @@ const defaultProps = {
   sidebarIsVisible: true,
 };
 
+// component controls state changes
 class TernaryHull extends React.Component {
   constructor(props) {
     super(props);
@@ -42,6 +43,7 @@ class TernaryHull extends React.Component {
     this.onCollapseClick = this.onCollapseClick.bind(this);
   }
 
+  // initializes the entries into the scene
   componentDidMount() {
     this.state.THREEscene.init(this.props.container);
     // if (this.props.plotEntries) {
@@ -49,8 +51,10 @@ class TernaryHull extends React.Component {
     // }
   }
 
+  // adding a new hull
   componentWillReceiveProps(nextProps) {
     if (this.props.hull !== nextProps.hull) {
+      // initializing new hull
       const hull = new TernaryHullRender(
         nextProps.hull,
         nextProps.plotEntries,
@@ -81,6 +85,7 @@ class TernaryHull extends React.Component {
     }
   }
 
+  // OLD, React has depreceated this method
   // componentWillUpdate() {
   //   if (this.props.plotEntries) {
   //     if (this.props.hull.showHullPoints) {
@@ -91,6 +96,7 @@ class TernaryHull extends React.Component {
   //   }
   // }
 
+  // once updated, initializes new hull entries or updates with updatePlotttedEntries
   componentDidUpdate(prevProps) {
     if (this.props.hull.name !== prevProps.hull.name) {
       this.div.innerHTML = '';
@@ -103,6 +109,7 @@ class TernaryHull extends React.Component {
     }
   }
 
+  // class method onClick for default button
   onClick() {
     this.defaultBehavior = !this.defaultBehavior;
     this.state.THREEscene.switchDefault();
@@ -124,6 +131,7 @@ class TernaryHull extends React.Component {
     }
   }
 
+  // collapsible button
   onCollapseClick() {
     const content = document.getElementsByClassName('content')[0];
     if (content.style.display === 'block') {
@@ -135,6 +143,7 @@ class TernaryHull extends React.Component {
 
   render() {
     return (
+      // buttons
       <div id="container">
         <button
           type="button"
