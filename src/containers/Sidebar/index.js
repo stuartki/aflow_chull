@@ -108,7 +108,7 @@ class Sidebar extends React.Component {
             pointClickHandler={this.props.pointClickHandler}
             highlightPoint={this.props.highlightPoint}
           />
-          {infoCard}
+          {/* {infoCard} */}
           {hullOptions}
         </div>
       </div>
