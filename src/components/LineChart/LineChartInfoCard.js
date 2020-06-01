@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 // import * as hullActions from '../../actions/hullActions.js';
 // import { removeEntry, pointClickHandler } from '../../actions/hullActions.js';
 
+// will be depreceated
 
 const propTypes = {
   data: PropTypes.object.isRequired,
