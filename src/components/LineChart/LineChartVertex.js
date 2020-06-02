@@ -134,7 +134,6 @@ class Vertex extends React.Component {
         />
       ));
 
-      // if other points will fade out (defaultBehavior)
       // fill new hull points
       // only occurs under default behavior
       if (this.props.defaultBehavior) {
