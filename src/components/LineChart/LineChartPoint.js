@@ -108,19 +108,23 @@ class Point extends React.Component {
     // svg components
     let tieline = null;
     let point = null;
+    let decompCircles = null;
     // OLD
     let compound = null;
-    let decompCircles = null;
+
     // invert x back to local stoichiometric/enthalpy x/y coordinates
     const x = this.props.xScale.invert(this.props.cx);
     const y = this.props.yScale.invert(this.props.cy);
+
+    // DECOMPOSITION POINT HANDLING
+
     // if it is clicked and not a hull point
     if (this.props.isClicked) {
       // find the decomposition points
       let decompPoints = this.props.decompositionPoints;
       let pathToHull;
-      // condition to find vertex on hull for no decomposition points
-      // logic for single decomposition points are in LineChartPoints
+
+      // logic to handle single/null decomposition points can be found in LineChartPoints
       if (decompPoints.length === 1) {
         pathToHull = [
           { x, y },
@@ -133,7 +137,7 @@ class Point extends React.Component {
         ];
       }
 
-      // drawing the points
+      // DRAWING POINTS
       if (this.state.tielineClicked || this.state.tielineStay) {
         // deciding css class depending on selection type, default behavior
         let className = 'hull line shadow';
@@ -144,7 +148,7 @@ class Point extends React.Component {
           className = 'hull tieline shadow';
         }
 
-        // draws LineChartInfoCard
+        // draws LineChartInfoCard (DEPRECEATED NEXT VERSION)
         if (this.props.defaultBehavior) {
           compound =
           (
@@ -161,7 +165,7 @@ class Point extends React.Component {
           );
         }
 
-        //  drawing distance to hull
+        //  draw distance to hull line / decomppsition point borders
         tieline =
         (
           <g>
@@ -176,8 +180,9 @@ class Point extends React.Component {
           </g>
         );
 
-        // decomposition line between decomposition points drawing
-        // fill in decomposition circles 
+        // decomposition line between decomposition points
+        // filled in decomposition circles
+        // only occurs under default behavior
         if (this.props.defaultBehavior) {
           decompCircles =
           (
@@ -196,7 +201,7 @@ class Point extends React.Component {
       }
     }
 
-    // added boundary conditions
+    // added boundary conditions (improve)
     // drawing the point
     if (y > this.props.yMin && this.props.yMax > y) {
       point =
