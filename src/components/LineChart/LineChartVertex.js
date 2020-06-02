@@ -73,10 +73,12 @@ class Vertex extends React.Component {
   render() {
     function ssHullDistance(vertices, curX) {
       let endpoints;
-      // catch first case
+      // catch first boundary case
       if (vertices[0].x === curX) {
         endpoints = vertices[0];
       }
+
+      // handle distance to stability criterion hull
       for (let i = 1; i < vertices.length; i++) {
         // if vertex is between two new hull points
         if (vertices[i].x > curX && vertices[i - 1].x < curX) {
@@ -95,6 +97,8 @@ class Vertex extends React.Component {
       }
       return (endpoints.y);
     }
+
+
     // svg components
     let point = null;
     let ssHull = null;
@@ -105,6 +109,8 @@ class Vertex extends React.Component {
     const yScale = this.props.yScale;
     const x = this.props.xScale.invert(this.props.cx);
     const y = this.props.yScale.invert(this.props.cy);
+
+    // DRAWING SC HULL
 
     // if clicked and mouse is hovering
     if ((this.state.sc || this.state.scStay) && this.props.isClicked) {
@@ -130,6 +136,7 @@ class Vertex extends React.Component {
 
       // if other points will fade out (defaultBehavior)
       // fill new hull points
+      // only occurs under default behavior
       if (this.props.defaultBehavior) {
         filledCircles = this.scHullVertices.map(d => (
           <circle

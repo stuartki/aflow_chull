@@ -75,16 +75,20 @@ const Points = (props) => {
     let point;
     const fill = props.color;
     if (d.isClicked) {
-      // push selected points to second order rendering
+      // if clicked, push selected points to second order rendering
       selectedData.push(d);
       click = click || d.isClicked;
     } else if (d.distanceToHull === 0) {
-      // if vertex, create Vertex component
+      // else if vertex, create Vertex component
 
       // getting ssHullVertices for stability criterion hull
+
+      // retrieve vertex from vertices prop
       const vertex = props.vertices.filter(t => t.auid === d.auid);
+      // retrieve thisSSHullVertices data
       const thisSSHullVertices = vertex.length > 0 ? vertex[0].ssHullVertices : null;
       point = (
+        // create Vertex component
         <Vertex
           key={d.auid}
           defaultBehavior={props.defaultBehavior}
@@ -106,20 +110,27 @@ const Points = (props) => {
         />
       );
     } else {
+      // handle decomposition ppoints
       let decompositionPoints;
       if (d.decompositionAuids === null || d.decompositionAuids === undefined) {
+        // convert to empty array
         decompositionPoints = [];
       } else {
+        // retrieve decomposition points from props data
         decompositionPoints = data.filter(entry => d.decompositionAuids.includes(entry.auid));
+        // retrieve x and y data
         decompositionPoints = decompositionPoints.map(pt => ({
           x: pt.composition[1],
           y: pt.enthalpyFormationAtom,
         }));
       }
+      // after attempt at retrieval, if length is 0
       if (decompositionPoints.length === 0) {
+        // find all points with same composition proportion
         decompositionPoints = props.vertices.filter(v => Math.abs(v.x - d.x) < 0.01);
         // if it is not a hull point
         if (decompositionPoints.length === 0) {
+          // find point that has minimum enthalpy formation 
           decompositionPoints = props.data.filter(e => d.compound === e.compound);
           let minIndex = 0;
           for (let dp = 0; dp < decompositionPoints.length; dp ++) {
@@ -134,6 +145,7 @@ const Points = (props) => {
           }));
         }
       }
+      // then, create Point component
       point = (
         <Point
           key={d.auid}
@@ -181,7 +193,7 @@ const Points = (props) => {
   //   }
   // }
 
-  // third order rendering: selected points
+  // second order rendering: selected points
   const selectedCircles = selectedData.map((d) => {
     const fill = '#CA6F96';
     let point;
@@ -272,6 +284,7 @@ const Points = (props) => {
   });
 
   // Points also handles fading of points and deletion of previous LineChartInfoCards
+  // handle fade in and fade out of points
   if (props.defaultBehavior && click) {
     // circles = null;
     const x = document.getElementsByClassName('point');
@@ -281,6 +294,7 @@ const Points = (props) => {
       }
       x[i].style.opacity = 0.4;
     }
+    // clean any hull components
     const extra = document.getElementsByClassName('hull');
     const lenExtra = extra.length;
     for (let l = 0; l < lenExtra; l++) {
@@ -296,7 +310,6 @@ const Points = (props) => {
   return (
     <g>
       {circles}
-      {/* hull */}
       <path
         className="line shadow"
         stroke={props.color}

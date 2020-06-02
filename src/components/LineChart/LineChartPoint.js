@@ -121,7 +121,7 @@ class Point extends React.Component {
     // if it is clicked and not a hull point
     if (this.props.isClicked) {
       // find the decomposition points
-      let decompPoints = this.props.decompositionPoints;
+      const decompPoints = this.props.decompositionPoints;
       let pathToHull;
 
       // logic to handle single/null decomposition points can be found in LineChartPoints

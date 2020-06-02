@@ -128,17 +128,15 @@ export default class TernaryHull {
   }
 
   stabilityCriterion(vertexAuid) {
+    // filter for sshull data
     const f = this.data.vertices.filter(t => t.auid === vertexAuid);
+
+    // retrieve faces and vertices
     const thisSSHullVertices = f.length > 0 ? f[0].ssHullVertices : null;
     const thisSSHullFaces = f.length > 0 ? f[0].ssHullFaces : null;
+
+    // this.sc === undefined indicates need to create new sc hull
     if (this.sc === undefined) {
-      // const vertices = res.data.facets_data;
-      // const newHullSet = [];
-      // Object.values(vertices).forEach(d =>
-      //   d.forEach(e => e.vertices_auid.forEach(element => newHullSet.push(element))),
-      // );
-      // const scData = this.data.entries.filter(entry => newHullSet.includes(entry.auid));
-      // const scFaces = THREE.ShapeUtils.triangulateShape(scData);
       const hullData = { vertices: thisSSHullVertices, faces: thisSSHullFaces };
       this.sc = this.drawHull(hullData, false, false);
     }
@@ -149,10 +147,14 @@ export default class TernaryHull {
       const hullData = { vertices: this.data.n1HullVertices, faces: this.data.n1HullFaces };
       this.n1EG = this.drawHull(hullData, false, false);
       this.hullGroup.add(this.n1EG);
+
+      // clean edges and original hull
       this.hullGroup.remove(this.edges);
       this.hullGroup.remove(this.hullMesh);
     } else {
       this.hullGroup.remove(this.n1EG);
+      
+      // re-add hull
       this.hullGroup.add(this.edges);
       this.hullGroup.add(this.hullMesh);
       this.n1EG = undefined;
