@@ -136,6 +136,8 @@ class LineChart extends React.Component {
 
     const vertices = this.props.vertices;
 
+    // create d3 functions (svg generators)
+
     const x = d3
       .scaleLinear()
       .domain([0, 1])
