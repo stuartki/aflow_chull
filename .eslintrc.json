@@ -1,0 +1,16 @@
+{
+    "extends": "airbnb",
+    "plugins": [
+        "react"
+    ],
+    "globals": {
+        "document": true,
+        "window": true,
+        "Blob": true
+    },
+    "rules": {
+        "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+        "react/prop-types": [2, { "ignore": ["children"] }],
+        "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }]
+    }
+}

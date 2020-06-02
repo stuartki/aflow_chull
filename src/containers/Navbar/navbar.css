@@ -1,0 +1,159 @@
+.nav {
+    /*background-color: #37474F;*/
+    background-color: #FFF;
+    color: #FFFFFF;
+    font-size: 21px;
+    height: 55px; /* 50px; */
+    margin-bottom: 0px;
+    padding-left: 0px;
+    width: 100%;
+    /*border-bottom: 1px solid #2D2F37;*/
+    border-bottom: 1px solid #EEEEEE;
+    position: fixed;
+    z-index: 1;
+    /* box-shadow: 0 2px 5px rgba(0,0,0,0.26); */
+    /*box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2);*/
+}
+
+.navlink {
+  /*background-color: #2D2F37;*/
+  height: 50px;
+  line-height: 60px;/*55px; */
+  padding-right: 10px;
+}
+
+.sidebar-toggle{
+    height: 50px;
+    line-height: 54px; /*50px;*/
+    padding-left: 20px;
+    font-size: 12px;
+}
+
+.sidebar-toggle-btn{
+  color: #cfcfcf; /*#757575;*/
+  font-size: 16px;
+}
+
+.sidebar-toggle-btn:hover{
+  color: #687BC9;
+  cursor: pointer;
+}
+
+.navlink:last-of-type {
+  padding-left:10px;
+}
+
+.nav-brand {
+    height: 100%;
+    line-height: 47px; /*50px;*/
+    width: 200px;
+    /*border-bottom: 1px solid #2D2F37;*/
+    text-align: center;
+
+    /*box-shadow: 0px 5px 4px rgba(0, 0, 0, 0.3);*/
+}
+
+
+.logo-drk-purp{
+  color: #353787;
+}
+
+.float-right {
+  float: right !important;
+}
+.float-left {
+  float: left !important;
+}
+
+
+.nav-btn-default{
+  color: #cfcfcf; /*#757575;*/
+  font-size: 24px;
+}
+
+.nav-btn-default:hover{
+  color: #687BC9;
+  cursor: pointer;
+}
+
+.table-btn{
+  color: #3FC380;
+  font-size: 24px;
+}
+
+.table-btn:hover{
+    color: #36AF71;
+    cursor: pointer;
+}
+
+.info-btn{
+  color: #3798DF;
+  font-size: 24px;
+}
+
+.info-btn:hover{
+    color: #3390CF;
+    cursor: pointer;
+}
+
+.history-btn{
+  color: #F5AB35;
+  text-align:center;
+  font-size: 24px;
+
+}
+
+.history-btn:hover{
+  color: #E89E27;
+  cursor: pointer;
+}
+
+.visualization-btn{
+  color: #CA6F96;
+  font-size: 24px;
+}
+
+.visualization-btn:hover{
+    color: #CA6F96;
+    cursor: hand;
+    cursor: pointer;
+}
+
+
+.nav-tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.nav-tooltip__text {
+    visibility: hidden;
+    background-color: #425ABB;
+    height: 35%;
+    line-height: 20px;
+    font-size: 12px;
+    padding: 0 5px;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    top: 32%;
+    right: 140%;
+
+    position: absolute;
+    z-index: 1;
+    white-space: nowrap;
+}
+
+.nav-tooltip:hover .nav-tooltip__text {
+    visibility: visible;
+}
+
+.nav-tooltip .nav-tooltip__text::after {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent #425ABB;
+}
