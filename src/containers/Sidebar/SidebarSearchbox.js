@@ -47,9 +47,16 @@ class Searchbox extends React.Component {
     if (e.charCode === 13 && e.target.value !== '') {
       if (e.target.value.charAt(0) === 'c') {
         // eslint-disable-next-line max-len
-        const entry = this.props.selectedHulls.map(hull => hull.entries.filter(d => d.compound === e.target.value.slice(1)));
+        const thisHull = this.props.pathname.split('/')[-1];
+        let index = 0;
+        for (let i = 0; i < this.props.selectedHulls.length; i++) {
+          if (thisHull === this.props.selectedHulls[i].name) {
+            index = i;
+          }
+        }
+        const entry = this.props.selectedHulls[index].entries.filter(d => d.compound === e.target.value.slice(1));
         if (entry.length > 0) {
-          this.props.pointClickHandler(entry[0][0].auid);
+          this.props.pointClickHandler(entry[0].auid);
         }
       } else if (e.target.value.includes('aflow:')) {
         this.props.pointClickHandler(e.target.value);

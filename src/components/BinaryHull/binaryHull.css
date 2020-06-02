@@ -1,6 +1,11 @@
 
 
 
+#container{
+  width: 100%;
+  height: 100%;
+  background-color: #FFF;
+}
 
 .axis-input {
     width: 50px;
@@ -15,26 +20,26 @@
 .axis-controls {
   font-size: 12px;
   padding-left: 10px;
-  margin-top: 15px;
+  /* margin-top: 15px; */
   color: #A3A3A7;
 }
 
-#reset {
+/* #reset {
   font-size: 12px;
   padding-left: 10px;
   margin-top: 15px;
   color: #A3A3A7;
-}
+} */
 
-#default {
+/* #default {
   background-color: green;
   position: relative;
   top: 180px;
   left: 45px;
   color: white;
-}
+} */
 
-#hullresize {
+/* #hullresize {
   font-size: 12px;
   padding-left: 10px;
   margin-top: 15px;
@@ -46,7 +51,7 @@
   padding-left: 10px;
   margin-top: 15px;
   color: #A3A3A7;
-}
+} */
 
 .axis-control-icon:hover{
   cursor: pointer;
@@ -191,4 +196,59 @@
 
 .selected-hull-list-entry:first-child{
   border-top: 1px solid #2A373D;
+}
+
+.default{
+  color: white;
+  background-color: green;
+}
+
+/* Style the button that is used to open and close the collapsible content */
+.collapsible {
+  height: 35px;
+  width: 20%;
+  position: absolute;
+  top: 175px;
+  /* right: 40px; */
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 5px 5px;
+  text-align: center;
+  font-size: 15px;
+  z-index: 3;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.active, .collapsible:hover {
+  background-color: #ccc;
+}
+
+.content{
+  background-color: gray;
+  height: 30%;
+  width: 20%;
+  right: 40px;
+  position: absolute;
+  top: 175px;
+  /* max-height: 0; */
+  display: none;
+  overflow: scroll;
+  z-index: 1;
+  /* transition: max-height 0.2s ease-out; */
+}
+
+#buttons{
+  height: 10px;
+  margin-top: 40px;
+  width: 100%;
+  z-index: 2;
+}
+
+.camera-button{
+  font-size: 10px;
+  height: 20px;
+  width: 95%;
+  margin: auto;
+  display: block;
 }

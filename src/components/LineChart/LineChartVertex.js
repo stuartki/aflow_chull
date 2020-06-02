@@ -16,6 +16,7 @@ const propTypes = {
   compound: PropTypes.string.isRequired,
   isClicked: PropTypes.bool.isRequired,
   line: PropTypes.func.isRequired,
+  ssHullVertices: PropTypes.array.isRequired,
   pointClickHandler: PropTypes.func.isRequired,
 };
 
@@ -29,7 +30,7 @@ class Vertex extends React.Component {
     this.onClick = this.onClick.bind(this);
     this.onMouseOver = this.onMouseOver.bind(this);
     this.onMouseOut = this.onMouseOut.bind(this);
-    this.onLineClick = this.onLineClick.bind(this);
+    // this.onLineClick = this.onLineClick.bind(this);
     this.findStabilityCriterion = this.findStabilityCriterion.bind(this);
     this.findStabilityCriterion();
   }
@@ -47,20 +48,19 @@ class Vertex extends React.Component {
     this.setState({ sc: false });
   }
 
-  onLineClick() {
-    this.setState({ scStay: !this.state.scStay });
-    if (!this.state.scStay) {
-      this.setState({ sc: false });
-    }
-  }
+  // onLineClick() {
+  //   this.setState({ scStay: !this.state.scStay });
+  //   if (!this.state.scStay) {
+  //     this.setState({ sc: false });
+  //   }
+  // }
 
   findStabilityCriterion() {
     // catch if no stability criterion
-    // eslint-disable-next-line react/prop-types
     if (this.props.ssHullVertices === undefined || this.props.ssHullVertices === null) {
       this.scHullVertices = [];
     } else {
-      // eslint-disable-next-line react/prop-types
+      // reformat to desired
       this.scHullVertices = this.props.ssHullVertices.map(d => (
         { auid: d.auid,
           y: d.enthalpyFormationAtom * 1000,
@@ -73,17 +73,23 @@ class Vertex extends React.Component {
   render() {
     function ssHullDistance(vertices, curX) {
       let endpoints;
+      // catch first boundary case
       if (vertices[0].x === curX) {
         endpoints = vertices[0];
       }
+
+      // handle distance to stability criterion hull
       for (let i = 1; i < vertices.length; i++) {
+        // if vertex is between two new hull points
         if (vertices[i].x > curX && vertices[i - 1].x < curX) {
           endpoints = vertices.slice(i - 1, i + 1);
         }
+        // if vertex is below a single hull point
         if (vertices[i] === curX) {
           endpoints = vertices[i];
         }
       }
+      // find hull distance if between two hull points
       if (endpoints.length > 1) {
         const m = (endpoints[1].y - endpoints[0].y) / (endpoints[1].x - endpoints[0].x);
         const b = endpoints[0].y - (m * endpoints[0].x);
@@ -92,6 +98,8 @@ class Vertex extends React.Component {
       return (endpoints.y);
     }
 
+
+    // svg components
     let point = null;
     let ssHull = null;
     let compound = null;
@@ -102,13 +110,17 @@ class Vertex extends React.Component {
     const x = this.props.xScale.invert(this.props.cx);
     const y = this.props.yScale.invert(this.props.cy);
 
+    // DRAWING SC HULL
+
+    // if clicked and mouse is hovering
     if ((this.state.sc || this.state.scStay) && this.props.isClicked) {
+      // add line vertices for distance to hull
       const pathToHull = [
         { x, y },
         { x, y: ssHullDistance(this.scHullVertices, x) },
       ];
 
-      // make new hull circles
+      // make new stability criterion hull point borders
       const circles = this.scHullVertices.map(d => (
         <circle
           key={`${d.x.toString()}`}
@@ -121,6 +133,9 @@ class Vertex extends React.Component {
           stroke="#687BC9"
         />
       ));
+
+      // fill new hull points
+      // only occurs under default behavior
       if (this.props.defaultBehavior) {
         filledCircles = this.scHullVertices.map(d => (
           <circle
@@ -134,6 +149,7 @@ class Vertex extends React.Component {
         ));
       }
 
+      // LineChartInfoCard (OLD)
       if (this.props.defaultBehavior) {
         compound =
         (
@@ -150,6 +166,7 @@ class Vertex extends React.Component {
         );
       }
 
+      // new hull and distance to hull drawing lines
       ssHull =
         (
           <g>
@@ -157,7 +174,7 @@ class Vertex extends React.Component {
               className="line shadow"
               stroke="#687BC9"
               d={this.props.line(this.scHullVertices)}
-              onClick={this.onLineClick}
+              // onClick={this.onLineClick}
               strokeLinecap="round"
               strokeDasharray="3, 10"
             />
@@ -165,7 +182,7 @@ class Vertex extends React.Component {
               className="line shadow"
               stroke="#687BC9"
               d={this.props.line(pathToHull)}
-              onClick={this.onLineClick}
+              // onClick={this.onLineClick}
               strokeLinecap="round"
             />
             {circles}
@@ -173,6 +190,9 @@ class Vertex extends React.Component {
           </g>
         );
     }
+
+    // boundary conditions
+    // draw vertex point
     if (y > this.props.yMin && this.props.yMax > y) {
       point =
           (

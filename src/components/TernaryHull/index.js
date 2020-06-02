@@ -6,6 +6,7 @@ import TernaryHullRender from './render';
 // import { pointClickHandler } from '../../actions/hullActions.js';
 
 import './ternaryHull.css';
+import { $CombinedState } from 'redux';
 
 const propTypes = {
   hull: PropTypes.object.isRequired,
@@ -14,6 +15,7 @@ const propTypes = {
   defaultColor: PropTypes.bool,
   pointClickHandler: PropTypes.func.isRequired,
   sidebarIsVisible: PropTypes.bool,
+  resetHull: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
@@ -21,6 +23,7 @@ const defaultProps = {
   sidebarIsVisible: true,
 };
 
+// component controls state changes
 class TernaryHull extends React.Component {
   constructor(props) {
     super(props);
@@ -28,15 +31,19 @@ class TernaryHull extends React.Component {
       THREEscene: new TernaryHullRender(
         this.props.hull,
         this.props.plotEntries,
+        true,
         this.props.defaultColor,
         true,
         this.props.pointClickHandler,
       ),
     };
     this.defaultBehavior = true;
+    this.showThree = false;
     this.onClick = this.onClick.bind(this);
+    this.onCollapseClick = this.onCollapseClick.bind(this);
   }
 
+  // initializes the entries into the scene
   componentDidMount() {
     this.state.THREEscene.init(this.props.container);
     // if (this.props.plotEntries) {
@@ -44,11 +51,14 @@ class TernaryHull extends React.Component {
     // }
   }
 
+  // adding a new hull
   componentWillReceiveProps(nextProps) {
     if (this.props.hull !== nextProps.hull) {
+      // initializing new hull
       const hull = new TernaryHullRender(
         nextProps.hull,
         nextProps.plotEntries,
+        this.showPointer,
         nextProps.defaultColor,
         this.defaultBehavior,
         nextProps.pointClickHandler,
@@ -75,6 +85,7 @@ class TernaryHull extends React.Component {
     }
   }
 
+  // OLD, React has depreceated this method
   // componentWillUpdate() {
   //   if (this.props.plotEntries) {
   //     if (this.props.hull.showHullPoints) {
@@ -85,6 +96,7 @@ class TernaryHull extends React.Component {
   //   }
   // }
 
+  // once updated, initializes new hull entries or updates with updatePlotttedEntries
   componentDidUpdate(prevProps) {
     if (this.props.hull.name !== prevProps.hull.name) {
       this.div.innerHTML = '';
@@ -97,66 +109,100 @@ class TernaryHull extends React.Component {
     }
   }
 
+  // class method onClick for default button
   onClick() {
     this.defaultBehavior = !this.defaultBehavior;
     this.state.THREEscene.switchDefault();
     if (this.defaultBehavior) {
       try {
-        document.getElementById('default').style.backgroundColor = 'green';
-        document.getElementById('default').textContent = 'DEFAULT';
+        document.getElementsByClassName('default')[0].style.backgroundColor = 'green';
+        document.getElementsByClassName('default')[0].textContent = 'DEFAULT';
       } catch (error) {
         console.log(error);
       }
     } else {
       this.defaultText = 'NON-DEFAULT';
       try {
-        document.getElementById('default').style.backgroundColor = 'red';
-        document.getElementById('default').textContent = 'NON-DEFAULT';
+        document.getElementsByClassName('default')[0].style.backgroundColor = 'red';
+        document.getElementsByClassName('default')[0].textContent = 'NON-DEFAULT';
       } catch (error) {
         console.log(error);
       }
     }
   }
 
+  // collapsible button
+  onCollapseClick() {
+    const content = document.getElementsByClassName('content')[0];
+    if (content.style.display === 'block') {
+      content.style.display = 'none';
+    } else {
+      content.style.display = 'block';
+    }
+  }
+
   render() {
     return (
+      // buttons
       <div id="container">
         <button
-          id="default"
-            // eslint-disable-next-line no-unused-vars
-          onClick={this.onClick}
+          type="button"
+          className="collapsible"
+          onClick={this.onCollapseClick}
         >
-          DEFAULT
+          Options
         </button>
-        <div id="buttons">
-          <button
-            // id="reset"
-            className="camera-button"
-            onClick={(e) => {
-              this.state.THREEscene.setCamera('init');
-              // this.state.THREEscene.render();
-            }}
-          >
-          Reset Camera
-          </button>
-          <button
-            // id="reset"
-            className="camera-button"
-            onClick={(e) => {
-              this.state.THREEscene.THull.n1EnthalpyGain();
-            }}
-          >
-          N+1 Enthalpy Gain
-          </button>
-          {/* <button
-            // id="reset"
-            className="camera-button"
-            onClick={(e) => {
-              this.state.THREEscene.setCamera(2);
-            }}
-          >
-          2
-          </button> */}
+        <div className="content">
+          <div id="buttons">
+            <button
+              className="camera-button default"
+              onClick={this.onClick}
+            >
+              DEFAULT
+            </button>
+            <button
+              className="camera-button"
+              onClick={(e) => {
+                this.state.THREEscene.setCamera('init');
+              }}
+            >
+              Reset Camera
+            </button>
+            <button
+              className="camera-button"
+              onClick={(e) => {
+                this.props.resetHull(this.props.hull.name);
+              }}
+            >
+              Reset Points
+            </button>
+            <button
+              className="camera-button"
+              onClick={(e) => {
+                this.showThree = !this.showThree;
+                this.state.THREEscene.plotEntries(this.showThree);
+              }}
+            >
+              Show 3D Points
+            </button>
+            <button
+              className="camera-button"
+              onClick={(e) => {
+                this.state.THREEscene.switchPointer();
+              }}
+            >
+              Show Pointer
+            </button>
+            <button
+              // id="reset"
+              className="camera-button"
+              onClick={(e) => {
+                this.state.THREEscene.THull.n1EnthalpyGain();
+              }}
+            >
+            N+1 Enthalpy Gain
+            </button>
+          </div>
         </div>
         <div
           id={this.props.container}

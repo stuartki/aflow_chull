@@ -8,7 +8,7 @@ export default class TernaryPoints {
     this.TGrid = TGrid;
   }
 
-  plotEntries() {
+  plotEntries(showThree = false) {
     // clear points
     const entries = this.filterMinMaxGrid(this.data);
 
@@ -28,6 +28,12 @@ export default class TernaryPoints {
       const pY = entries[i].composition[2] * 100;
       const pZ = entries[i].composition[1] * 100;
       const pCoord = this.TGrid.triCoord(pX, pY, pZ);
+
+      if (showThree) {
+        if (pX === 0 || pY === 0 || pZ === 0) {
+          continue;
+        }
+      }
 
       const datapoint = new THREE.Vector3(
         pCoord[0],
@@ -65,6 +71,12 @@ export default class TernaryPoints {
       'uniform sampler2D texture;',
       'varying vec3 vColor;',
       'void main() {',
+      // ' float r = 0.0;',
+      // ' vec2 cxy = 2.0 * gl_PointCoord - 1.0;',
+      // ' r = dot(cxy, cxy);',
+      // ' if (r > 1.0) {',
+      // '  discard;',
+      // ' }',
       ' gl_FragColor = vec4( color * vColor, 1.0 );',
       ' gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );',
       ' if ( gl_FragColor.a < ALPHATEST ) discard;',
@@ -83,7 +95,27 @@ export default class TernaryPoints {
       '}',
     ].join('\n');
 
-    const texture = new THREE.TextureLoader().load('textures/ball.png');
+    // function createCanvasMaterial(color, size) {
+    //   const matCanvas = document.createElement('canvas');
+    //   matCanvas.width = size;
+    //   matCanvas.height = size;
+    //   const matContext = matCanvas.getContext('2d');
+    //   // create exture object from canvas.
+    //   const texture = new THREE.Texture(matCanvas);
+    //   // Draw a circle
+    //   const center = size / 2;
+    //   matContext.arc(center, center, size / 2, 0, 2 * Math.PI);
+    //   // matContext.fillStyle = 'red';
+    //   matContext.fill();
+    //   // need to set needsUpdate
+    //   texture.needsUpdate = true;
+    //   // return a texture made from the canvas
+    //   return texture;
+    // }
+    const texture = new THREE.TextureLoader().load('textures/disc.png');
+    texture.mapping = THREE.SphericalReflectionMapping;
+
+    // const texture = createCanvasMaterial('FFFFFF', 60);
     const pointsMaterial = new THREE.ShaderMaterial({
       uniforms: {
         color: { type: 'c', value: new THREE.Color(0xFFFFFF) },
@@ -93,6 +125,7 @@ export default class TernaryPoints {
       fragmentShader,
       alphaTest: 0.9,
     });
+
     this.pointCloud = new THREE.Points(pointsGeometry, pointsMaterial);
 
     this.pointCloud.pointNames = auids;

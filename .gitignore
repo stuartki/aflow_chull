@@ -7,3 +7,8 @@ apool_txt_editor.py
 dist/data/
 log.log
 php/
+<<<<<<< HEAD
+=======
+*.json
+
+>>>>>>> module_three

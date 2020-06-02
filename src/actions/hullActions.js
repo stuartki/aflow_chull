@@ -121,6 +121,47 @@ export function removeEntry(auid) {
 //              Thunks
 // **************************************
 
+export function getEntries(auids) {
+  return (dispatch) => {
+    const getEntry = url => axios.get(url);
+    const requests = [];
+    for (let i = 0; i < auids.length; i++) {
+      // const url = `http://aflowhull.materials.duke.edu/entries/${auids[i]}/?format=json`;
+      // const url = `${URL_ROOT}/api/v2/entry/${auids[i]}`;
+      const url = `http://aflowlib.duke.edu/search/API/?auid(%27${auids[i]}%27),compound,composition,enthalpy_formation_atom,species,stoichiometry,lattice_system_relax,density,spacegroup_relax,energy_atom,prototype`;
+      requests.push(getEntry(url));
+    }
+    return axios.all(requests).then((results) => {
+      // const temp = results.map(r => r.data);
+      const temp = results.map(r => r.data[0]);
+      const entries = [];
+      for (let i = 0; i < temp.length; i++) {
+        const entry = { //data section in InfoCard.js
+          auid: temp[i].auid,
+          aurl: temp[i].aurl.replace('aflowlib.duke.edu:', 'http://aflowlib.duke.edu/'),
+          // catalog: temp[i].catalog,
+          energy_atom: Number(temp[i].energy_atom),
+          compound: temp[i].compound,
+          composition: temp[i].composition.split(',').map(d => Number(d)),
+          enthalpy: Number(temp[i].enthalpy_formation_atom) * 1000,
+          species: temp[i].species.split(','),
+          stoichiometry: temp[i].stoichiometry.split(',').map(d => Number(d)),
+          spacegroup: Number(temp[i].spacegroup_relax),
+          lattice: temp[i].lattice_system_relax,
+          density: Number(temp[i].density),
+          prototype: temp[i].prototype,
+          // np1enthalpygain: np1, // wws16
+          // stabilitycriterion: sc,
+          // distancetohull: Number(hdata[tindex].points[tindex2].distanceToHull).toFixed(3),
+          // grstate: gstate,
+        };
+        entries.push(entry);
+      }
+      dispatch(addEntries(entries));
+    });
+  };
+}
+
 export function getSelectedEntries(auids) {
   return (dispatch) => {
     const getEntry = url => axios.get(url);
@@ -435,6 +476,7 @@ export function fetchHull(name, selectedHulls) {
       }
       return hull;
     }).then((currentHull) => {
+      // retrieve stability criterion with chained axios call for each vertex
       const callList = [];
       function nary(vertex, dimension) {
         let count = 0;
@@ -446,7 +488,7 @@ export function fetchHull(name, selectedHulls) {
       currentHull.vertices.forEach((d) => {
         if (d.auid !== null && d.auid.includes('aflow:') && nary(d, hull.dim)) {
           const auidCode = d.auid.slice(6);
-          const query = `${currentHull.name}_n_${auidCode}`;
+          const query = `${currentHull.name}_sc_${auidCode}`;
           // const query = 'MnPd';
           const ssurl = `http://aflowlib.duke.edu/search/ui/API/chull/v1.2/?ss=${query}`;
           callList.push(axios.get(ssurl));
@@ -467,30 +509,21 @@ export function fetchHull(name, selectedHulls) {
           index += 1;
         });
       });
-    // }).then((res) => {
-    //   function nary(vertex, dimension) {
-    //     let count = 0;
-    //     vertex.composition.forEach((d) => { if (d > 0) { count += 1; } });
-    //     if (count === dimension) {
-    //       return true;
-    //     } return false;
-    //   }
-
-    //   const mNeglect = hull.entries.filter(d => nary(d, hull.dim)).map(d => d.auid);
-    //   let neglectAuids = '';
-    //   // eslint-disable-next-line no-return-assign
-    //   mNeglect.forEach(d => neglectAuids += `${d},`);
-    //   const query = `${hull.name}_m_${neglectAuids}`;
-    //   const murl = `http://aflowlib.duke.edu/search/ui/API/chull/v1.2/?n1=${query}`;
-    //   return axios.get(murl);
+    }).then((res) => {
+      // get n+1 data
+      const query = `${hull.name}`;
+      const murl = `http://aflowlib.duke.edu/search/ui/API/chull/v1.2/?n1=${query}`;
+      return axios.get(murl);
     // eslint-disable-next-line newline-per-chained-call
     }).then((res) => {
-      // if (res.status !== 414) {
-      //   hull.n1HullVertices = res.data.vertices;
-      //   if (hull.dim > 2) {
-      //     hull.n1HullFaces = res.data.faces;
-      //   }
-      // }
+      // handle errors
+      // retrieve faces and vertices for n+1 hull
+      if (res.status !== 414) {
+        hull.n1HullVertices = res.data.vertices;
+        if (hull.dim > 2) {
+          hull.n1HullFaces = res.data.faces;
+        }
+      }
       dispatch(addHull(hull));
     });
   };

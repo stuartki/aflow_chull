@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Point from './LineChartPoint';
 import Vertex from './LineChartVertex';
 import axios from 'axios';
+import { packSiblings } from 'd3';
 
 /*
 const propTypes = {
@@ -60,25 +61,34 @@ const propTypes = {
 };
 
 const Points = (props) => {
+  // click is a variable that indicates whether any element is clicked
   let click = false;
+
   // svg rendering order dictates the z-index
   // first order rendering
   const data = props.data;
-  // third order rendering
+  // second order rendering
   const selectedData = [];
 
   // first order rendering: general points
-  let circles = data.map((d) => {
+  const circles = data.map((d) => {
     let point;
     const fill = props.color;
     if (d.isClicked) {
+      // if clicked, push selected points to second order rendering
       selectedData.push(d);
       click = click || d.isClicked;
     } else if (d.distanceToHull === 0) {
-      const co = d.compound;
-      const f = props.vertices.filter(t => t.auid === d.auid);
-      const thisSSHullVertices = f.length > 0 ? f[0].ssHullVertices : null;
+      // else if vertex, create Vertex component
+
+      // getting ssHullVertices for stability criterion hull
+
+      // retrieve vertex from vertices prop
+      const vertex = props.vertices.filter(t => t.auid === d.auid);
+      // retrieve thisSSHullVertices data
+      const thisSSHullVertices = vertex.length > 0 ? vertex[0].ssHullVertices : null;
       point = (
+        // create Vertex component
         <Vertex
           key={d.auid}
           defaultBehavior={props.defaultBehavior}
@@ -100,16 +110,42 @@ const Points = (props) => {
         />
       );
     } else {
+      // handle decomposition ppoints
       let decompositionPoints;
       if (d.decompositionAuids === null || d.decompositionAuids === undefined) {
+        // convert to empty array
         decompositionPoints = [];
       } else {
+        // retrieve decomposition points from props data
         decompositionPoints = data.filter(entry => d.decompositionAuids.includes(entry.auid));
+        // retrieve x and y data
         decompositionPoints = decompositionPoints.map(pt => ({
           x: pt.composition[1],
           y: pt.enthalpyFormationAtom,
         }));
       }
+      // after attempt at retrieval, if length is 0
+      if (decompositionPoints.length === 0) {
+        // find all points with same composition proportion
+        decompositionPoints = props.vertices.filter(v => Math.abs(v.x - d.x) < 0.01);
+        // if it is not a hull point
+        if (decompositionPoints.length === 0) {
+          // find point that has minimum enthalpy formation 
+          decompositionPoints = props.data.filter(e => d.compound === e.compound);
+          let minIndex = 0;
+          for (let dp = 0; dp < decompositionPoints.length; dp ++) {
+            if (decompositionPoints[dp].enthalpyFormationAtom < decompositionPoints[minIndex].enthalpyFormationAtom) {
+              minIndex = dp;
+            }
+          }
+          decompositionPoints = [decompositionPoints[minIndex]];
+          decompositionPoints = decompositionPoints.map(pt => ({
+            x: pt.composition[1],
+            y: pt.enthalpyFormationAtom,
+          }));
+        }
+      }
+      // then, create Point component
       point = (
         <Point
           key={d.auid}
@@ -136,20 +172,28 @@ const Points = (props) => {
     return (point);
   });
 
-  if (props.defaultBehavior && click) {
-    // circles = null;
-    const x = document.getElementsByClassName('point');
-    for (let i = 0; i < x.length; i++) {
-      x[i].style.opacity = 0.4;
-    }
-  } else {
-    const x = document.getElementsByClassName('point');
-    for (let i = 0; i < x.length; i++) {
-      x[i].style.opacity = 1;
-    }
-  }
+  // if (props.defaultBehavior && click) {
+  //   // circles = null;
+  //   const x = document.getElementsByClassName('point');
+  //   for (let i = 0; i < x.length; i++) {
+  //     if (x[i].attributes[4].value === '#CA6F96') {
+  //       continue;
+  //     }
+  //     x[i].style.opacity = 0.4;
+  //   }
+  //   const extra = document.getElementsByClassName('hull');
+  //   const lenExtra = extra.length;
+  //   for (let l = 0; l < lenExtra; l++) {
+  //     extra[0].parentNode.removeChild(extra[0]);
+  //   }
+  // } else {
+  //   const x = document.getElementsByClassName('point');
+  //   for (let i = 0; i < x.length; i++) {
+  //     x[i].style.opacity = 1;
+  //   }
+  // }
 
-  // third order rendering: selected points
+  // second order rendering: selected points
   const selectedCircles = selectedData.map((d) => {
     const fill = '#CA6F96';
     let point;
@@ -178,16 +222,41 @@ const Points = (props) => {
         />
       );
     } else {
+      // handling decomposition points
       let decompositionPoints;
+
+      // if no decomposition points are retrieved from AFLOW, still initialize an array
       if (d.decompositionAuids === null || d.decompositionAuids === undefined) {
         decompositionPoints = [];
       } else {
+        // retrieve decomposition point data from entries
         decompositionPoints = data.filter(entry => d.decompositionAuids.includes(entry.auid));
         decompositionPoints = decompositionPoints.map(pt => ({
           x: pt.composition[1],
           y: pt.enthalpyFormationAtom,
         }));
       }
+      if (decompositionPoints.length === 0) {
+        // first case, find vertex of point directly underneath -> spacegroup decomposition
+        decompositionPoints = props.vertices.filter(v => Math.abs(v.x - d.x) < 0.01);
+        // if there is no hull points underneath point, find minimum decomposition point
+        // that is the same compound as point
+        if (decompositionPoints.length === 0) {
+          decompositionPoints = props.data.filter(e => d.compound === e.compound);
+          let minIndex = 0;
+          for (let dp = 0; dp < decompositionPoints.length; dp++) {
+            if (decompositionPoints[dp].enthalpyFormationAtom < decompositionPoints[minIndex].enthalpyFormationAtom) {
+              minIndex = dp;
+            }
+          }
+          decompositionPoints = [decompositionPoints[minIndex]];
+          decompositionPoints = decompositionPoints.map(pt => ({
+            x: pt.composition[1],
+            y: pt.enthalpyFormationAtom,
+          }));
+        }
+      }
+      // if not vertex, the entry is a point
       point = (
         <Point
           key={d.auid}
@@ -213,10 +282,34 @@ const Points = (props) => {
     }
     return (point);
   });
+
+  // Points also handles fading of points and deletion of previous LineChartInfoCards
+  // handle fade in and fade out of points
+  if (props.defaultBehavior && click) {
+    // circles = null;
+    const x = document.getElementsByClassName('point');
+    for (let i = 0; i < x.length; i++) {
+      if (x[i].attributes[4].value === '#CA6F96') {
+        continue;
+      }
+      x[i].style.opacity = 0.4;
+    }
+    // clean any hull components
+    const extra = document.getElementsByClassName('hull');
+    const lenExtra = extra.length;
+    for (let l = 0; l < lenExtra; l++) {
+      extra[0].parentNode.removeChild(extra[0]);
+    }
+  } else {
+    const x = document.getElementsByClassName('point');
+    for (let i = 0; i < x.length; i++) {
+      x[i].style.opacity = 1;
+    }
+  }
+
   return (
     <g>
       {circles}
-      {/* hull */}
       <path
         className="line shadow"
         stroke={props.color}
